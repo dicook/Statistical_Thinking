@@ -124,7 +124,6 @@ glimpse(economics)
 
 These are not usually kept up to date but are good for practicing your analysis skills on.
 
-## Getting Data
 
 Or in their own packages
 
@@ -132,8 +131,6 @@ Or in their own packages
 library(gapminder)
 glimpse(gapminder)
 ```
-
-## Getting Data
 
 I primarily use the `readr` package for reading data now. It mimics the base R reading functions but is implemented in `C` so reads large files quickly, and it also attempts to identify the types of variables.
 
@@ -147,21 +144,28 @@ You can pull data together yourself, or look at data compiled by someone else.
 
 ## Question 1
 
-- Look at the document `economics` data in the `ggplot2` package. Can you think of questions you could answer using these variables?
+- Look at the document `economics` data in the `ggplot2` package. Can you think of two questions you could answer using these variables?
 
 - Write these into your `.Rmd` file. 
 
 ## Question 2
 
-- Read the documentation for `gapminder` data. Can you think of questions you could answer using these variables?
+- Read the documentation for `gapminder` data. Can you think of two questions you could answer using these variables?
 
 - Write these into your `.Rmd` file. 
 
 ## Question 3
 
-- Read the documentation for `pedestrian sensor` data. Can you think of questions you could answer using these variables?
+- Read the documentation for `pedestrian sensor` data. Can you think of two questions you could answer using these variables?
 
 - Write these into your `.Rmd` file. 
+
+## Exercise 4
+
+- What's a `package`?
+- How does the `library()` function relate to a `package`?
+- How often do you install a package, using `install.package()`?
+- How oten do to load a `library`?
 
 ## Some R Basics
 
@@ -244,7 +248,7 @@ mean(x, na.rm=TRUE)
 * the `table` function can be used to tabulate numbers
 
 ```{r}
-table(ped$Sensor_Name)
+head(table(ped$Sensor_Name), 5)
 ```
 
 ## Some Oddities
@@ -278,21 +282,20 @@ rm("+")
 
 * It's becoming more and more popular to bundle "vignettes" with a package (__dplyr__ has _awesome_ vignettes)
 
-```{r, eval = FALSE}
+```{r eval = FALSE}
 browseVignettes("dplyr")
 ```
 
-## Your Turn
-
-![](lorikeets.png)
+## Question 4
 
 1. Read in the OECD PISA data
 2. Tabulate the countries (CNT)
 3. Extract the values for Australia (AUS) and Shanghai (QCN)
 4. Compute the average and standard deviation of the reading scores (PV1READ), for each country
+5. Write a few sentences explaining what you learn aboutreading in these two countries.
 
 ```{r eval=FALSE, echo=FALSE}
-student2012.sub <- readRDS("data/student_sub.rds")
+student2012.sub <- readRDS("http://dicook.github.io/Statistical_Thinking/data/student_sub.rds")
 table(student2012.sub$CNT)
 australia <- student2012.sub[student2012.sub$CNT=="AUS",]
 shanghai <- student2012.sub[student2012.sub$CNT=="QCN",]
@@ -301,6 +304,12 @@ sd(australia$PV1READ)
 mean(shanghai$PV1READ)
 sd(shanghai$PV1READ)
 ```
+
+## TURN IN 
+
+- Your `.Rmd` file
+- Your Word (or pdf) file that results from knitting the Rmd.
+- DUE: One day after the lab, loaded into moodle
 
 ## Resources
 
