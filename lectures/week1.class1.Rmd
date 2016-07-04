@@ -1,0 +1,99 @@
+---
+title: "Simulation of games for decision strategies: W1.C1"
+author: "Di Cook, Econometrics and Business Statistics, Monash University"
+date: ""
+output:
+  ioslides_presentation:
+    transition: default
+    widescreen: yes
+css: default.css
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  cache = FALSE,
+  fig.height = 2,
+  fig.width = 5,
+  collapse = TRUE,
+  comment = "#>"
+)
+options(digits=2)
+library(dplyr)
+library(tidyr)
+```
+
+## What is randomness?
+
+- Coin flip
+- Die roll
+- Your sporting team wins
+- Gender of a baby
+- Rain tomorrow
+- Stock price in an hour from now
+- Lightning strike
+- Pipe burst
+
+## Your turn
+
+- Write down a sequence of heads and tails that you might expect to come from TEN flips of a coin
+- Now flip a coin TEN times, and write down the outcomes
+
+Enter these in the online sheet. Before I look at these, I am going to listen to some of your sequences. Don't tell me if they were made up, or actual outcomes. I will guess. 
+
+## Using permutation to examine association
+
+Example from DBCR: 
+
+*The participants in this study were 48 male bank supervisors attending a management institute at the University of North Carolina in 1972. They were asked to assume the role of the personnel director of a bank and were given a personnel file to judge whether the person should be promoted to a branch manager position. The files given to the participants were identical, except that half of them indicated the candidate was male and the other half indicated the candidate was female. These files were randomly assigned to the subjects.*
+
+## Your turn
+
+Is this an observational study or an experiment? How does
+the type of study impact what can be inferred from the results?
+
+##
+
+```{r echo=FALSE}
+bank <- data.frame(gender=c(rep("male", 24), rep("female", 24)), 
+                   decision=c(rep("promoted", 21), rep("not promoted", 3), 
+                              rep("promoted", 14), rep("not promoted", 10)))
+```
+
+```{r echo=FALSE, eval=FALSE}
+bank %>% group_by(gender, decision) %>%
+  tally() %>% 
+  spread(decision, n) %>%
+  kable(format.args=list(width=80))
+```
+
+```{r echo=FALSE}
+kable(addmargins(table(bank$gender, bank$decision)))
+kable(prop.table(table(bank$gender, bank$decision), 1))
+```
+
+## How likely is this?
+ 
+1. Break any association between gender and decision
+2. Re-tabulate
+3. Compute proportion of women promoted
+
+##
+
+Original: 
+
+```{r echo=FALSE}
+kable(head(bank, 10))
+```
+
+##
+
+Permuted decision:
+
+```{r echo=FALSE}
+set.seed(4664)
+bank.p <- bank %>% mutate(decision=sample(decision))
+kable(head(bank.p, 10))
+```
+
