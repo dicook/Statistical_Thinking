@@ -128,58 +128,6 @@ Let's also count the number of times that we see a bigger difference by chance. 
 
 If we oberve this many times `r length(aec_abs_shuffle$d[aec_abs_shuffle$d > aec_abs_meandif])` out of `r length(aec_abs_shuffle$d)` random shuffles, is it likely to see this electorate distribution by chance?
 
-## Using permutation to examine association
+## Share and share alike
 
-Example from DBCR: 
-
-*The participants in this study were 48 male bank supervisors attending a management institute at the University of North Carolina in 1972. They were asked to assume the role of the personnel director of a bank and were given a personnel file to judge whether the person should be promoted to a branch manager position. The files given to the participants were identical, except that half of them indicated the candidate was male and the other half indicated the candidate was female. These files were randomly assigned to the subjects.*
-
-## Your turn
-
-Is this an observational study or an experiment? How does
-the type of study impact what can be inferred from the results?
-
-##
-
-```{r echo=FALSE}
-bank <- data.frame(gender=c(rep("male", 24), rep("female", 24)), 
-                   decision=c(rep("promoted", 21), rep("not promoted", 3), 
-                              rep("promoted", 14), rep("not promoted", 10)))
-```
-
-```{r echo=FALSE, eval=FALSE}
-bank %>% group_by(gender, decision) %>%
-  tally() %>% 
-  spread(decision, n) %>%
-  kable(format.args=list(width=80))
-```
-
-```{r echo=FALSE}
-kable(addmargins(table(bank$gender, bank$decision)))
-kable(prop.table(table(bank$gender, bank$decision), 1))
-```
-
-## How likely is this?
- 
-1. Break any association between gender and decision
-2. Re-tabulate
-3. Compute proportion of women promoted
-
-##
-
-Original: 
-
-```{r echo=FALSE}
-kable(head(bank, 10))
-```
-
-##
-
-Permuted decision:
-
-```{r echo=FALSE}
-set.seed(4664)
-bank.p <- bank %>% mutate(decision=sample(decision))
-kable(head(bank.p, 10))
-```
-
+This work is licensed under the Creative Commons Attribution-Noncommercial 3.0 United States License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/ 3.0/us/ or send a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
