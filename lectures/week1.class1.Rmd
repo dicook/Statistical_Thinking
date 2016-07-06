@@ -1,7 +1,7 @@
 ---
-title: "Simulation of games for decision strategies: W1.C1"
-author: "Di Cook, Econometrics and Business Statistics, Monash University"
-date: ""
+title: "Statistical Methods for Insurance: Randomisation"
+author: "Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monash University"
+date: "W1.C1"
 output:
   ioslides_presentation:
     transition: default
@@ -37,10 +37,96 @@ library(tidyr)
 
 ## Your turn
 
-- Write down a sequence of heads and tails that you might expect to come from TEN flips of a coin
-- Now flip a coin TEN times, and write down the outcomes
+We are going to play a game of "Stump the Professor". 
 
-Enter these in the online sheet. Before I look at these, I am going to listen to some of your sequences. Don't tell me if they were made up, or actual outcomes. I will guess. 
+1. Flip a coin. If it shows up tails do A first, if it shows up heads to B first. 
+
+  `A. Write down a sequence of heads and tails that you might expect to come from TEN flips of a coin`
+  
+  `B. Now flip a coin TEN times, and write down the outcomes`
+
+2. Enter these in the online sheet. Make a note to yourself, whether you did A or B first, but don't tell me. 
+
+3. Now I am going to look at what you entered, and guess if were made up, or actual outcomes from coin flips. 
+
+4. You record how many times I get it right. 
+
+## How to use randomization to understand probability
+
+```{r echo=FALSE, fig.width=10, fig.height=4}
+library(eechidna)
+library(dplyr)
+library(ggplot2)
+aec2013 <- aec2013_2cp_electorate %>%
+  filter(Elected == "Y")
+aec_abs <- merge(aec2013, abs2011, by = "Electorate")
+aec_abs$PartyGp <- aec_abs$PartyAb
+aec_abs$PartyGp[aec_abs$PartyGp %in% c("LP","LNP","NP","CLP")] <- "Coalition"
+aec_abs$PartyGp[aec_abs$PartyGp %in% c("IND","PUP","KAP","GRN")] <- "Other"
+ggplot(data=aec_abs, aes(x=Population)) + geom_dotplot(binwidth=2900) +
+  facet_wrap(~PartyGp, ncol = 3) + ylab("")
+```
+
+## Your turn
+
+- What is the difference (roughly) in population between the biggest and smallest electorates?
+- What is the relative worth of a voter in the electorate with the largest population, compared to a voter in the electorate with the smallest population?
+
+##
+
+- Ideally all electorates have exactly the same number of people.
+- Geography can interfere with this, e.g an electorate cannot be part in Tasmania and part in Victoria.
+- The Australian Electoral Commission will adjust geographic boundaries before each election to adjust for population changes as measured in the most recent Census.
+
+## Compute averages
+
+```{r echo=FALSE}
+aec_abs_means <- aec_abs %>% filter(PartyGp != "Other") %>%
+  group_by(PartyGp) %>%
+  summarise(m = mean(Population, na.rm=T), s = sd(Population, na.rm=T))
+aec_abs_means
+```
+
+##
+
+- The means are different
+- How big is this difference?
+- How likely is this difference to have arisen by chance?
+
+We could use a two-sample t-test to answer these, but here is how to do the equivalent by randomization.
+
+## Procedure
+
+1. Compute the statistic for the data (e.g. absolute value of mean difference)
+2. Shuffle the group labels (e.g. put the MP party names into a hat, mix them around, draw them and assign to new electorate)
+3. Compute the statistic for this shuffled data
+4. Repeat steps 2, 3 many times
+5. Examine how often the value of the data statistic, or a larger value occurs
+
+## Let's do it
+
+```{r echo=FALSE, fig.height=4, fig.width=4}
+library(purrr)
+mad <- function(df, shuffle=TRUE) {
+  if (shuffle)
+    df$PartyGp <- sample(df$PartyGp)
+  df_means <- df %>% group_by(PartyGp) %>%
+    summarise(m = mean(Population, na.rm=T))
+  return(d = abs(df_means$m[1] - df_means$m[2]))
+}
+aec_abs_sub <- aec_abs %>% filter(PartyGp != "Other")
+aec_abs_meandif <- mad(aec_abs_sub, shuffle=FALSE)
+aec_abs_shuffle <-1:100 %>% map_dbl(~ mad(aec_abs_sub))
+aec_abs_shuffle <- data.frame(d=aec_abs_shuffle, y=1:100)
+ggplot(data=aec_abs_shuffle, aes(x=d)) + geom_dotplot() +
+  geom_vline(xintercept=aec_abs_meandif, colour="red")
+```
+
+Let's also count the number of times that we see a bigger difference by chance. It is `r length(aec_abs_shuffle$d[aec_abs_shuffle$d > aec_abs_meandif])`. 
+
+## What does this mean?
+
+If we oberve this many times `r length(aec_abs_shuffle$d[aec_abs_shuffle$d > aec_abs_meandif])` out of `r length(aec_abs_shuffle$d)` random shuffles, is it likely to see this electorate distribution by chance?
 
 ## Using permutation to examine association
 
