@@ -24,6 +24,17 @@ library(dplyr)
 library(tidyr)
 ```
 
+## Review of hypothesis testing
+
+- Terminology: null and alternative hypothesis, test statistic, significance value, p-value, critical value, decision, power, one-sided or two-sided test
+- Common basic tests: one sample t-test, two sample t-test, paired sample t-test, chisquared test (for association), analysis of variance
+
+## Hypotheses
+
+- The two hypotheses need to cover all poosibilities.
+- Alternative hypothesis is usually the interesting outcome, sometimes its easier to write this first. It is usually stated as an inequality.
+- Null hypothesis is the usually stated as a parameter is `=` to some specified value. It represents a historical value, or a conservative state of business as usual where we would only rule against it if there is overwhelming evidence.
+
 ## Using permutation to examine association
 
 Example from DBCR: 
