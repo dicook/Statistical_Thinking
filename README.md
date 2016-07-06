@@ -78,6 +78,6 @@ Di: Oct 13, 14, 20, 21
 
 Assessment: 
 
-- Labs will be worth 25% of final grade
+- Tutes will be worth 25% of final grade
 - In-class exercises will be worth 5% of final grade
 - Final exam is 70%
