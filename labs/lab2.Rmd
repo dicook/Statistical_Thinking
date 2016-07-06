@@ -1,0 +1,98 @@
+---
+title: "ETC 2420/5242 Lab 2 2016"
+author: "Di Cook"
+date: "Week 2"
+output: pdf_document
+---
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, warning = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  error = FALSE, 
+  collapse = TRUE,
+  comment = "#",
+  fig.height = 4,
+  fig.width = 8,
+  fig.align = "center",
+  cache = FALSE
+)
+```
+
+## Purpose
+
+This lab is an introduction to simulation. We are going to create a version of the famous game Monty Hall. 
+
+## Description of the game
+
+Suppose you're on a game show, and you're given the choice of three doors: Behind one door is a car; behind the others, goats. You pick a door, say No. 1, and the host, who knows what's behind the doors, opens another door, say No. 3, which has a goat. He then says to you, "Do you want to pick door No. 2?" Is it to your advantage to switch your choice? [Source: wikipedia](https://en.wikipedia.org/wiki/Monty_Hall_problem)
+
+## Question 1
+
+- Write a function that will sample randomly one value from a the choice of `{pig, pig, car}`.
+- Run this function 20 times and report the proportion of times that `car` is selected.
+
+## Question 2
+
+
+
+```{r echo=FALSE, eval=FALSE}
+#####################################################
+# Simulation of the Monty Hall Problem
+# Demonstrates that switching is always better
+# than staying with your initial guess
+#
+# Corey Chivers, 2012
+#####################################################
+ 
+monty<-function(strat='stay',N=1000,print_games=TRUE)
+{
+ doors<-1:3 #initialize the doors behind one of which is a good prize
+ win<-0 #to keep track of number of wins
+ 
+for(i in 1:N)
+ {
+ prize<-floor(runif(1,1,4)) #randomize which door has the good prize
+ guess<-floor(runif(1,1,4)) #guess a door at random
+ 
+## Reveal one of the doors you didn't pick which has a bum prize
+ if(prize!=guess)
+ reveal<-doors[-c(prize,guess)]
+ else
+ reveal<-sample(doors[-c(prize,guess)],1)
+ 
+ ## Stay with your initial guess or switch
+ if(strat=='switch')
+ select<-doors[-c(reveal,guess)]
+ if(strat=='stay')
+ select<-guess
+ if(strat=='random')
+ select<-sample(doors[-reveal],1)
+ 
+## Count up your wins
+ if(select==prize)
+ {
+ win<-win+1
+ outcome<-'Winner!'
+ }else
+ outcome<-'Losser!'
+ 
+if(print_games)
+ cat(paste('Guess: ',guess,
+ '\nRevealed: ',reveal,
+ '\nSelection: ',select,
+ '\nPrize door: ',prize,
+ '\n',outcome,'\n\n',sep=''))
+ }
+ cat(paste('Using the ',strat,' strategy, your win percentage was ',win/N*100,'%\n',sep='')) #Print the win percentage of your strategy
+}
+```
+
+
+## Resources
+
+
+- [R Bloggers post](http://www.r-bloggers.com/monty-hall-by-simulation-in-r/)
+- [Web app](http://www.shodor.org/interactivate/activities/SimpleMontyHall/) where you can play the game
+
+

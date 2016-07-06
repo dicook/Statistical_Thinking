@@ -1,7 +1,7 @@
 ---
 title: "ETC 2420/5242 Lab 1 2016"
 author: "Di Cook"
-date: "July 4, 2016"
+date: "Week 1"
 output: pdf_document
 ---
 
