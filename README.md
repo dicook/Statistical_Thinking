@@ -11,16 +11,14 @@ This repository is housing material for the course ETC2420/ETC5242 Statistical M
 
 * Topic 1: Simulation of games for decision strategies (2 weeks): 
 
-Jul 28 (Di) and Jul 29 (Souhaib) 
-
  - A. Case studies in randomization (Ch 2, Diez, Barr, Cetinkaya-Rundel)
    (i) What is randomness? (Include the draw vs flip coin tosses)
    (ii) Using permutation to examine association - use election, population/party
    (iii) Review of hypothesis testing
 
- - Lab 1: Introduction to R, functions, permutation, random number generation
+Jul 28 (Di) and Jul 29 (Souhaib) 
 
-Aug 4 (Souhaib) and Aug 5 (Souhaib)
+ - Lab 1: Introduction to R, functions, permutation, random number generation
 
  - B. Game simulation (Unit 1: IFA CT6)
    (i) Introduction to random numbers: uniform distribution on integers, real line
@@ -31,7 +29,7 @@ Aug 4 (Souhaib) and Aug 5 (Souhaib)
    (vi) Criteria for making decisions: minimax, Bayes
    (vii) Monty Hall problem
 
-
+Aug 4 (Souhaib) and Aug 5 (Souhaib)
 
  - Lab 2: Simulate Monty Hall in R
 
