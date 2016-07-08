@@ -11,15 +11,15 @@ This repository is housing material for the course ETC2420/ETC5242 Statistical M
 
 * Topic 1: Simulation of games for decision strategies (2 weeks): 
 
- - Week 1, Class 1. Case studies in randomization using Australian election, What is randomness? (Include the draw vs flip coin tosses)
- - Week 1, Class 2. Case studies in randomization (Ch 2, Diez, Barr, Cetinkaya-Rundel) Review of hypothesis testing
+ - Week 1, Class 1. Case studies in randomization using Australian election. What is randomness? (Include the draw vs flip coin tosses)
+ - Week 1, Class 2. Case studies in randomization (Ch 2, Diez, Barr, Cetinkaya-Rundel). Review of hypothesis testing
 
 *Jul 28 (Di) and Jul 29 (Souhaib)*
 
  - Lab 1: Introduction to R, functions, permutation, random number generation
 
-  - Week 2, Class 1. Game simulation (Unit 1: IFA CT6) Introduction to random numbers: uniform distribution on integers, real line, Finite set events, mapping events to random numbers, Simulation of events
-  - Week 2, Class 2. Computing probabilities of outcomes. Zero-sum two-person: adding reward and loss, language, saddle points, domination. Criteria for making decisions: minimax, Bayes
+  - Week 2, Class 1. Game simulation (Unit 1: IFA CT6) Introduction to random numbers: uniform distribution on integers, real line. Finite set events. mapping events to random numbers. Simulation of events.
+  - Week 2, Class 2. Computing probabilities of outcomes. Zero-sum two-person: adding reward and loss, language, saddle points, domination. Criteria for making decisions: minimax, Bayes.
 
 *Aug 4 (Souhaib) and Aug 5 (Souhaib)*
 
