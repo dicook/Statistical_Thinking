@@ -1,4 +1,4 @@
-# Statistical_Thinking
+# Statistical Thinking
 
 This repository is housing material for the course ETC2420/ETC5242 Statistical Methods in Insurance (soon to be Statistical Thinking using Randomisation and Simulation) taught in Spring 2016 in the Department of Econometrics adn Business Statistics at Monash University.
 
@@ -10,8 +10,9 @@ This repository is housing material for the course ETC2420/ETC5242 Statistical M
 # Tentative outline
 
 * Topic 1: Simulation of games for decision strategies (2 weeks): 
-Jul 28: Di
-Jul 29, Aug 4, 5 Souhaib
+Jul 28 (Di)
+
+Jul 29 (Souhaib) 
 
  - A. Case studies in randomization (Ch 2, Diez, Barr, Cetinkaya-Rundel)
    (i) What is randomness? (Include the draw vs flip coin tosses)
@@ -19,6 +20,9 @@ Jul 29, Aug 4, 5 Souhaib
    (iii) Review of hypothesis testing
 
  - Lab 1: Introduction to R, functions, permutation, random number generation
+Aug 4 (Souhaib)
+
+Aug 5 (Souhaib)
 
  - B. Game simulation (Unit 1: IFA CT6)
    (i) Introduction to random numbers: uniform distribution on integers, real line
@@ -28,6 +32,8 @@ Jul 29, Aug 4, 5 Souhaib
    (v) Zero-sum two-person: adding reward and loss, language, saddle points, domination
    (vi) Criteria for making decisions: minimax, Bayes
    (vii) Monty Hall problem
+
+
 
  - Lab 2: Simulate Monty Hall in R
 
