@@ -10,9 +10,8 @@ This repository is housing material for the course ETC2420/ETC5242 Statistical M
 # Tentative outline
 
 * Topic 1: Simulation of games for decision strategies (2 weeks): 
-Jul 28 (Di)
 
-Jul 29 (Souhaib) 
+Jul 28 (Di) and Jul 29 (Souhaib) 
 
  - A. Case studies in randomization (Ch 2, Diez, Barr, Cetinkaya-Rundel)
    (i) What is randomness? (Include the draw vs flip coin tosses)
@@ -20,9 +19,8 @@ Jul 29 (Souhaib)
    (iii) Review of hypothesis testing
 
  - Lab 1: Introduction to R, functions, permutation, random number generation
-Aug 4 (Souhaib)
 
-Aug 5 (Souhaib)
+Aug 4 (Souhaib) and Aug 5 (Souhaib)
 
  - B. Game simulation (Unit 1: IFA CT6)
    (i) Introduction to random numbers: uniform distribution on integers, real line
