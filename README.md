@@ -76,8 +76,13 @@ Souhaib: Sep 23, Oct 6, 7
 * Topic 7: Modeling risk and loss, with data and using randomization to assess uncertainty (2 weeks)
 Di: Oct 13, 14, 20, 21
 
-Assessment: 
+# Assessment: 
 
 - Tutes will be worth 25% of final grade
 - In-class exercises will be worth 5% of final grade
 - Final exam is 70%
+
+# Software:
+
+* R-3.3.1 (2016-06-21, Bug in Your Hair)
+* RStudio 0.99.902 
