@@ -54,7 +54,6 @@ Di: Aug 19-26
 Di: Sep 1-9
 
  - types of data: sampling, survey, observational, experimental
- - 
  - working with temporal data, dates, times, seasonality, covariates
  - longitudinal data
  - working with maps and spatial data: chloropleth, point processes
