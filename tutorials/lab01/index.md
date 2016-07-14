@@ -6,12 +6,12 @@ date: Lab 01
 
 
 
-# Markdown syntax
+# What is markdown?
+
+> An **easy-to-read** and **easy-to-write** plain text format.
 
 * [Markdown homepage](https://daringfireball.net/projects/markdown/)
-    + Easy-to-read
-    + Easy-to-write
-* Basic syntax
+* Examples of basic syntax
     + Emphasis
         - `**bold**` ===> **bold**
         - `*italics*` ===> *italics*
