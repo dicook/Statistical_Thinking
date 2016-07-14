@@ -18,7 +18,7 @@ date: Lab 01
     * Lists
 
 ```
-* Basic syntax
+* Examples of basic syntax
     + Emphasis
         - **bold**
         - *italics*

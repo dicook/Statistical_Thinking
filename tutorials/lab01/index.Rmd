@@ -24,7 +24,7 @@ opts_chunk$set(warning = FALSE, message = FALSE,
     * Lists
 
 ```
-* Basic syntax
+* Examples of basic syntax
     + Emphasis
         - **bold**
         - *italics*
