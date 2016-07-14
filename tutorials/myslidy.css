@@ -227,8 +227,8 @@ a img { border-width: 0; border-style: none }
 
 a:visited { color: navy }
 a:link { color: navy }
-a:hover { color: red; text-decoration: underline }
-a:active { color: red; text-decoration: underline }
+a:hover { color: rgb(165, 15, 21); text-decoration: underline }
+a:active { color: rgb(165, 15, 21); text-decoration: underline }
 
 a {text-decoration: none}
 .toolbar a:link {color: blue}
