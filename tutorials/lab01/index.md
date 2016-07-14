@@ -11,10 +11,21 @@ date: Lab 01
 * [Markdown homepage](https://daringfireball.net/projects/markdown/)
     + Easy-to-read
     + Easy-to-write
-* A little example
+* Basic syntax
     + Emphasis
         - `**bold**` ===> **bold**
         - `*italics*` ===> *italics*
+    * Lists
+
+```
+* Basic syntax
+    + Emphasis
+        - **bold**
+        - *italics*
+* Lists
+```
+
 * [Markdown cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+* The slides are written in **Markdown**!!
 
 <meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" />
