@@ -29,13 +29,27 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\
   </p>
   <p class="date">Lab 01</p>
 </div>
+<div id="view-this-slides-in-your-browser" class="slide section level1">
+<h1>View this slides in your browser</h1>
+<center>
+<a href="http://rawgit.com/earowang/Statistical_Thinking/gh-pages/tutorials/lab01/index.html" class="uri">http://rawgit.com/earowang/Statistical_Thinking/gh-pages/tutorials/lab01/index.html</a>
+</center>
+<h2 id="manual-control">Manual control</h2>
+<ul>
+<li><strong>Left/Right arrow</strong>: page up/down</li>
+<li><strong>C</strong>: toggle table of content</li>
+<li><strong>A</strong>: display current or all slides</li>
+<li><strong>S</strong>: make fonts smaller</li>
+<li><strong>B</strong>: make fonts bigger</li>
+</ul>
+</div>
 <div id="what-is-markdown" class="slide section level1">
 <h1>What is markdown?</h1>
 <blockquote>
 <p>An <strong>easy-to-read</strong> and <strong>easy-to-write</strong> plain text format.</p>
 </blockquote>
 <ul>
-<li><a href="https://daringfireball.net/projects/markdown/">Markdown homepage</a></li>
+<li>Check out the <a href="https://daringfireball.net/projects/markdown/">markdown homepage</a> for its philosophy</li>
 <li>Examples of basic syntax
 <ul>
 <li>Emphasis
@@ -53,8 +67,31 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\
 * Lists</code></pre>
 <ul>
 <li><a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">Markdown cheatsheet</a></li>
-<li>The slides are written in <strong>Markdown</strong>!!</li>
+<li>This slides is written in <strong>R</strong> + <strong>Markdown</strong> = <strong>RMarkdown</strong>!!</li>
 </ul>
+</div>
+<div id="write-report-in-rmarkdown" class="slide section level1">
+<h1>Write report in RMarkdown</h1>
+<ol style="list-style-type: decimal">
+<li>Start RStudio</li>
+<li>Create a new project (<code>ETC2420</code>)for this unit
+<ul>
+<li>File -&gt; New Project -&gt; Existing Directory -&gt; Empty Project</li>
+</ul></li>
+<li>Open a new RMarkdown document and save it as <code>MYLab1.Rmd</code>
+<ul>
+<li>File -&gt; New File -&gt; R Markdown -&gt; OK -&gt; Knit HTML</li>
+</ul></li>
+<li>Look through this sample Rmd file
+<ul>
+<li>Meta information starting and ending with <code>---</code></li>
+<li>Embed R code like
+<pre>```{r cars} 
+summary(cars)
+```</pre></li>
+<li>Write as usuall but in markdown way</li>
+</ul></li>
+</ol>
 <p><meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" /></p>
 </div>
 </body>
