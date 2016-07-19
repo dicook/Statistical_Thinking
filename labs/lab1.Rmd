@@ -144,7 +144,7 @@ You can pull data together yourself, or look at data compiled by someone else.
 
 ## Question 1
 
-- Look at the document `economics` data in the `ggplot2` package. Can you think of two questions you could answer using these variables?
+- Look at the `economics` data in the `ggplot2` package. Can you think of two questions you could answer using these variables?
 
 - Write these into your `.Rmd` file. 
 
@@ -162,15 +162,14 @@ You can pull data together yourself, or look at data compiled by someone else.
 
 ## Exercise 4
 
-- What's a `package`?
+- What is a `package`?
 - How does the `library()` function relate to a `package`?
 - How often do you install a package, using `install.package()`?
-- How oten do to load a `library`?
+- How often do to load a `library`?
 
 ## Some R Basics
 
 * _Assign_ values to a name with `<-` is called _gets_
-* 
 * `n_max=50` option to the `read_csv` function reads just the first 50 lines
 * `dim` reports the dimensions of the data matrix
 * `colnames` shows the column names (you can see these by looking at the object in the RStudio environment window, too)
@@ -183,7 +182,6 @@ You can pull data together yourself, or look at data compiled by someone else.
 * `list`'s are heterogeneous (elements can have different types)
 * `data.frame`'s are heterogeneous but elements have same length
 * `vector`'s and `matrix`'s are homogeneous (elements have the same type), which would be why `c(1, "2")` ends up being a character string.
-*
 * `function`'s can be written to save repeating code again and again    
 
 * If you'd like to know more, see Hadley Wickham's online chapters on [data structures](http://adv-r.had.co.nz/Data-structures.html) and [subsetting](http://adv-r.had.co.nz/Subsetting.html)
