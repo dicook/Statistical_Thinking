@@ -9,6 +9,43 @@
   <meta name="author" content="Earo Wang   earo.wang@gmail.com" />
   <title>ETC2420   Introduction to R, RStudio &amp; RMarkdown</title>
   <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
   <link rel="stylesheet" type="text/css" media="screen, projection, print"
     href="http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css" />
   <link rel="stylesheet" type="text/css" media="screen, projection, print"
@@ -67,14 +104,14 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\
 * Lists</code></pre>
 <ul>
 <li><a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">Markdown cheatsheet</a></li>
-<li>This slides is written in <strong>R</strong> + <strong>Markdown</strong> = <strong>RMarkdown</strong>!!</li>
+<li>This slides is written in <strong>R</strong> + <strong>Markdown</strong> = <strong><a href="http://rmarkdown.rstudio.com/">RMarkdown</a></strong>!!</li>
 </ul>
 </div>
 <div id="write-report-in-rmarkdown" class="slide section level1">
 <h1>Write report in RMarkdown</h1>
 <ol style="list-style-type: decimal">
 <li>Start RStudio</li>
-<li>Create a new project (<code>ETC2420</code>)for this unit
+<li>Create a new project (<code>ETC2420</code>) for this unit
 <ul>
 <li>File -&gt; New Project -&gt; Existing Directory -&gt; Empty Project</li>
 </ul></li>
@@ -82,16 +119,141 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\
 <ul>
 <li>File -&gt; New File -&gt; R Markdown -&gt; OK -&gt; Knit HTML</li>
 </ul></li>
-<li>Look through this sample Rmd file
+<li>Look through this sample Rmd document
 <ul>
 <li>Meta information starting and ending with <code>---</code></li>
 <li>Embed R code like
+<ul>
+<li>One line of R code
 <pre>```{r cars} 
 summary(cars)
 ```</pre></li>
-<li>Write as usuall but in markdown way</li>
+<li>Multiple lines of R code
+<pre>```{r economics} 
+library(dplyr) 
+data(economics, package = "ggplot2")
+glimpse(economics)
+```</pre></li>
 </ul></li>
+<li>Write outside the R chunk but in markdown way</li>
+</ul></li>
+<li>Knit the file to a Word document</li>
 </ol>
+</div>
+<div id="have-fun-with-r" class="slide section level1">
+<h1>Have fun with R</h1>
+<h2 id="us-economic-time-series-from-ggplot2">US economic time series from ggplot2</h2>
+<ul>
+<li><code>date</code>: month of data collection</li>
+<li><code>pce</code>: personal consumption expenditures</li>
+<li><code>pop</code>: total population</li>
+<li><code>psavert</code>: personal saving rate</li>
+<li><code>uempmed</code>: median duration of unemployment</li>
+<li><code>unemploy</code>: number of unemployed</li>
+<li>Read its <a href="http://docs.ggplot2.org/current/economics.html">documentation</a> for more details</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
+<span class="kw">data</span>(economics, <span class="dt">package =</span> <span class="st">&quot;ggplot2&quot;</span>)
+<span class="co"># data frames are essentially a list of vectors</span>
+<span class="kw">glimpse</span>(economics)</code></pre></div>
+<pre><code>## Observations: 574
+## Variables: 6
+## $ date     &lt;date&gt; 1967-07-01, 1967-08-01, 1967-09-01, 1967-10-01, 1967...
+## $ pce      &lt;dbl&gt; 507.4, 510.5, 516.3, 512.9, 518.1, 525.8, 531.5, 534....
+## $ pop      &lt;int&gt; 198712, 198911, 199113, 199311, 199498, 199657, 19980...
+## $ psavert  &lt;dbl&gt; 12.5, 12.5, 11.7, 12.5, 12.5, 12.1, 11.7, 12.2, 11.6,...
+## $ uempmed  &lt;dbl&gt; 4.5, 4.7, 4.6, 4.9, 4.7, 4.8, 5.1, 4.5, 4.1, 4.6, 4.4...
+## $ unemploy &lt;int&gt; 2944, 2945, 2958, 3143, 3066, 3018, 2878, 3001, 2877,...</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(economics)</code></pre></div>
+<pre><code>## # A tibble: 6 x 6
+##         date   pce    pop psavert uempmed unemploy
+##       &lt;date&gt; &lt;dbl&gt;  &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;int&gt;
+## 1 1967-07-01 507.4 198712    12.5     4.5     2944
+## 2 1967-08-01 510.5 198911    12.5     4.7     2945
+## 3 1967-09-01 516.3 199113    11.7     4.6     2958
+## 4 1967-10-01 512.9 199311    12.5     4.9     3143
+## 5 1967-11-01 518.1 199498    12.5     4.7     3066
+## 6 1967-12-01 525.8 199657    12.1     4.8     3018</code></pre>
+<p>Can you think of two questions you could answer using these variables?</p>
+</div>
+<div id="have-fun-with-r-1" class="slide section level1">
+<h1>Have fun with R</h1>
+<h2 id="gapminder-data">Gapminder data</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(gapminder)
+<span class="kw">glimpse</span>(gapminder)</code></pre></div>
+<pre><code>## Observations: 1,704
+## Variables: 6
+## $ country   &lt;fctr&gt; Afghanistan, Afghanistan, Afghanistan, Afghanistan,...
+## $ continent &lt;fctr&gt; Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asi...
+## $ year      &lt;int&gt; 1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992...
+## $ lifeExp   &lt;dbl&gt; 28.801, 30.332, 31.997, 34.020, 36.088, 38.438, 39.8...
+## $ pop       &lt;int&gt; 8425333, 9240934, 10267083, 11537966, 13079460, 1488...
+## $ gdpPercap &lt;dbl&gt; 779.4453, 820.8530, 853.1007, 836.1971, 739.9811, 78...</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">help</span>(gapminder) <span class="co"># the data set gapminder documentation</span>
+?gapminder <span class="co"># equivalent to help(gapminder)</span></code></pre></div>
+<p>Can you think of two questions you could answer using these variables?</p>
+</div>
+<div id="have-fun-with-r-2" class="slide section level1">
+<h1>Have fun with R</h1>
+<h2 id="pedestrian-sensor-data">Pedestrian sensor data</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
+ped &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;http://dicook.github.io/Statistical_Thinking/data/Pedestrian_Counts.csv&quot;</span>)
+<span class="kw">glimpse</span>(ped)</code></pre></div>
+<pre><code>## Observations: 1,392,618
+## Variables: 4
+## $ Date_Time     &lt;chr&gt; &quot;01-MAY-2009 00:00&quot;, &quot;01-MAY-2009 00:00&quot;, &quot;01-MA...
+## $ Sensor_ID     &lt;int&gt; 4, 17, 18, 16, 2, 1, 13, 15, 9, 10, 12, 11, 5, 6...
+## $ Sensor_Name   &lt;chr&gt; &quot;Town Hall (West)&quot;, &quot;Collins Place (South)&quot;, &quot;Co...
+## $ Hourly_Counts &lt;int&gt; 209, 28, 36, 22, 52, 53, 17, 124, 5, 8, 2, 5, 15...</code></pre>
+<p>Can you think of two questions you could answer using these variables?</p>
+</div>
+<div id="have-fun-with-r-3" class="slide section level1">
+<h1>Have fun with R</h1>
+<h2 id="r-packages">R packages</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.package</span>(<span class="st">&quot;dplyr&quot;</span>)
+<span class="kw">library</span>(dplyr) <span class="co"># load the package</span></code></pre></div>
+<ul>
+<li>For example, <code>dplyr</code> is an R package written by <a href="http://hadley.nz/">Hadley Wickham</a>. It is a fast, consistent tool for working with data frame.</li>
+<li>There are more than 8000 packages available on R CRAN now.</li>
+</ul>
+</div>
+<div id="have-fun-with-r-4" class="slide section level1">
+<h1>Have fun with R</h1>
+<h2 id="r-basics">R basics</h2>
+<ul>
+<li>Example 1: a vector of numerics</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1000</span>) <span class="co"># specify a seed to make sure the results reproducible</span>
+x &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">6</span>) <span class="co"># randomly generate 6 numbers from the standard normal distribution</span>
+<span class="kw">typeof</span>(x) <span class="co"># type of x</span>
+x <span class="co"># print x on the screen</span>
+<span class="kw">sum</span>(x +<span class="st"> </span><span class="dv">10</span>) <span class="co"># add 10 to each element in x and sum them up</span>
+x[<span class="dv">1</span>] <span class="co"># extract the 1st element in x</span>
+x[<span class="dv">1</span>:<span class="dv">4</span>] <span class="co"># extract the first four elements in x</span>
+x[<span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>, <span class="ot">TRUE</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>, <span class="ot">FALSE</span>)]</code></pre></div>
+<ul>
+<li>Example 2: a list</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create a list with two named elements &quot;a&quot; and &quot;b&quot; and the old x being overwritten</span>
+x &lt;-<span class="st"> </span><span class="kw">list</span>(   
+  <span class="dt">a =</span> <span class="dv">10</span>,
+  <span class="dt">b =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="st">&quot;2&quot;</span>)
+)
+x$a <span class="co"># extract named element of &quot;a&quot; from the list &#39;x&#39; </span>
+x[[<span class="st">&quot;a&quot;</span>]] <span class="co"># equivalent to x$a</span>
+x[<span class="st">&quot;a&quot;</span>] <span class="co"># notice the difference from x[[&quot;a&quot;]]?</span>
+<span class="kw">class</span>(x[[<span class="st">&quot;a&quot;</span>]]); <span class="kw">class</span>(x[<span class="st">&quot;a&quot;</span>]) <span class="co"># so what&#39;s the difference?</span>
+<span class="kw">str</span>(x) <span class="co"># show the structure of the object &quot;x&quot;</span></code></pre></div>
+<ul>
+<li>Example 3: compute statistics on a vector with missing values</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">50</span>, <span class="dv">12</span>, <span class="ot">NA</span>, <span class="dv">20</span>) <span class="co"># NA means Not Avaiable in R</span>
+<span class="kw">mean</span>(x) <span class="co"># calculate the average of x</span>
+<span class="kw">mean</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) <span class="co"># na.rm is an argument in the mean() function</span></code></pre></div>
+</div>
+<div id="your-turn" class="slide section level1">
+<h1>Your turn</h1>
+<h2 id="get-things-done-in-r-and-rmarkdown">Get things done in R and RMarkdown</h2>
 <p><meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" /></p>
 </div>
 </body>
