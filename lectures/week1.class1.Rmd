@@ -24,6 +24,48 @@ library(dplyr)
 library(tidyr)
 ```
 
+## Overview of the class
+
+- Topics
+- Assessment
+- Resources
+- Instructors, tutors
+
+## Topics
+
+- Topic 1: Simulation of games for decision strategies (2 weeks))
+- Topic 2: Statistical distributions for decision theory (1.5 weeks)
+- Topic 3: Linear models for credibility theory (1.5 weeks) 
+- Topic 4: Compiling data to problem solve (2 weeks)
+- Topic 5: Bayesian statistical thinking (1.5 weeks)
+- Topic 6: Temporal data and time series models
+- Topic 7: Modeling risk and loss, with data and using randomization to assess uncertainty (2 weeks)
+
+## Assessment
+
+- Final exam: 70%
+- Tutorials/labs: 25%,  Weekly reports due Monday noon after the lab
+- Class exercises: 5%
+- ETC5242 students: Labs 15%, Project report and presentation 10%
+
+## Resources
+
+- Web site: [http://dicook.github.io/Statistical_Thinking/](http://dicook.github.io/Statistical_Thinking/)
+- Moodle
+- [Statistics online textbook](https://www.openintro.org/stat/textbook.php?stat_book=isrs
+)
+- [Accuarial online curriculum/exam material](https://www.actuaries.org.uk/studying/plan-my-study-route/fellowshipassociateship/core-technical-subjects/ct6-statistical-methods)
+- Software: [R](https://cran.r-project.org), [RStudio Desktop](https://www.rstudio.com/products/rstudio/download2/)
+
+## Instructors
+
+- Instructors: 
+    - Professor Di Cook 
+    - Dr Souhaib Ben Taieb
+- Tutors: 
+    - Earo Wang (working with Di on PhD) 
+    - Nathaniel Tomasetti (worked with Di for Honors, working with Dr Catherine Forbes on PhD)
+
 ## What is randomness?
 
 - Coin flip
@@ -47,9 +89,16 @@ We are going to play a game of "Stump the Professor".
 
 2. Enter these in the online sheet. Make a note to yourself, whether you did A or B first, but don't tell me. 
 
-3. Now I am going to look at what you entered, and guess if were made up, or actual outcomes from coin flips. 
+3. Now I am going to look at what you entered, and guess if sequence was made up, or actual outcomes from coin flips. 
 
 4. You record how many times I get it right. 
+
+## Example: a look at the Australian electoral distribution
+
+- Results of 2013 election from Australian Electoral Commission web site
+- 2011 Census data from the Australian Bureau of Statistics
+- Combined demographics of electorate with political representation
+- Interactive application, in R package `eechidna`
 
 ## How to use randomization to understand probability
 
@@ -64,7 +113,8 @@ aec_abs$PartyGp <- aec_abs$PartyAb
 aec_abs$PartyGp[aec_abs$PartyGp %in% c("LP","LNP","NP","CLP")] <- "Coalition"
 aec_abs$PartyGp[aec_abs$PartyGp %in% c("IND","PUP","KAP","GRN")] <- "Other"
 ggplot(data=aec_abs, aes(x=Population)) + geom_dotplot(binwidth=2900) +
-  facet_wrap(~PartyGp, ncol = 3) + ylab("")
+  facet_wrap(~PartyGp, ncol = 3) + ylab("") + xlab("Population ('000)") +
+  scale_x_continuous(breaks=seq(75000, 225000, 25000), labels=seq(75, 225, 25))
 ```
 
 ## Your turn
@@ -72,7 +122,7 @@ ggplot(data=aec_abs, aes(x=Population)) + geom_dotplot(binwidth=2900) +
 - What is the difference (roughly) in population between the biggest and smallest electorates?
 - What is the relative worth of a voter in the electorate with the largest population, compared to a voter in the electorate with the smallest population?
 
-##
+## Politics
 
 - Ideally all electorates have exactly the same number of people.
 - Geography can interfere with this, e.g an electorate cannot be part in Tasmania and part in Victoria.
@@ -87,7 +137,7 @@ aec_abs_means <- aec_abs %>% filter(PartyGp != "Other") %>%
 aec_abs_means
 ```
 
-##
+## Statistical thinking
 
 - The means are different
 - How big is this difference?
@@ -126,7 +176,20 @@ Let's also count the number of times that we see a bigger difference by chance. 
 
 ## What does this mean?
 
-If we oberve this many times `r length(aec_abs_shuffle$d[aec_abs_shuffle$d > aec_abs_meandif])` out of `r length(aec_abs_shuffle$d)` random shuffles, is it likely to see this electorate distribution by chance?
+If we oberve a difference this large `r length(aec_abs_shuffle$d[aec_abs_shuffle$d > aec_abs_meandif])` out of `r length(aec_abs_shuffle$d)` random shuffles, is it likely to see this electorate distribution by chance?
+
+## Caveats
+
+Let's wait until the next Census results are in (after August this year) and the latest election results, to compare populations of electorates again. 
+
+## Next steps
+
+- Next few classes we will 
+    - review statistical hypothesis testing
+    - go through a few more examples of using permutation to make statistical significance tests
+    - discuss random number generators, and simulating events
+    - compute probabilities of events, and 
+- Lab this week will be getting started with using R - the top data science software available today.
 
 ## Share and share alike
 

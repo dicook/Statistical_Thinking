@@ -27,10 +27,34 @@ This lab is an introduction to simulation. We are going to create a version of t
 
 Suppose you're on a game show, and you're given the choice of three doors: Behind one door is a car; behind the others, goats. You pick a door, say No. 1, and the host, who knows what's behind the doors, opens another door, say No. 3, which has a goat. He then says to you, "Do you want to pick door No. 2?" Is it to your advantage to switch your choice? [Source: wikipedia](https://en.wikipedia.org/wiki/Monty_Hall_problem)
 
+## Exercise 1
+
+Go to the web site [InterActivate's Simple Monty Hall](http://www.shodor.org/interactivate/activities/SimpleMontyHall/). Each member of the group should do this themselves.
+
+- Play the game 21 times with the strategy "Do not switch doors". Note the proportion of times you win the jackpot.
+
+- Play the game 21 times with the strategy "Switch doors". Note the proportion of times you win the jackpot.
+
+Discuss with your group how the two strategies change your chances of winning.
+
 ## Question 1
 
 - Write a function that will sample randomly one value from a the choice of `{pig, pig, car}`.
 - Run this function 20 times and report the proportion of times that `car` is selected.
+
+## The game algorithm
+
+The components for the simulation need to be:
+
+(1) Randomly assign `{pig, pig, car}` to door `{1, 2, 3}`.
+
+(2) Player selects a door
+
+(3) Check if door selected matches a `{pig}`, and if so show the other `{pig}`. If it is the `{car}`, randomly select one of the two other doors to reveal
+
+(4) Enable the player choose their next door, either to `switch` or `stay`.
+
+(5) Print result
 
 ## Question 2
 
