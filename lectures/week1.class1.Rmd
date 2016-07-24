@@ -3,6 +3,7 @@ title: "Statistical Methods for Insurance: Randomisation"
 author: "Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monash University"
 date: "W1.C1"
 output:
+  beamer_presentation: default
   ioslides_presentation:
     transition: default
     widescreen: yes

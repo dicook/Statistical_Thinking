@@ -37,11 +37,6 @@ Go to the web site [InterActivate's Simple Monty Hall](http://www.shodor.org/int
 
 Discuss with your group how the two strategies change your chances of winning.
 
-## Question 1
-
-- Write a function that will sample randomly one value from a the choice of `{pig, pig, car}`.
-- Run this function 20 times and report the proportion of times that `car` is selected.
-
 ## The game algorithm
 
 The components for the simulation need to be:
@@ -56,8 +51,42 @@ The components for the simulation need to be:
 
 (5) Print result
 
+## Question 1
+
+Here is a function that will randomly sample one value from a choice of `{pig, pig, car}`
+
+```{r}
+ppc_sample <- function(){
+  sample(c("pig","pig","car"), 1)
+}
+```
+
+- Run this function 20 times and report the proportion of times that `car` is selected. (You could put this in a loop and compute the proportion of times `car` shows.)
+- How many times would you expect `car` to be selected out of 20 runs?
+- Modify the function so that it takes one argument, which will be the player's initial choice of door. 
+
 ## Question 2
 
+- Modify your function so that it shows the player the door that the host selects.
+
+## Question 3
+
+- Modify your function so that it includes the player strategy as an input, and returns the appropriate result.
+
+## Question 4
+
+- Run your function 100 times, for each strategy and report the proportion of times that the player wins the car. (You might want to do this in a loop to automate it. Also, if you have had trouble writing your function, you can use the code at the bottom of this Rmd document, which simulates the game - it can be found on the web, too.)
+
+## Question 5
+
+- What is different about Monty Hall, and the popular TV game show "Deal or No Deal"? Players are given the choice to switch cases, if they play to the very end of the game. Do they get an advantage if they switch cases?
+
+## TURN IN 
+
+- Your `.Rmd` file
+- Your Word (or pdf) file that results from knitting the Rmd.
+- Make sure your group members are listed as authors, one person per group will turn in the report
+- DUE: Monday after the lab, by noon, loaded into moodle
 
 
 ```{r echo=FALSE, eval=FALSE}
@@ -76,8 +105,8 @@ monty<-function(strat='stay',N=1000,print_games=TRUE)
  
 for(i in 1:N)
  {
- prize<-floor(runif(1,1,4)) #randomize which door has the good prize
- guess<-floor(runif(1,1,4)) #guess a door at random
+ prize<-sample(1:3, 1) #randomize which door has the good prize
+ guess<-sample(1:3, 1) #guess a door at random
  
 ## Reveal one of the doors you didn't pick which has a bum prize
  if(prize!=guess)
