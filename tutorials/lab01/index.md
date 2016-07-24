@@ -63,7 +63,7 @@ data(economics, package = "ggplot2")
 glimpse(economics)
 ```</pre>
     * Write outside the R chunk but in markdown way
-5. Knit the file to a Pdf/Word document
+5. Knit the file to a pdf/word document
 
 # Have fun with R
 ## US economic time series from ggplot2 
@@ -213,7 +213,7 @@ str(x) # show the structure of the object "x"
 * Example 3: compute statistics on a vector with missing values
 
 ```r
-x <- c(50, 12, NA, 20) # NA means Not Avaiable in R
+x <- c(50, 12, NA, 20) # NA means Not Available in R
 mean(x) # calculate the average of x
 mean(x, na.rm = TRUE) # na.rm is an argument in the mean() function
 ```

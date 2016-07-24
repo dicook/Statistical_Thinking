@@ -39,7 +39,7 @@ class(x[["a"]]); class(x["a"]) # so what's the difference?
 str(x) # show the structure of the object "x"
 
 ## ---- basics3
-x <- c(50, 12, NA, 20) # NA means Not Avaiable in R
+x <- c(50, 12, NA, 20) # NA means Not Available in R
 mean(x) # calculate the average of x
 mean(x, na.rm = TRUE) # na.rm is an argument in the mean() function
 
