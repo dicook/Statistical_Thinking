@@ -44,7 +44,8 @@ mean(x) # calculate the average of x
 mean(x, na.rm = TRUE) # na.rm is an argument in the mean() function
 
 ## ---- student
-student2012.sub <- readRDS("http://dicook.github.io/Statistical_Thinking/data/student_sub.rds")
+# student2012.sub <- readRDS("http://dicook.github.io/Statistical_Thinking/data/student_sub.rds")
+student2012.sub <- readRDS("../data/student_sub.rds")
 table(student2012.sub$CNT)
 australia <- student2012.sub[student2012.sub$CNT=="AUS",]
 shanghai <- student2012.sub[student2012.sub$CNT=="QCN",]

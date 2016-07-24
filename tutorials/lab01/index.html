@@ -73,7 +73,7 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\
 </center>
 <h2 id="manual-control">Manual control</h2>
 <ul>
-<li><strong>Left/Right arrow</strong>: page up/down</li>
+<li><strong>Left/Right arrow</strong>: page up/down; or click to page down</li>
 <li><strong>C</strong>: toggle table of content</li>
 <li><strong>A</strong>: display current or all slides</li>
 <li><strong>S</strong>: make fonts smaller</li>
@@ -137,7 +137,7 @@ glimpse(economics)
 </ul></li>
 <li>Write outside the R chunk but in markdown way</li>
 </ul></li>
-<li>Knit the file to a Word document</li>
+<li>Knit the file to a Pdf/Word document</li>
 </ol>
 </div>
 <div id="have-fun-with-r" class="slide section level1">
@@ -195,7 +195,7 @@ glimpse(economics)
 </div>
 <div id="have-fun-with-r-2" class="slide section level1">
 <h1>Have fun with R</h1>
-<h2 id="pedestrian-sensor-data">Pedestrian sensor data</h2>
+<h2 id="pedestrian-counts-in-the-city-of-melbourne">Pedestrian counts in the city of Melbourne</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
 ped &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;http://dicook.github.io/Statistical_Thinking/data/Pedestrian_Counts.csv&quot;</span>)
 <span class="kw">glimpse</span>(ped)</code></pre></div>
@@ -206,6 +206,10 @@ ped &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="
 ## $ Sensor_Name   &lt;chr&gt; &quot;Town Hall (West)&quot;, &quot;Collins Place (South)&quot;, &quot;Co...
 ## $ Hourly_Counts &lt;int&gt; 209, 28, 36, 22, 52, 53, 17, 124, 5, 8, 2, 5, 15...</code></pre>
 <p>Can you think of two questions you could answer using these variables?</p>
+<p>p.s. I came across with this drawing about the city of Melbourne (1854) in the rare book exhibition.</p>
+<center>
+<img src="figure/melb_city.jpeg" alt="Melb City" style="width: 716px; height: 490px"/>
+</center>
 </div>
 <div id="have-fun-with-r-3" class="slide section level1">
 <h1>Have fun with R</h1>
@@ -254,6 +258,20 @@ x[<span class="st">&quot;a&quot;</span>] <span class="co"># notice the differenc
 <div id="your-turn" class="slide section level1">
 <h1>Your turn</h1>
 <h2 id="get-things-done-in-r-and-rmarkdown">Get things done in R and RMarkdown</h2>
+<ol style="list-style-type: decimal">
+<li>Read in the OECD PISA data</li>
+<li>Tabulate the countries (<code>CNT</code>)</li>
+<li>Extract the values for Australia (<code>AUS</code>) and Shanghai (<code>QCN</code>)</li>
+<li>Compute the average and standard deviation of the reading scores (<code>PV1READ</code>), for each country</li>
+<li>Write a few sentences explaining what you learn about reading scores in these two countries</li>
+</ol>
+<h2 id="turn-in">Turn in</h2>
+<ul>
+<li>Your <code>.Rmd</code> file</li>
+<li>Your pdf (or word) file that results from knitting the Rmd</li>
+<li>Make sure your group members are listed as authors, one person per group will turn in the report</li>
+<li><strong>DUE</strong>: Monday after the lab, by noon, loaded into moodle</li>
+</ul>
 <p><meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" /></p>
 </div>
 </body>

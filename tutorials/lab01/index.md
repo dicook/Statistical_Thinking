@@ -13,7 +13,7 @@ date: Lab 01
 </center>
 
 ## Manual control
-* **Left/Right arrow**: page up/down
+* **Left/Right arrow**: page up/down; or click to page down
 * **C**: toggle table of content
 * **A**: display current or all slides
 * **S**: make fonts smaller
@@ -63,7 +63,7 @@ data(economics, package = "ggplot2")
 glimpse(economics)
 ```</pre>
     * Write outside the R chunk but in markdown way
-5. Knit the file to a Word document
+5. Knit the file to a Pdf/Word document
 
 # Have fun with R
 ## US economic time series from ggplot2 
@@ -141,7 +141,7 @@ help(gapminder) # the data set gapminder documentation
 Can you think of two questions you could answer using these variables?
 
 # Have fun with R
-## Pedestrian sensor data
+## Pedestrian counts in the city of Melbourne
 
 
 ```r
@@ -160,6 +160,11 @@ glimpse(ped)
 ```
 
 Can you think of two questions you could answer using these variables?
+
+p.s. I came across with this drawing about the city of Melbourne (1854) in the
+rare book exhibition.
+
+<center><img src="figure/melb_city.jpeg" alt="Melb City" style="width: 716px; height: 490px"/></center>
 
 # Have fun with R
 ## R packages
@@ -215,5 +220,18 @@ mean(x, na.rm = TRUE) # na.rm is an argument in the mean() function
 
 # Your turn
 ## Get things done in R and RMarkdown
+
+1. Read in the OECD PISA data
+2. Tabulate the countries (`CNT`)
+3. Extract the values for Australia (`AUS`) and Shanghai (`QCN`)
+4. Compute the average and standard deviation of the reading scores (`PV1READ`), for each country
+5. Write a few sentences explaining what you learn about reading scores in these two countries
+
+## Turn in 
+
+* Your `.Rmd` file
+* Your pdf (or word) file that results from knitting the Rmd
+* Make sure your group members are listed as authors, one person per group will turn in the report
+* **DUE**: Monday after the lab, by noon, loaded into moodle
 
 <meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" />
