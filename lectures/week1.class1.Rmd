@@ -1,6 +1,7 @@
 ---
-title: "Statistical Methods for Insurance: Randomisation"
-author: "Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monash University"
+title: 'Statistical Methods for Insurance: Randomisation'
+author: Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monash
+  University
 date: "W1.C1"
 output:
   beamer_presentation: default
@@ -156,7 +157,7 @@ We could use a two-sample t-test to answer these, but here is how to do the equi
 
 ## Let's do it
 
-```{r echo=FALSE, fig.height=4, fig.width=4}
+```{r echo=FALSE, fig.height=4, fig.width=8, fig.align='center'}
 library(purrr)
 mad <- function(df, shuffle=TRUE) {
   if (shuffle)
@@ -167,9 +168,9 @@ mad <- function(df, shuffle=TRUE) {
 }
 aec_abs_sub <- aec_abs %>% filter(PartyGp != "Other")
 aec_abs_meandif <- mad(aec_abs_sub, shuffle=FALSE)
-aec_abs_shuffle <-1:100 %>% map_dbl(~ mad(aec_abs_sub))
-aec_abs_shuffle <- data.frame(d=aec_abs_shuffle, y=1:100)
-ggplot(data=aec_abs_shuffle, aes(x=d)) + geom_dotplot() +
+aec_abs_shuffle <-1:1000 %>% map_dbl(~ mad(aec_abs_sub))
+aec_abs_shuffle <- data.frame(d=aec_abs_shuffle, y=1:1000)
+ggplot(data=aec_abs_shuffle, aes(x=d)) + geom_dotplot(binwidth=100) +
   geom_vline(xintercept=aec_abs_meandif, colour="red")
 ```
 
