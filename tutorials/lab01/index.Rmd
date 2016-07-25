@@ -105,7 +105,7 @@ Can you think of two questions you could answer using these variables?
 Can you think of two questions you could answer using these variables?
 
 p.s. I came across with this drawing about the city of Melbourne (1854) in the
-rare book exhibition.
+2016 rare book exhibition.
 
 <center><img src="figure/melb_city.jpeg" alt="Melb City" style="width: 716px; height: 490px"/></center>
 
@@ -140,6 +140,8 @@ It is a fast, consistent tool for working with data frame.
 ## Get things done in R and RMarkdown
 
 1. Read in the OECD PISA data
+```{r student, eval = FALSE}
+```
 2. Tabulate the countries (`CNT`)
 3. Extract the values for Australia (`AUS`) and Shanghai (`QCN`)
 4. Compute the average and standard deviation of the reading scores (`PV1READ`), for each country

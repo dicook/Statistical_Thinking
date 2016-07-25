@@ -162,7 +162,7 @@ glimpse(ped)
 Can you think of two questions you could answer using these variables?
 
 p.s. I came across with this drawing about the city of Melbourne (1854) in the
-rare book exhibition.
+2016 rare book exhibition.
 
 <center><img src="figure/melb_city.jpeg" alt="Melb City" style="width: 716px; height: 490px"/></center>
 
@@ -222,6 +222,12 @@ mean(x, na.rm = TRUE) # na.rm is an argument in the mean() function
 ## Get things done in R and RMarkdown
 
 1. Read in the OECD PISA data
+
+```r
+download.file("http://dicook.github.io/Statistical_Thinking/data/student_sub.rds",
+              destfile = "../data/student_sub.rds") # the path can be changed
+student2012.sub <- readRDS("../data/student_sub.rds")
+```
 2. Tabulate the countries (`CNT`)
 3. Extract the values for Australia (`AUS`) and Shanghai (`QCN`)
 4. Compute the average and standard deviation of the reading scores (`PV1READ`), for each country

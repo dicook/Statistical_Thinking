@@ -206,7 +206,7 @@ ped &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="
 ## $ Sensor_Name   &lt;chr&gt; &quot;Town Hall (West)&quot;, &quot;Collins Place (South)&quot;, &quot;Co...
 ## $ Hourly_Counts &lt;int&gt; 209, 28, 36, 22, 52, 53, 17, 124, 5, 8, 2, 5, 15...</code></pre>
 <p>Can you think of two questions you could answer using these variables?</p>
-<p>p.s. I came across with this drawing about the city of Melbourne (1854) in the rare book exhibition.</p>
+<p>p.s. I came across with this drawing about the city of Melbourne (1854) in the 2016 rare book exhibition.</p>
 <center>
 <img src="figure/melb_city.jpeg" alt="Melb City" style="width: 716px; height: 490px"/>
 </center>
@@ -260,6 +260,11 @@ x[<span class="st">&quot;a&quot;</span>] <span class="co"># notice the differenc
 <h2 id="get-things-done-in-r-and-rmarkdown">Get things done in R and RMarkdown</h2>
 <ol style="list-style-type: decimal">
 <li>Read in the OECD PISA data</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">download.file</span>(<span class="st">&quot;http://dicook.github.io/Statistical_Thinking/data/student_sub.rds&quot;</span>,
+              <span class="dt">destfile =</span> <span class="st">&quot;../data/student_sub.rds&quot;</span>) <span class="co"># the path can be changed</span>
+student2012.sub &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="st">&quot;../data/student_sub.rds&quot;</span>)</code></pre></div>
+<ol start="2" style="list-style-type: decimal">
 <li>Tabulate the countries (<code>CNT</code>)</li>
 <li>Extract the values for Australia (<code>AUS</code>) and Shanghai (<code>QCN</code>)</li>
 <li>Compute the average and standard deviation of the reading scores (<code>PV1READ</code>), for each country</li>
