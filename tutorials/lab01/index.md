@@ -36,7 +36,7 @@ date: Lab 01
     + Emphasis
         - **bold**
         - *italics*
-* Lists
+    + Lists
 ```
 
 * [Markdown cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)

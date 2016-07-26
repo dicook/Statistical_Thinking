@@ -43,7 +43,7 @@ read_chunk("lab01.R")
     + Emphasis
         - **bold**
         - *italics*
-* Lists
+    + Lists
 ```
 
 * [Markdown cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
