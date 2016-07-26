@@ -1,5 +1,5 @@
 ---
-title: "ETC2420 <br> Introduction to R, RStudio & RMarkdown"
+title: "ETC2420/5242 <br> Introduction to R, RStudio & RMarkdown"
 author: Earo Wang <br> <earo.wang@gmail.com>
 date: Lab 01
 ---
@@ -119,6 +119,9 @@ library(dplyr) # load the package
 
 * For example, `dplyr` is an R package written by [Hadley Wickham](http://hadley.nz/).
 It is a fast, consistent tool for working with data frame.
+* I've also developed the [hts](https://cran.r-project.org/web/packages/hts/index.html)
+package on analysing and forecasting hierarchical and grouped time series, with Rob Hyndman,
+Alan Lee and Shanika Wickramasuriya. (Yes, this is an advertisement.)
 * There are more than 8000 packages available on R CRAN now.
 
 # Have fun with R
