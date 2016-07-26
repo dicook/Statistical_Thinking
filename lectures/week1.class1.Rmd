@@ -4,10 +4,10 @@ author: Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monas
   University
 date: "W1.C1"
 output:
-  beamer_presentation: default
   ioslides_presentation:
     transition: default
     widescreen: yes
+  beamer_presentation: default
 css: default.css
 ---
 
@@ -89,8 +89,7 @@ We are going to play a game of "Stump the Professor".
   
   `B. Now flip a coin TEN times, and write down the outcomes`
 
-2. Enter these in the online sheet. Make a note to yourself, whether you did A or B first, but don't tell me. 
-
+2. Enter these in the online sheet at http://bit.ly/ETC2420-1 (Remember whether you entered the coin flip sequence first or the made up sequence.)
 3. Now I am going to look at what you entered, and guess if sequence was made up, or actual outcomes from coin flips. 
 
 4. You record how many times I get it right. 
