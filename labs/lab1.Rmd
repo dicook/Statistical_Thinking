@@ -290,10 +290,10 @@ browseVignettes("dplyr")
 2. Tabulate the countries (CNT)
 3. Extract the values for Australia (AUS) and Shanghai (QCN)
 4. Compute the average and standard deviation of the reading scores (PV1READ), for each country
-5. Write a few sentences explaining what you learn aboutreading in these two countries.
+5. Write a few sentences explaining what you learn about reading scores in these two countries.
 
 ```{r eval=FALSE, echo=FALSE}
-student2012.sub <- readRDS("http://dicook.github.io/Statistical_Thinking/data/student_sub.rds")
+student2012.sub <- readRDS("data/student_sub.rds") # The file needs to be in your working directory in a subdirectory called data
 table(student2012.sub$CNT)
 australia <- student2012.sub[student2012.sub$CNT=="AUS",]
 shanghai <- student2012.sub[student2012.sub$CNT=="QCN",]
@@ -307,7 +307,8 @@ sd(shanghai$PV1READ)
 
 - Your `.Rmd` file
 - Your Word (or pdf) file that results from knitting the Rmd.
-- DUE: One day after the lab, loaded into moodle
+- Make sure your group members are listed as authors, one person per group will turn in the report
+- DUE: Monday after the lab, by noon, loaded into moodle
 
 ## Resources
 
