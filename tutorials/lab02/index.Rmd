@@ -1,0 +1,72 @@
+---
+title: "ETC2420/5242 <br> Write functions in R: <br> using the Monty Hall example"
+author: Earo Wang <br> <earo.wang@gmail.com>
+date: Lab 02
+---
+
+```{r initial, echo = FALSE, cache = FALSE, results = 'hide'}
+opts_chunk$set(warning = FALSE, message = FALSE, 
+			   fig.path = 'figure/', cache.path = 'cache/', 
+			   fig.align = 'center', dev = 'png', fig.width = 22, fig.height = 10, 
+			   fig.show = 'hold', cache = TRUE, external  =  TRUE,
+         dev = 'Cairo_png')
+```
+
+# View this slides in your browser
+
+<center>
+<http://rawgit.com/earowang/Statistical_Thinking/gh-pages/tutorials/lab02/index.html>
+</center>
+
+## Manual control
+* **Left/Right arrow**: page up/down; or click to page down
+* **C**: toggle table of content
+* **A**: display current or all slides
+* **S**: make fonts smaller
+* **B**: make fonts bigger
+
+# Consultation time
+
+* **Time**: 13:30 to 14:40 on Thursday
+* **Venue**: Level 11/W1106, Menzies Building
+
+# Play the game Monty Hall
+
+* Go to the web site [InterActivate's Simple Monty Hall](http://www.shodor.org/interactivate/activities/SimpleMontyHall/). Each member of the group should do this themselves.
+
+1. Play the game 21 times with the strategy "Do not switch doors". Note the proportion of times you win the jackpot.
+
+2. Play the game 21 times with the strategy "Switch doors". Note the proportion of times you win the jackpot.
+
+* Discuss with your group how the two strategies change your chances of winning.
+
+## My stats
+
+* Strategy 1:
+    + Games stayed: 21
+    + Games stayed and won: 9
+    + Experimental probability to win: 42.86%
++ Strategy 2:
+    + Games switched: 21
+    + Games switched and won: 15
+    + Experimental probability to win: 71.43%
+
+# The algorithm of the game
+
+1. Randomly assign `{"pig", "pig", "car"}` to door `{1, 2, 3}`
+2. Player selects a door
+3. Check if door selected matches a `{pig}`, and if so show the other `{pig}`. If it is the `{car}`, randomly select one of the two other doors to reveal
+4. Enable the player choose their next door, either to `switch` or `stay`
+5. Print result
+
+# Your turn
+## Get things done in R and RMarkdown
+
+## Turn in 
+
+* Your `.Rmd` file
+* Your pdf (or word) file that results from knitting the Rmd
+* Make sure your group members are listed as authors, one person per group will turn in the report
+* **DUE**: by 7:30am in the following Wednesday , loaded into moodle
+
+<meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" />
