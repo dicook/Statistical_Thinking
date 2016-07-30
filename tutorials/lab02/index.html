@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Earo Wang   earo.wang@gmail.com" />
+  <title>ETC2420/5242   Write functions in R:   using the Monty Hall example</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+    href="http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css" />
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+   href="../myslidy.css" />
+  <script src="http://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js"
+    charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">ETC2420/5242 <br> Write functions in R: <br> using the Monty Hall example</h1>
+  <p class="author">
+Earo Wang <br> <script type="text/javascript">
+<!--
+h='&#x67;&#x6d;&#x61;&#x69;&#108;&#46;&#x63;&#x6f;&#x6d;';a='&#64;';n='&#x65;&#x61;&#114;&#x6f;&#46;&#x77;&#x61;&#110;&#x67;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\/'+'a'+'>');
+// -->
+</script><noscript>&#x65;&#x61;&#114;&#x6f;&#46;&#x77;&#x61;&#110;&#x67;&#32;&#x61;&#116;&#32;&#x67;&#x6d;&#x61;&#x69;&#108;&#32;&#100;&#x6f;&#116;&#32;&#x63;&#x6f;&#x6d;</noscript>
+  </p>
+  <p class="date">Lab 02</p>
+</div>
+<div id="view-this-slides-in-your-browser" class="slide section level1">
+<h1>View this slides in your browser</h1>
+<center>
+<a href="http://rawgit.com/earowang/Statistical_Thinking/gh-pages/tutorials/lab02/index.html" class="uri">http://rawgit.com/earowang/Statistical_Thinking/gh-pages/tutorials/lab02/index.html</a>
+</center>
+<h2 id="manual-control">Manual control</h2>
+<ul>
+<li><strong>Left/Right arrow</strong>: page up/down; or click to page down</li>
+<li><strong>C</strong>: toggle table of content</li>
+<li><strong>A</strong>: display current or all slides</li>
+<li><strong>S</strong>: make fonts smaller</li>
+<li><strong>B</strong>: make fonts bigger</li>
+</ul>
+</div>
+<div id="consultation-time" class="slide section level1">
+<h1>Consultation time</h1>
+<ul>
+<li><strong>Time</strong>: 13:30 to 14:40 on Thursday</li>
+<li><strong>Venue</strong>: Level 11/W1106, Menzies Building</li>
+</ul>
+</div>
+<div id="play-the-game-monty-hall" class="slide section level1">
+<h1>Play the game Monty Hall</h1>
+<ul>
+<li>Go to the web site <a href="http://www.shodor.org/interactivate/activities/SimpleMontyHall/">InterActivate's Simple Monty Hall</a>. Each member of the group should do this themselves.</li>
+</ul>
+<ol style="list-style-type: decimal">
+<li><p>Play the game 21 times with the strategy &quot;Do not switch doors&quot;. Note the proportion of times you win the jackpot.</p></li>
+<li><p>Play the game 21 times with the strategy &quot;Switch doors&quot;. Note the proportion of times you win the jackpot.</p></li>
+</ol>
+<ul>
+<li>Discuss with your group how the two strategies change your chances of winning.</li>
+</ul>
+<h2 id="my-stats">My stats</h2>
+<ul>
+<li>Strategy 1:
+<ul>
+<li>Games stayed: 21</li>
+<li>Games stayed and won: 9</li>
+<li>Experimental probability to win: 42.86%</li>
+</ul></li>
+<li>Strategy 2:
+<ul>
+<li>Games switched: 21</li>
+<li>Games switched and won: 15</li>
+<li>Experimental probability to win: 71.43%</li>
+</ul></li>
+</ul>
+</div>
+<div id="the-algorithm-of-the-game" class="slide section level1">
+<h1>The algorithm of the game</h1>
+<ol style="list-style-type: decimal">
+<li>Randomly assign <code>{&quot;pig&quot;, &quot;pig&quot;, &quot;car&quot;}</code> to door <code>{1, 2, 3}</code></li>
+<li>Player selects a door</li>
+<li>Check if door selected matches a <code>{pig}</code>, and if so show the other <code>{pig}</code>. If it is the <code>{car}</code>, randomly select one of the two other doors to reveal</li>
+<li>Enable the player choose their next door, either to <code>switch</code> or <code>stay</code></li>
+<li>Print result</li>
+</ol>
+</div>
+<div id="your-turn" class="slide section level1">
+<h1>Your turn</h1>
+<h2 id="get-things-done-in-r-and-rmarkdown">Get things done in R and RMarkdown</h2>
+<h2 id="turn-in">Turn in</h2>
+<ul>
+<li>Your <code>.Rmd</code> file</li>
+<li>Your pdf (or word) file that results from knitting the Rmd</li>
+<li>Make sure your group members are listed as authors, one person per group will turn in the report</li>
+<li><strong>DUE</strong>: Monday after the lab, by noon, loaded into moodle</li>
+</ul>
+<p><meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" /></p>
+</div>
+</body>
+</html>
