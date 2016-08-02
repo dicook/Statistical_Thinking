@@ -1,0 +1,88 @@
+---
+title: "ETC 2420/5242 Lab 1 2016"
+author: "Di Cook"
+date: "SOLUTION"
+output: pdf_document
+---
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, warning = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  error = FALSE, 
+  collapse = TRUE,
+  comment = "#",
+  fig.height = 4,
+  fig.width = 8,
+  fig.align = "center",
+  cache = FALSE
+)
+```
+
+
+## Question 1 (2pts)
+
+There could be many possible questions that might be answered by this data. Examples include these ones:
+
+- Does the personal savings rate dip when unemployment is high?
+
+- Is there a seasonal effect in unemployment?
+
+- Is population increasing?
+
+## Question 2 (2pts)
+
+There could be many possible questions that might be answered by this data. Examples include these ones:
+
+- Is life expectancy positively associated with gdp percapita?
+
+- Is life expectancy increasing over time?
+
+- Is the trend in life expectancy similar across all countries?
+
+## Question 3 (2pts)
+
+There could be many possible questions that might be answered by this data. Examples include these ones:
+
+- What places in the city see the most pedestrians?
+
+- What times would be rush hours on week days?
+
+- Can you see the Wednesday night markets location and time based on pedestrian traffic?
+
+- Is White Night visible in terms of pedestrian traffic?
+
+- Are more people out and about in summer than in winter?
+
+
+## Question 4 (4pts)
+
+1. Read in the OECD PISA data
+2. (1pt) Tabulate the countries (CNT)
+3. Extract the values for Australia (AUS) and Shanghai (QCN)
+4. (1pt) Compute the average and standard deviation of the reading scores (PV1READ), for each country
+5. (2pts) Write a few sentences explaining what you learn about reading scores in these two countries.
+
+```{r}
+student2012.sub <- readRDS("../data/student_sub.rds") 
+table(student2012.sub$CNT)
+australia <- student2012.sub[student2012.sub$CNT=="AUS",]
+shanghai <- student2012.sub[student2012.sub$CNT=="QCN",]
+mean(australia$PV1READ)
+sd(australia$PV1READ)
+mean(shanghai$PV1READ)
+sd(shanghai$PV1READ)
+```
+
+The reading scores are higher in Shanghai than in Australia by about 67 points. The variation in scores in Australia is higher, with a standard deviation of 100 as opposed to 80 for Shanghai.
+
+```{r}
+# Alternative way to do the code
+library(dplyr)
+library(knitr)
+library(tidyr)
+student2012.sub %>% select(CNT) %>% group_by(CNT) %>% tally() 
+student2012.sub %>% filter(CNT %in% c("AUS", "QCN")) %>%
+  group_by(CNT) %>%
+  summarise(m=mean(PV1READ), s=sd(PV1READ)) %>% kable(digits=1)
+```
