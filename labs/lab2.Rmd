@@ -86,7 +86,7 @@ ppc_sample <- function(){
 - Your `.Rmd` file
 - Your Word (or pdf) file that results from knitting the Rmd.
 - Make sure your group members are listed as authors, one person per group will turn in the report
-- DUE: Monday after the lab, by noon, loaded into moodle
+- DUE: Wednesday after the lab, by 7am, loaded into moodle
 
 
 ```{r echo=FALSE, eval=FALSE}
