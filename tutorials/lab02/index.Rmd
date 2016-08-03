@@ -125,7 +125,7 @@ The code above does the same thing. Which piece of R code is more efficient?
 * Your `.Rmd` file
 * Your pdf (or word) file that results from knitting the Rmd
 * Make sure your group members are listed as authors, one person per group will turn in the report
-* **DUE**: by 7:30am in the following Wednesday , loaded into moodle
+* **DUE**: by 7:00am in the following Wednesday , loaded into moodle
 
 # View this slides in your browser
 

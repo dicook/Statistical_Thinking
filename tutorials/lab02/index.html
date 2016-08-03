@@ -140,8 +140,9 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\
 <ul>
 <li>Use <code>ppc_sample()</code> in a for-loop</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">for (i in <span class="dv">1</span>:<span class="dv">20</span>) {
-  <span class="kw">ppc_sample</span>()
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="dt">mode =</span> <span class="st">&quot;character&quot;</span>, <span class="dt">length =</span> <span class="dv">20</span>)
+for (i in <span class="dv">1</span>:<span class="dv">20</span>) {
+  results[i] &lt;-<span class="st"> </span><span class="kw">ppc_sample</span>()
 }</code></pre></div>
 <ul>
 <li>Report the proportion of times that <code>car</code> is selected. (You could put this in a loop and compute the proportion of times <code>car</code> shows.)</li>
@@ -227,7 +228,7 @@ host_choice</code></pre></div>
 <li>Your <code>.Rmd</code> file</li>
 <li>Your pdf (or word) file that results from knitting the Rmd</li>
 <li>Make sure your group members are listed as authors, one person per group will turn in the report</li>
-<li><strong>DUE</strong>: by 7:30am in the following Wednesday , loaded into moodle</li>
+<li><strong>DUE</strong>: by 7:00am in the following Wednesday , loaded into moodle</li>
 </ul>
 </div>
 <div id="view-this-slides-in-your-browser" class="slide section level1">

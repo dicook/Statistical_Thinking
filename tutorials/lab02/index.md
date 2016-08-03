@@ -83,8 +83,9 @@ for (i in 1:20) {
 
 
 ```r
+results <- vector(mode = "character", length = 20)
 for (i in 1:20) {
-  ppc_sample()
+  results[i] <- ppc_sample()
 }
 ```
 
@@ -203,7 +204,7 @@ ppc_play <- function(choice = 1, strategy = "switch") {
 * Your `.Rmd` file
 * Your pdf (or word) file that results from knitting the Rmd
 * Make sure your group members are listed as authors, one person per group will turn in the report
-* **DUE**: by 7:30am in the following Wednesday , loaded into moodle
+* **DUE**: by 7:00am in the following Wednesday , loaded into moodle
 
 # View this slides in your browser
 
