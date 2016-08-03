@@ -14,9 +14,8 @@ for (i in 1:20) {
 }
 
 ## ---- for-loop-eg
-results <- vector(mode = "character", length = 20)
 for (i in 1:20) {
-  results[i] <- ppc_sample()
+  print(ppc_sample())
 }
 
 ## ---- 20-props-cars-1

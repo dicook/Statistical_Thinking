@@ -123,7 +123,7 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\
   <span class="kw">sample</span>(<span class="kw">c</span>(<span class="st">&quot;pig&quot;</span>, <span class="st">&quot;pig&quot;</span>, <span class="st">&quot;car&quot;</span>), <span class="dv">1</span>)
 }
 <span class="kw">ppc_sample</span>() </code></pre></div>
-<pre><code>## [1] &quot;pig&quot;</code></pre>
+<pre><code>## [1] &quot;car&quot;</code></pre>
 <ul>
 <li>Run this function 20 times</li>
 </ul>
@@ -140,9 +140,8 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\
 <ul>
 <li>Use <code>ppc_sample()</code> in a for-loop</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="dt">mode =</span> <span class="st">&quot;character&quot;</span>, <span class="dt">length =</span> <span class="dv">20</span>)
-for (i in <span class="dv">1</span>:<span class="dv">20</span>) {
-  results[i] &lt;-<span class="st"> </span><span class="kw">ppc_sample</span>()
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">for (i in <span class="dv">1</span>:<span class="dv">20</span>) {
+  <span class="kw">print</span>(<span class="kw">ppc_sample</span>())
 }</code></pre></div>
 <ul>
 <li>Report the proportion of times that <code>car</code> is selected. (You could put this in a loop and compute the proportion of times <code>car</code> shows.)</li>
@@ -210,7 +209,7 @@ if (doors[choice] ==<span class="st"> &quot;pig&quot;</span>) { <span class="co"
   host_choice &lt;-<span class="st"> </span><span class="kw">paste</span>(d, doors[d],  <span class="dt">sep =</span> <span class="st">&quot;-&quot;</span>)
 }
 host_choice</code></pre></div>
-<pre><code>## [1] &quot;1-pig&quot;</code></pre>
+<pre><code>## [1] &quot;3-pig&quot;</code></pre>
 <ul>
 <li>Wrap the code above into a function <code>ppc_host()</code></li>
 </ul>
