@@ -62,7 +62,7 @@ ppc_sample()
 ```
 
 ```
-## [1] "pig"
+## [1] "car"
 ```
 
 * Run this function 20 times
@@ -83,9 +83,8 @@ for (i in 1:20) {
 
 
 ```r
-results <- vector(mode = "character", length = 20)
 for (i in 1:20) {
-  results[i] <- ppc_sample()
+  print(ppc_sample())
 }
 ```
 
@@ -178,7 +177,7 @@ host_choice
 ```
 
 ```
-## [1] "1-pig"
+## [1] "3-pig"
 ```
 
 * Wrap the code above into a function `ppc_host()`
