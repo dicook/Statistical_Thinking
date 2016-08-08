@@ -1,0 +1,90 @@
+---
+title: "ETC2420/5242 <br> Testing hypotheses using permutation"
+author: Earo Wang <br> <earo.wang@gmail.com>
+date: Lab 03
+---
+
+```{r initial, echo = FALSE, cache = FALSE, results = 'hide'}
+opts_chunk$set(warning = FALSE, message = FALSE, 
+			   fig.path = 'figure/', cache.path = 'cache/', 
+			   fig.align = 'center', dev = 'png', fig.width = 12, fig.height = 7, 
+			   fig.show = 'hold', cache = TRUE, external  =  TRUE,
+         dev = 'Cairo_png')
+read_chunk("lab03.R")
+```
+
+# Consultation hours
+
+* **Time**: 13:30 to 15:00 on Thursday
+* **Venue**: Level 11/W1106, Menzies Building
+
+# Data structures --- data frame
+
+* Vector
+* Matrix
+* Array
+* List
+* **Data frame**
+
+More on data structures in R, please read one of the chapters in [Advanced R](http://adv-r.had.co.nz/Data-structures.html).
+
+## Create a data frame
+
+```{r df}
+```
+
+```{r glimpse, eval = FALSE}
+```
+
+# Make a contingency table
+
+```{r table1, echo = FALSE, results = "hide"}
+```
+
+<center>
+```{r kable, echo = FALSE}
+```
+</center>
+
+```{r table1}
+```
+
+* However, the R code above is NOT readable, since it needs reading from right to left.
+* "Piping" with `%>%` has been introduced to make code more readable.
+
+```{r table2}
+```
+
+# Permutation test
+
+```{r prop_dif, eval = FALSE}
+```
+
+```{r prop_dif2, echo = FALSE}
+```
+
+* Run the function 10000 times
+
+```{r diff_prop, eval = FALSE}
+```
+
+```{r diff_prop1, echo = FALSE}
+```
+
+* Make a histogram
+
+```{r histogram}
+```
+
+* Draw a vertical line on the plot that represents the difference for the actual data
+
+```{r vline, echo = FALSE}
+```
+
+# Online R resources
+
+* [Data wrangling cheet sheet](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
+* [Data visualization cheet sheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
+* [R programming course](https://www.coursera.org/learn/r-programming) on Coursera starts this week!
+
+<meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" />
