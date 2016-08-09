@@ -1,0 +1,379 @@
+---
+title: 'Statistical Methods for Insurance: Statistical distributions'
+author: Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monash
+  University
+date: "W3.C1"
+output:
+  ioslides_presentation:
+    transition: default
+    widescreen: yes
+  beamer_presentation: default
+css: default.css
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE,
+  echo=FALSE,
+  fig.height = 2,
+  fig.width = 5,
+  collapse = TRUE,
+  comment = "#>"
+)
+options(digits=2)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readr)
+library(gridExtra)
+```
+
+## Overview of this class
+
+- Quiz 1 solution
+- Random numbers
+- Mapping random numbers to events for simulation
+- Statistical distributions
+- READING: CT6, Section 1.3-1.9
+
+## Random numbers
+
+- True random number generators: [Radioactive decay](https://www.fourmilab.ch/hotbits/), [electromagnetic field of a vacuum](https://qrng.anu.edu.au)
+- Computers only technically provide pseudo-random numbers, using deterministic process, e.g linear congruential, for large $a, b, m$
+
+$$X_{n+1} = (aX_n + b) ~~mod ~~m$$
+
+## RANDU - a bad PRNG
+
+- Used in the 60s and onwards
+
+$$X_{n+1} = 65539 X_n ~~mod ~~2^{31}$$
+
+```{r fig.width=3.5, fig.height=3.5, fig.align='center'}
+randu <- read.csv("randu.csv")
+ggplot(randu, aes(x=V1, y=V2)) + geom_point() + theme(aspect.ratio=1)
+```
+
+## Mersenne Twister
+
+- algorithm is a twisted generalised feedback shift register (TGFSR)
+- based on a Marsenne prime, $2^m-1$
+- most commonly used today
+- each integer will occur the same number of times in a period
+
+## Using random numbers
+
+- Random number tables deliver single digits 0, 1, ..., 9
+- When using these you need to ensure that you map these digits or combinations of the digits to match the probabilities of events
+- For example, use random numbers to sample students from class
+    + There are 105 students in the class
+    + Need to use three sequential digits
+    + BUT there are 1000 three digit numbers, so either we will throw away 895 of them, or we could map a person to multiple numbers (9) and throw away only 55
+    + If any person is selected more than once, throw out repeats
+
+## Estimate the proportion of 2420:5242
+
+Class list:
+
+```{r}
+classlist <- read_csv("../labs/groups-ETC2420 - ETC5242 - S2 2016-20160809120717.csv")
+sample_class <- classlist %>% 
+  separate(`Full name`, c("First", "Last"), sep=" ") %>%
+  arrange(Last) %>% select(First, Last) 
+sample_class_sub <- sample_class[1:5,]
+sample_class_sub$numbers <- c("001,002,003,004,005,006,007,008,009",
+                              "010,011,012,013,014,015,016,017,018,019",
+                              "020,021,022,023,024,025,026,027,028,029",
+                              "030,031,032,033,034,035,036,037,038,039",
+                              "040,041,042,043,044,045,046,047,048,049")
+kable(sample_class_sub)
+```
+
+## Set of random digits
+
+```{r eval=FALSE}
+classlist$course <- "2420"
+classlist$course[grep("5242", classlist$Group)] <- "5242"
+sample_class <- classlist %>% 
+  separate(`Full name`, c("First", "Last"), sep=" ") %>%
+  arrange(Last) %>% 
+  select(First, Last, course) 
+nbr <- data.frame(matrix(1:945, ncol=9, byrow=T))
+sample_class <- cbind(sample_class, nbr)
+write_csv(sample_class, "sample_classlist.csv")
+```
+
+```{r}
+sample(0:9, 315, replace = TRUE)
+```
+
+## Just do it ...
+
+True proportion of 2420:5242 is 0.59. Sample 20 students and check this. 
+
+## Simpler approach computationally
+
+- Use a sample function
+
+```{r echo=TRUE, results='hide'}
+sample_class %>% sample_n(20) 
+```
+
+##
+
+```{r}
+sample_class %>% sample_n(20) %>% kable()
+```
+
+## Statistical distributions
+
+- Uniform
+- Normal 
+- Exponential
+- Binomial
+- Pareto
+- Weibull
+- Gamma
+- Lognormal
+
+## Random numbers = Uniform
+
+```{r fig.align='center', fig.width=8, fig.height=3, fig.show='hold'}
+df <- data.frame(x=sample(0:9, 10000, replace = TRUE), y=rep(0:9, 1000))
+p1 <- ggplot(df, aes(x=y)) + geom_bar() + 
+  scale_x_continuous("", breaks=0:10, labels=0:10) + ggtitle("Theory")
+p2 <- ggplot(df, aes(x=x)) + geom_bar() + 
+  scale_x_continuous("", breaks=0:10, labels=0:10) + ggtitle("Sample")
+grid.arrange(p1, p2, ncol=2)
+```
+
+- symmetric, unimodal, uniform
+- e.g. $U\{0, ..., 9\}$
+- e.g. $P(X=x) = f(x) = 1/10, ~~ x \in \{0, ..., 9\}$
+
+## Normal distribution
+
+- Gaussian, bell-shaped
+- symmetric, unimodal
+- $N(\mu, \sigma)$
+
+ $$f(x~|~\mu, \sigma) = \frac{1}{\sqrt{2}\pi\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}}, ~~~ -\infty<x<\infty$$
+
+```{r fig.align='center', fig.width=8, fig.height=3, fig.show='hold'}
+df <- data.frame(x=seq(-4,4, 0.008),  r=rnorm(1001), d=dnorm(seq(-4,4, 0.008)))
+p1 <- ggplot(df, aes(x=x, y=d)) + geom_line() + xlab("") + ylab("") +
+  geom_hline(yintercept=0, colour="grey70") + ggtitle("Theory")
+p2 <- ggplot(df, aes(x=r, y=..density..)) + geom_histogram(binwidth=0.5) + xlab("") + ylab("") + geom_line(aes(x=x, y=d), color="red") + ggtitle("Sample")
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Exponential distribution
+
+$$f(x~|~\lambda) = e^{-\lambda x} ~~ x\geq 0$$
+
+- right-skewed, unimodal
+- $Exp(\lambda)$
+- Arises in time between or duration of events, e.g. time between successive failures of a machine, duration of a phone call to a help center
+
+```{r fig.align='center', fig.width=8, fig.height=3, fig.show='hold'}
+df <- data.frame(x=seq(0,8, 0.008),  r=rexp(1001), d=dexp(seq(0,8, 0.008)))
+p1 <- ggplot(df, aes(x=x, y=d)) + geom_line() + xlab("") + ylab("") +
+  geom_hline(yintercept=0, colour="grey70") + ggtitle("Theory")
+p2 <- ggplot(df, aes(x=r, y=..density..)) + geom_histogram(binwidth=0.5) + xlab("") + ylab("") + geom_line(aes(x=x, y=d), color="red") + ggtitle("Sample")
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Poisson distribution
+
+$$P(X=x~|~\lambda) = \frac{\lambda^x e^{-\lambda}}{x!} ~~ x \in \{0, 1, 2, ...\}$$
+
+- discrete, right-skewed, unimodal
+- Arises when counting number of times event occurs in an interval of time, e.g. the number of patients arriving in an emergency room between 11 and 12 pm
+
+```{r fig.align='center', fig.width=8, fig.height=3, fig.show='hold'}
+df <- data.frame(x=seq(0, 8, 1),  d=dpois(seq(0, 8, 1), lambda=1))
+p1 <- ggplot(df, aes(x=x, y=d)) + 
+  geom_bar(stat="identity") + xlab("") + ylab("") + xlim(c(-1,8)) +
+  geom_hline(yintercept=0, colour="grey70") + ggtitle("Theory")
+df2 <- data.frame(r=rpois(1001, lambda=1))
+p2 <- ggplot(df2, aes(x=r)) + geom_bar() +
+  xlab("") + ylab("") + xlim(c(-1,8)) + ggtitle("Sample")
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Binomial
+
+$$P(X=x~|~n,p) = \left(\begin{array}{c} n \\ p \end{array} \right) p^x (1-p)^{n-x} ~~ x \in \{0, 1, 2, ..., n\}$$
+
+- discrete, unimodal, right- or left-skewed or unimodal depending on $p$
+- Arises from counting the number of successes from $n$ independent Bernouilli trials, e.g. the number of heads in 10 coin flips
+
+```{r fig.align='center', fig.width=8, fig.height=3, fig.show='hold'}
+df <- data.frame(x=seq(0, 10, 1),  d=dbinom(seq(0, 10, 1), 10, 0.5))
+p1 <- ggplot(df, aes(x=x, y=d)) + 
+  geom_bar(stat="identity") + xlab("") + ylab("") + 
+  scale_x_continuous(breaks=seq(0,10,1), labels=seq(0,10,1)) + 
+  ggtitle("Theory")
+df2 <- data.frame(r=rbinom(100, 10, 0.5))
+p2 <- ggplot(df2, aes(x=r)) + geom_bar() +
+  scale_x_continuous(breaks=seq(0,10,1), labels=seq(0,10,1), limits=c(0,10)) + 
+  xlab("") + ylab("") + ggtitle("Sample")
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Pareto
+
+```{r}
+dpareto <- function(x, c) {
+  # x must be greater than 1
+  if (c<=0) stop("c must be positive") # Diagnostic step
+  c/x^(c+1)
+}
+
+ppareto <- function(q, c) {
+  if (c<=0) stop("c must be positive > 0")
+  ifelse(q<1, 0, 1-1/q^c)
+}
+
+qpareto <- function(p,c){
+  if (c<=0) stop("c must be positive > 0")
+  if (any(p<0)|any(p>1)) # Symbol | denotes logical OR
+    stop("p must be between 0 and 1")
+  q <- (1-p)^(-1/c)
+  q
+}
+
+rpareto <- function(n, c){
+ if (c<=0) stop("c must be positive")
+   rp <- runif(n)^(-1/c)
+  rp
+}
+```
+
+$$f(x~|~\alpha, \lambda) = \frac{\alpha\lambda^\alpha}{(\lambda+x)^{\alpha+1}} ~~~x>0, \alpha>0, \lambda>0 $$ 
+
+- Used to describe allocation of wealth, sizes of human settlement
+- Heavier tailed than exponential distribution
+
+```{r fig.align='center', fig.width=8, fig.height=3, fig.show='hold'}
+df <- data.frame(x=seq(1, 10, 0.1),  d=dpareto(seq(1, 10, 0.1), 1))
+p1 <- ggplot(df, aes(x=x, y=d)) + 
+  geom_line() + xlab("") + ylab("") +
+  scale_x_continuous(breaks=seq(1,10,1), labels=seq(1,10,1)) +
+  ggtitle("Theory")
+df2 <- data.frame(r=rpareto(1000, 1))
+p2 <- ggplot(df2, aes(x=r)) + geom_histogram(binwidth=1) +
+  scale_x_continuous(breaks=seq(1,10,1), labels=seq(1,10,1), limits=c(0.5,10.5)) +
+  xlab("") + ylab("") + ggtitle("Sample")
+grid.arrange(p1, p2, ncol=2)
+```
+
+
+## Weibull
+
+$$f(x~|~\lambda, k) = \frac{k}{\lambda}\left(\frac{x}{\lambda}\right)^{k-1} e^{(-x/\lambda)^k}, ~~~ x\geq 0$$
+
+- used for particle size distribution, failure analysis, delivery time, extreme value theory
+- shape changes considerably with different $k$
+
+```{r fig.align='center', fig.width=8, fig.height=3, fig.show='hold'}
+df <- data.frame(x=seq(0.0025, 2.5, 0.0025),  r=rweibull(1000, shape=1.5), d=dweibull(seq(0.0025, 2.5, 0.0025), shape=1.5))
+p1 <- ggplot(df, aes(x=x, y=d)) + geom_line() + xlab("") + ylab("") +
+  geom_hline(yintercept=0, colour="grey70") + ggtitle("Theory") + xlim(c(0,4.5))
+p2 <- ggplot(df, aes(x=r, y=..density..)) + geom_histogram(binwidth=0.5) + xlab("") + ylab("") + geom_line(aes(x=x, y=d), color="red") + 
+  ggtitle("Sample") + xlim(c(0,4.5))
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Gamma
+
+$$f(x~|~\alpha, \beta) = \frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha-1}e^{-x\beta}, ~~~ x\geq 0 ~~\alpha, \beta > 0 $$
+
+- Generalisation of exponential distribution, and also $\chi^2$
+- $\alpha$ changes shape substantially
+- used to model size of insurance claims, rainfall
+
+```{r fig.align='center', fig.width=8, fig.height=3, fig.show='hold'}
+df <- data.frame(x=seq(0.005, 5, 0.005),  r=rgamma(1000, shape=2), d=dgamma(seq(0.005, 5, 0.005), shape=2))
+p1 <- ggplot(df, aes(x=x, y=d)) + geom_line() + xlab("") + ylab("") +
+  geom_hline(yintercept=0, colour="grey70") + ggtitle("Theory") + xlim(c(0,4.5))
+p2 <- ggplot(df, aes(x=r, y=..density..)) + geom_histogram(binwidth=0.5) + xlab("") + ylab("") + geom_line(aes(x=x, y=d), color="red") + 
+  ggtitle("Sample") + xlim(c(0,4.5))
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Lognormal
+
+- Also called Galton's distribution
+- Generated when $Y\sim N(\mu, \sigma)$, and study $X=exp(Y)$
+- used for modeling length of comments posted in internet discussion forums, users' dwell time on the online articles, size of living tissue, highly communicable epidemics
+
+```{r fig.align='center', fig.width=8, fig.height=3, fig.show='hold'}
+df <- data.frame(x=seq(0.005, 5, 0.005),  r=rlnorm(1000), d=dlnorm(seq(0.005, 5, 0.005)))
+p1 <- ggplot(df, aes(x=x, y=d)) + geom_line() + xlab("") + ylab("") +
+  geom_hline(yintercept=0, colour="grey70") + ggtitle("Theory") + xlim(c(0,4.5))
+p2 <- ggplot(df, aes(x=r, y=..density..)) + geom_histogram(binwidth=0.5) + xlab("") + ylab("") + geom_line(aes(x=x, y=d), color="red") + 
+  ggtitle("Sample") + xlim(c(0,4.5))
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Sampling variability
+
+```{r fig.align='center', fig.width=8, fig.height=5}
+df <- data.frame(x=sample(0:9, 50, replace = TRUE))
+p1 <- ggplot(df, aes(x=x)) + geom_bar() + 
+  scale_x_continuous("", breaks=0:10, labels=0:10) + ggtitle("n=50")
+df <- data.frame(x=sample(0:9, 100, replace = TRUE))
+p2 <- ggplot(df, aes(x=x)) + geom_bar() + 
+  scale_x_continuous("", breaks=0:10, labels=0:10) + ggtitle("n=100")
+df <- data.frame(x=sample(0:9, 1000, replace = TRUE))
+p3 <- ggplot(df, aes(x=x)) + geom_bar() + 
+  scale_x_continuous("", breaks=0:10, labels=0:10) + ggtitle("n=1000")
+df <- data.frame(x=sample(0:9, 100000, replace = TRUE))
+p4 <- ggplot(df, aes(x=x)) + geom_bar() + 
+  scale_x_continuous("", breaks=0:10, labels=0:10) + ggtitle("n=100000")
+grid.arrange(p1, p2, p3, p4, ncol=2)
+```
+
+## Probability calculations
+
+- Probability density functions are useful for computing expected quantities
+- E.g. Gamma(2,1), what is the probability of seeing $X>3.2$, or $1.5<X<2.5$
+
+```{r echo=TRUE}
+pgamma(3.2, 2, lower.tail=FALSE)
+pgamma(2.5, 2) - pgamma(1.5, 2)
+```
+
+```{r fig.align='center', fig.width=7, fig.height=2.5, fig.show='hold'}
+df <- data.frame(x=seq(0.005, 5, 0.005), d=dgamma(seq(0.005, 5, 0.005), shape=2))
+p1 <- ggplot(df, aes(x=x, y=d)) + geom_line() + xlab("") + ylab("") +
+  geom_hline(yintercept=0, colour="grey70") + 
+  geom_vline(xintercept=3.2, colour="red") +
+  ggtitle("X>3.2") + xlim(c(0,4.5))
+p2 <- ggplot(df, aes(x=x, y=d)) + geom_line() + xlab("") + ylab("") +
+  geom_hline(yintercept=0, colour="grey70") + 
+  geom_vline(xintercept=c(1.5, 2.5), colour="red") +
+  ggtitle("1.5<X<2.5") + xlim(c(0,4.5))
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Your turn
+
+- Continuous distributions: Area under the curve = ______
+- Discrete distributions: Sum of probabilities = ______
+
+## Resources
+
+- [NIST Statistics Handbook](http://www.itl.nist.gov/div898/handbook/eda/section3/eda366.htm)
+- [random.org](https://www.random.org/randomness/)
+- [Radioactive decay](https://www.fourmilab.ch/hotbits/)
+- [electromagnetic field of a vacuum](https://qrng.anu.edu.au)
+- [wikipedia](https://en.wikipedia.org/wiki/List_of_probability_distributions)
+
+## Share and share alike
+
+This work is licensed under the Creative Commons Attribution-Noncommercial 3.0 United States License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/ 3.0/us/ or send a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
