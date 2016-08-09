@@ -1,0 +1,104 @@
+---
+title: "ETC 2420/5242 Lab 3 2016"
+author: "Di Cook"
+date: "Week 3"
+output: html_document
+---
+
+```{r echo = FALSE, message = FALSE, warning = FALSE, warning = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  error = FALSE, 
+  echo = FALSE, 
+  collapse = TRUE,
+  comment = "#",
+  fig.height = 4,
+  fig.width = 8,
+  fig.align = "center",
+  cache = FALSE
+)
+```
+
+## Purpose
+
+This lab is to examine testing hypotheses using permutation. 
+
+## Background
+
+Read Sections 2.3, and the exercises in 2.9.3, of the online textbook "IntroStat with Randomization and Simulation". 
+ 
+## Problem description
+
+Is yawning contagious? An experiment conducted by the MythBusters, a science entertainment TV program on the Discovery Channel, tested if a person can be subconsciously influenced into yawning if another person near them yawns. 50 people were randomly assigned to two groups: 34 to a group where a person near them yawned (treatment) and 16 to a group where there wasn’t a person yawning near them (control). The following table shows the results of this experiment.
+
+```{r}
+yawn_expt <- data.frame(group=c(rep("treatment", 34), rep("control", 16)), 
+  yawn=c(rep("yes", 10), rep("no", 24), rep("yes", 4), rep("no", 12)))
+
+library(dplyr)
+library(tidyr)
+library(knitr)
+yawn_expt %>%
+   group_by(group, yawn) %>% 
+   tally() %>%
+   ungroup() %>%
+   spread(yawn, n, fill=0) %>% 
+   mutate(total = rowSums(.[-1])) %>% 
+   kable()
+```
+
+## Question 1
+
+a. How many subjects participated in the experiment?
+b. How were participants assigned to treatment and control groups?
+c. What are the two variables that describe the experiment?
+d. Compute the proportion of the treatment and control groups who yawned. Add this to the table.
+e. Compute the difference in proportions between the two groups.
+
+## Question 2
+
+The null hypothesis for the experiment is
+
+$$H_o: p_{control} = p_{treatment}$$
+
+a. Write the null hypothesis as an English sentence.
+
+b. What would be the alternative hypothesis tested by MythBusters? $H_o: p_{control} \neq p_{treatment}$, $H_a: p_{control} < p_{treatment}$ or $H_a: p_{control} > p_{treatment}$
+
+c. Explain your reasoning.
+
+## Question 3
+
+Write a function that permutes the `yawn` variable, and computes the difference between proportions of treatment and control groups.
+
+## Question 4
+
+a. Run the function 10000 times, saving the result.
+b. Make a histogram (or a dotplot) of the results.
+c. Draw a vertical line on the plot that represents the difference for the actual data.
+d. Compute the proportion of times that the permuted data yields a difference larger than the difference of the actual data.
+
+## Question 5
+
+a. Compute the (permutation) p-value for testing the null hypothesis.
+b. Based on your p-value, what is your decision about the null hypothesis? (Reject or fail to reject the null)
+c. Write a sentence stating your conclusion.
+d. Finally, based on these experimental results how would you answer "Is yawning contagious?"
+
+## TURN IN 
+
+- Your `.Rmd` file
+- Your Word (or pdf) file that results from knitting the Rmd.
+- Make sure your group members are listed as authors, one person per group will turn in the report
+- DUE: Wednesday after the lab, by 7am, loaded into moodle
+
+
+
+## Resources
+
+
+- [IntroStat with Randomization and Simulation](https://www.openintro.org/stat/textbook.php)
+
+
+
