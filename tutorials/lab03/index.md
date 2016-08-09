@@ -82,7 +82,7 @@ list(x = 10:1, y = list(a = c(TRUE, FALSE, TRUE), b = c("pig", "pig", "car")))
 * **Data frame**
     + `economics`, `gapminder` and `pedestrian` datasets that you looked at in the
       first week are all data frames.
-    * More on data structures in R, please read one of the chapters in [Advanced R](http://adv-r.had.co.nz/Data-structures.html).
+* More on data structures in R, please read one of the chapters in [Advanced R](http://adv-r.had.co.nz/Data-structures.html).
 
 ## Create a data frame
 
@@ -235,10 +235,10 @@ ggplot(data = pdif_df, aes(x = value)) +
 
 ## Consultation hours
 
-* Earo Wang
+* Earo
     * **Time**: 13:30 to 15:00 on Thursday
     * **Venue**: Level 11/W1106, Menzies Building
-* Nathaniel Tomasetti
+* Nathaniel
     * **Time**: 14:00 to 15:00 on Tuesday
     * **Venue**: Level 11/W1106, Menzies Building
 

@@ -30,7 +30,7 @@ read_chunk("lab03.R")
 * **Data frame**
     + `economics`, `gapminder` and `pedestrian` datasets that you looked at in the
       first week are all data frames.
-    * More on data structures in R, please read one of the chapters in [Advanced R](http://adv-r.had.co.nz/Data-structures.html).
+* More on data structures in R, please read one of the chapters in [Advanced R](http://adv-r.had.co.nz/Data-structures.html).
 
 ## Create a data frame
 
@@ -101,10 +101,10 @@ read_chunk("lab03.R")
 
 ## Consultation hours
 
-* Earo Wang
+* Earo
     * **Time**: 13:30 to 15:00 on Thursday
     * **Venue**: Level 11/W1106, Menzies Building
-* Nathaniel Tomasetti
+* Nathaniel
     * **Time**: 14:00 to 15:00 on Tuesday
     * **Venue**: Level 11/W1106, Menzies Building
 
