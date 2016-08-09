@@ -66,13 +66,6 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\
   </p>
   <p class="date">Lab 03</p>
 </div>
-<div id="consultation-hours" class="slide section level1">
-<h1>Consultation hours</h1>
-<ul>
-<li><strong>Time</strong>: 13:30 to 15:00 on Thursday</li>
-<li><strong>Venue</strong>: Level 11/W1106, Menzies Building</li>
-</ul>
-</div>
 <div id="data-structures-----data-frame" class="slide section level1">
 <h1>Data structures --- data frame</h1>
 <ul>
@@ -80,9 +73,12 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\
 <li>Matrix</li>
 <li>Array</li>
 <li>List</li>
-<li><strong>Data frame</strong></li>
+<li><strong>Data frame</strong>
+<ul>
+<li><code>economics</code>, <code>gapminder</code> and <code>pedestrian</code> datasets that you looked at in the first week are all data frames.</li>
+<li>More on data structures in R, please read one of the chapters in <a href="http://adv-r.had.co.nz/Data-structures.html">Advanced R</a>.</li>
+</ul></li>
 </ul>
-<p>More on data structures in R, please read one of the chapters in <a href="http://adv-r.had.co.nz/Data-structures.html">Advanced R</a>.</p>
 <h2 id="create-a-data-frame">Create a data frame</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
 <span class="kw">library</span>(tidyr)
@@ -163,8 +159,15 @@ yawn_expt %&gt;%
 }</code></pre></div>
 <ul>
 <li>Run the function 10000 times</li>
+<li>Set seed to make results reproducible</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">2016</span>) <span class="co"># set a seed to make the results reproducible</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1234</span>) <span class="co"># give a seed to randomly sample from 1:10</span>
+<span class="kw">sample</span>(<span class="dv">1</span>:<span class="dv">10</span>)</code></pre></div>
+<pre><code>##  [1]  2  6  5  8  9  4  1  7 10  3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1234</span>) <span class="co"># retrieve the last random sample by using the same seed</span>
+<span class="kw">sample</span>(<span class="dv">1</span>:<span class="dv">10</span>)</code></pre></div>
+<pre><code>##  [1]  2  6  5  8  9  4  1  7 10  3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">2016</span>) 
 diff_prop &lt;-<span class="st"> </span><span class="kw">numeric</span>(<span class="dt">length =</span> <span class="dv">10000</span>)
 for (i in <span class="dv">1</span>:<span class="dv">10000</span>) {
   <span class="co"># Writing a for-loop is easy peasy for you ;)</span>
@@ -182,12 +185,18 @@ pdif_df &lt;-<span class="st"> </span><span class="kw">as_data_frame</span>(diff
 </ul>
 <p><img src="figure/vline-1.png" title="plot of chunk vline" alt="plot of chunk vline" style="display: block; margin: auto;" /></p>
 </div>
-<div id="online-r-resources" class="slide section level1">
-<h1>Online R resources</h1>
+<div id="misc" class="slide section level1">
+<h1>Misc</h1>
+<h2 id="online-r-resources">Online R resources</h2>
 <ul>
-<li><a href="https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf">Data wrangling cheet sheet</a></li>
-<li><a href="https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf">Data visualization cheet sheet</a></li>
+<li><a href="https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf">Data wrangling cheet sheet</a> about <code>dplyr</code> and <code>tidyr</code></li>
+<li><a href="https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf">Data visualization cheet sheet</a> about <code>ggplot2</code></li>
 <li><a href="https://www.coursera.org/learn/r-programming">R programming course</a> on Coursera starts this week!</li>
+</ul>
+<h2 id="consultation-hours">Consultation hours</h2>
+<ul>
+<li><strong>Time</strong>: 13:30 to 15:00 on Thursday</li>
+<li><strong>Venue</strong>: Level 11/W1106, Menzies Building</li>
 </ul>
 <p><meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" /></p>
 </div>

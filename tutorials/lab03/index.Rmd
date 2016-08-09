@@ -13,11 +13,6 @@ opts_chunk$set(warning = FALSE, message = FALSE,
 read_chunk("lab03.R")
 ```
 
-# Consultation hours
-
-* **Time**: 13:30 to 15:00 on Thursday
-* **Venue**: Level 11/W1106, Menzies Building
-
 # Data structures --- data frame
 
 * Vector
@@ -25,8 +20,9 @@ read_chunk("lab03.R")
 * Array
 * List
 * **Data frame**
-
-More on data structures in R, please read one of the chapters in [Advanced R](http://adv-r.had.co.nz/Data-structures.html).
+    + `economics`, `gapminder` and `pedestrian` datasets that you looked at in the
+      first week are all data frames.
+    * More on data structures in R, please read one of the chapters in [Advanced R](http://adv-r.had.co.nz/Data-structures.html).
 
 ## Create a data frame
 
@@ -64,6 +60,10 @@ More on data structures in R, please read one of the chapters in [Advanced R](ht
 ```
 
 * Run the function 10000 times
+* Set seed to make results reproducible
+
+```{r seed}
+```
 
 ```{r diff_prop, eval = FALSE}
 ```
@@ -81,10 +81,19 @@ More on data structures in R, please read one of the chapters in [Advanced R](ht
 ```{r vline, echo = FALSE}
 ```
 
-# Online R resources
+# Misc
+
+## Online R resources
 
 * [Data wrangling cheet sheet](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
+  about `dplyr` and `tidyr`
 * [Data visualization cheet sheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
+  about `ggplot2`
 * [R programming course](https://www.coursera.org/learn/r-programming) on Coursera starts this week!
+
+## Consultation hours
+
+* **Time**: 13:30 to 15:00 on Thursday
+* **Venue**: Level 11/W1106, Menzies Building
 
 <meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" />

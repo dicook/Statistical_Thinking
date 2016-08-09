@@ -6,11 +6,6 @@ date: Lab 03
 
 
 
-# Consultation hours
-
-* **Time**: 13:30 to 15:00 on Thursday
-* **Venue**: Level 11/W1106, Menzies Building
-
 # Data structures --- data frame
 
 * Vector
@@ -18,8 +13,9 @@ date: Lab 03
 * Array
 * List
 * **Data frame**
-
-More on data structures in R, please read one of the chapters in [Advanced R](http://adv-r.had.co.nz/Data-structures.html).
+    + `economics`, `gapminder` and `pedestrian` datasets that you looked at in the
+      first week are all data frames.
+    * More on data structures in R, please read one of the chapters in [Advanced R](http://adv-r.had.co.nz/Data-structures.html).
 
 ## Create a data frame
 
@@ -110,10 +106,30 @@ prop_dif <- function(dat) {
 
 
 * Run the function 10000 times
+* Set seed to make results reproducible
 
 
 ```r
-set.seed(2016) # set a seed to make the results reproducible
+set.seed(1234) # give a seed to randomly sample from 1:10
+sample(1:10)
+```
+
+```
+##  [1]  2  6  5  8  9  4  1  7 10  3
+```
+
+```r
+set.seed(1234) # retrieve the last random sample by using the same seed
+sample(1:10)
+```
+
+```
+##  [1]  2  6  5  8  9  4  1  7 10  3
+```
+
+
+```r
+set.seed(2016) 
 diff_prop <- numeric(length = 10000)
 for (i in 1:10000) {
   # Writing a for-loop is easy peasy for you ;)
@@ -138,10 +154,19 @@ ggplot(data = pdif_df, aes(x = value)) +
 
 <img src="figure/vline-1.png" title="plot of chunk vline" alt="plot of chunk vline" style="display: block; margin: auto;" />
 
-# Online R resources
+# Misc
+
+## Online R resources
 
 * [Data wrangling cheet sheet](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
+  about `dplyr` and `tidyr`
 * [Data visualization cheet sheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
+  about `ggplot2`
 * [R programming course](https://www.coursera.org/learn/r-programming) on Coursera starts this week!
+
+## Consultation hours
+
+* **Time**: 13:30 to 15:00 on Thursday
+* **Venue**: Level 11/W1106, Menzies Building
 
 <meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" />

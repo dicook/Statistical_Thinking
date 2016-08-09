@@ -53,8 +53,14 @@ prop_dif <- function(dat) {
   return(diff_prop)
 }
 
+## ---- seed
+set.seed(1234) # give a seed to randomly sample from 1:10
+sample(1:10)
+set.seed(1234) # retrieve the last random sample by using the same seed
+sample(1:10)
+
 ## ----- diff_prop
-set.seed(2016) # set a seed to make the results reproducible
+set.seed(2016) 
 diff_prop <- numeric(length = 10000)
 for (i in 1:10000) {
   # Writing a for-loop is easy peasy for you ;)
