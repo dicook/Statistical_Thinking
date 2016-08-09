@@ -53,7 +53,7 @@ prop_dif <- function(dat) {
   return(diff_prop)
 }
 
-## ---- seed
+## ---- seed0
 # give a seed to randomly sample from 1:10
 set.seed(1234) 
 sample(1:10)

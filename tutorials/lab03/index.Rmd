@@ -62,7 +62,7 @@ read_chunk("lab03.R")
 * Run the function 10000 times
 * Set seed to make results reproducible
 
-```{r seed}
+```{r seed0}
 ```
 
 ```{r diff_prop, eval = FALSE}
