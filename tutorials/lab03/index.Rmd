@@ -16,9 +16,17 @@ read_chunk("lab03.R")
 # Data structures --- data frame
 
 * Vector
+```{r vector}
+```
 * Matrix
+```{r matrix}
+```
 * Array
+```{r array}
+```
 * List
+```{r list}
+```
 * **Data frame**
     + `economics`, `gapminder` and `pedestrian` datasets that you looked at in the
       first week are all data frames.

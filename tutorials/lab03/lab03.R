@@ -1,3 +1,16 @@
+## ---- vector
+c("pig", "pig", "car")
+rpois(n = 10, lambda = 3)
+
+## ---- matrix
+matrix(1:9, nrow = 3)
+
+## ---- array
+array(1:12, dim = c(2, 2, 3))
+
+## ---- list
+list(x = 10:1, y = list(a = c(TRUE, FALSE, TRUE), b = c("pig", "pig", "car")))
+
 ## ---- df
 library(dplyr)
 library(tidyr)

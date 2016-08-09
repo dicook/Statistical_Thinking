@@ -9,9 +9,76 @@ date: Lab 03
 # Data structures --- data frame
 
 * Vector
+
+```r
+c("pig", "pig", "car")
+```
+
+```
+## [1] "pig" "pig" "car"
+```
+
+```r
+rpois(n = 10, lambda = 3)
+```
+
+```
+##  [1] 0 3 5 5 2 1 4 5 2 1
+```
 * Matrix
+
+```r
+matrix(1:9, nrow = 3)
+```
+
+```
+##      [,1] [,2] [,3]
+## [1,]    1    4    7
+## [2,]    2    5    8
+## [3,]    3    6    9
+```
 * Array
+
+```r
+array(1:12, dim = c(2, 2, 3))
+```
+
+```
+## , , 1
+## 
+##      [,1] [,2]
+## [1,]    1    3
+## [2,]    2    4
+## 
+## , , 2
+## 
+##      [,1] [,2]
+## [1,]    5    7
+## [2,]    6    8
+## 
+## , , 3
+## 
+##      [,1] [,2]
+## [1,]    9   11
+## [2,]   10   12
+```
 * List
+
+```r
+list(x = 10:1, y = list(a = c(TRUE, FALSE, TRUE), b = c("pig", "pig", "car")))
+```
+
+```
+## $x
+##  [1] 10  9  8  7  6  5  4  3  2  1
+## 
+## $y
+## $y$a
+## [1]  TRUE FALSE  TRUE
+## 
+## $y$b
+## [1] "pig" "pig" "car"
+```
 * **Data frame**
     + `economics`, `gapminder` and `pedestrian` datasets that you looked at in the
       first week are all data frames.
