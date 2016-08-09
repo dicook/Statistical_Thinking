@@ -1,6 +1,6 @@
 ---
 title: "ETC2420/5242 <br> Testing hypotheses using permutation"
-author: Earo Wang <br> <earo.wang@gmail.com>
+author: Earo Wang <br> & <br> Nathaniel Tomasetti 
 date: Lab 03
 ---
 
@@ -166,7 +166,11 @@ ggplot(data = pdif_df, aes(x = value)) +
 
 ## Consultation hours
 
-* **Time**: 13:30 to 15:00 on Thursday
-* **Venue**: Level 11/W1106, Menzies Building
+* Earo Wang
+    * **Time**: 13:30 to 15:00 on Thursday
+    * **Venue**: Level 11/W1106, Menzies Building
+* Nathaniel Tomasetti
+    * **Time**: 14:00 to 15:00 on Tuesday
+    * **Venue**: Level 11/W1106, Menzies Building
 
 <meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" />
