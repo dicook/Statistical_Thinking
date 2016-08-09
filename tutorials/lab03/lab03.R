@@ -54,9 +54,11 @@ prop_dif <- function(dat) {
 }
 
 ## ---- seed
-set.seed(1234) # give a seed to randomly sample from 1:10
+# give a seed to randomly sample from 1:10
+set.seed(1234) 
 sample(1:10)
-set.seed(1234) # retrieve the last random sample by using the same seed
+# retrieve the last random sample by using the same seed
+set.seed(1234) 
 sample(1:10)
 
 ## ----- diff_prop

@@ -156,10 +156,12 @@ yawn_expt %&gt;%
 <li>Run the function 10000 times</li>
 <li>Set seed to make results reproducible</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1234</span>) <span class="co"># give a seed to randomly sample from 1:10</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># give a seed to randomly sample from 1:10</span>
+<span class="kw">set.seed</span>(<span class="dv">1234</span>) 
 <span class="kw">sample</span>(<span class="dv">1</span>:<span class="dv">10</span>)</code></pre></div>
 <pre><code>##  [1]  2  6  5  8  9  4  1  7 10  3</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1234</span>) <span class="co"># retrieve the last random sample by using the same seed</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># retrieve the last random sample by using the same seed</span>
+<span class="kw">set.seed</span>(<span class="dv">1234</span>) 
 <span class="kw">sample</span>(<span class="dv">1</span>:<span class="dv">10</span>)</code></pre></div>
 <pre><code>##  [1]  2  6  5  8  9  4  1  7 10  3</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">2016</span>) 
