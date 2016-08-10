@@ -72,10 +72,10 @@ read_chunk("lab03.R")
 ```{r seed0}
 ```
 
+* Run the function 10000 times
+
 ```{r diff_prop, eval = FALSE}
 ```
-
-* Run the function 10000 times
 
 ```{r diff_prop1, echo = FALSE}
 ```

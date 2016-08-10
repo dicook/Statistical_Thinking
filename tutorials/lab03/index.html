@@ -213,14 +213,16 @@ yawn_expt %&gt;%
 <span class="kw">set.seed</span>(<span class="dv">1234</span>) 
 <span class="kw">sample</span>(<span class="dv">1</span>:<span class="dv">10</span>)</code></pre></div>
 <pre><code>##  [1]  2  6  5  8  9  4  1  7 10  3</code></pre>
+<ul>
+<li>Run the function 10000 times</li>
+</ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">2016</span>) 
 diff_prop &lt;-<span class="st"> </span><span class="kw">numeric</span>(<span class="dt">length =</span> <span class="dv">10000</span>)
 for (i in <span class="dv">1</span>:<span class="dv">10000</span>) {
   <span class="co"># Writing a for-loop is easy peasy for you ;)</span>
 }</code></pre></div>
 <ul>
-<li><p>Run the function 10000 times</p></li>
-<li><p>Make a histogram</p></li>
+<li>Make a histogram</li>
 </ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
 pdif_df &lt;-<span class="st"> </span><span class="kw">as_data_frame</span>(diff_prop) <span class="co"># convert numerics to data frame</span>

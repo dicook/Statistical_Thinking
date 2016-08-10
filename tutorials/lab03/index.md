@@ -195,6 +195,8 @@ sample(1:10)
 ##  [1]  2  6  5  8  9  4  1  7 10  3
 ```
 
+* Run the function 10000 times
+
 
 ```r
 set.seed(2016) 
@@ -203,8 +205,6 @@ for (i in 1:10000) {
   # Writing a for-loop is easy peasy for you ;)
 }
 ```
-
-* Run the function 10000 times
 
 
 
