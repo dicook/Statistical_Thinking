@@ -1,6 +1,6 @@
 ---
 title: "ETC2420/5242 <br> Testing hypotheses using permutation"
-author: Earo Wang <br> & <br> Nathaniel Tomasetti 
+author: Earo Wang <br> <earo.wang@gmail.com>
 date: Lab 03
 ---
 
