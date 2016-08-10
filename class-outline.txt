@@ -56,6 +56,9 @@ Di: Aug 11-18
   - statistical distributions, simulation, density, quantiles;
       exponential, pareto, weibull, gamma, lognormal, 
   - extreme value distributions
+  - goodness-of-fit
+  - estimation using method of moments, maximum likelihood
+
 
 Topic 3: Linear models for credibility theory (1.5 weeks) (Linear models)
 Di: Aug 19-26
