@@ -23,7 +23,7 @@ rpois(n = 10, lambda = 3)
 ```
 
 ```
-##  [1] 0 3 5 5 2 1 4 5 2 1
+##  [1] 3 3 2 3 9 2 4 2 6 2
 ```
 * Matrix
 
@@ -172,7 +172,6 @@ prop_dif <- function(dat) {
 
 
 
-* Run the function 10000 times
 * Set seed to make results reproducible
 
 
@@ -205,6 +204,8 @@ for (i in 1:10000) {
 }
 ```
 
+* Run the function 10000 times
+
 
 
 * Make a histogram
@@ -220,6 +221,7 @@ ggplot(data = pdif_df, aes(x = value)) +
 <img src="figure/histogram-1.png" title="plot of chunk histogram" alt="plot of chunk histogram" style="display: block; margin: auto;" />
 
 * Draw a vertical line on the plot that represents the difference for the actual data
+    + It's your turn to figure out how to draw a vertical line using `ggplot2`.
 
 <img src="figure/vline-1.png" title="plot of chunk vline" alt="plot of chunk vline" style="display: block; margin: auto;" />
 
@@ -241,5 +243,18 @@ ggplot(data = pdif_df, aes(x = value)) +
 * Nathaniel
     * **Time**: 14:00 to 15:00 on Tuesday
     * **Venue**: Level 11/W1106, Menzies Building
+
+# View this slides in your browser
+
+<center>
+<http://rawgit.com/earowang/Statistical_Thinking/gh-pages/tutorials/lab03/index.html>
+</center>
+
+## Manual control
+* **Left/Right arrow**: page up/down; or click to page down
+* **C**: toggle table of content
+* **A**: display current or all slides
+* **S**: make fonts smaller
+* **B**: make fonts bigger
 
 <meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" />
