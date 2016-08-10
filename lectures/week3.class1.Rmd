@@ -37,6 +37,7 @@ library(gridExtra)
 - Random numbers
 - Mapping random numbers to events for simulation
 - Statistical distributions
+- Density functions
 - READING: CT6, Section 1.3-1.9
 
 ## Random numbers
