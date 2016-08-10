@@ -113,7 +113,7 @@ read_chunk("lab03.R")
 # View this slides in your browser
 
 <center>
-<http://rawgit.com/earowang/Statistical_Thinking/gh-pages/tutorials/lab03/index.html>
+<http://bit.ly/etc2420-lab03>
 </center>
 
 ## Manual control
