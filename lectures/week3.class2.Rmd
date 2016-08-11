@@ -2,7 +2,7 @@
 title: 'Statistical Methods for Insurance: Statistical distributions'
 author: Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monash
   University
-date: "W3.C1"
+date: "W3.C2"
 output:
   ioslides_presentation:
     transition: default
