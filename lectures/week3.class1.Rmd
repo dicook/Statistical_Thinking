@@ -161,7 +161,7 @@ grid.arrange(p1, p2, ncol=2)
 - symmetric, unimodal
 - $N(\mu, \sigma)$
 
- $$f(x~|~\mu, \sigma) = \frac{1}{\sqrt{2}\pi\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}}, ~~~ -\infty<x<\infty$$
+ $$f(x~|~\mu, \sigma) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}}, ~~~ -\infty<x<\infty$$
 
 ```{r fig.align='center', fig.width=8, fig.height=3, fig.show='hold'}
 df <- data.frame(x=seq(-4,4, 0.008),  r=rnorm(1001), d=dnorm(seq(-4,4, 0.008)))
