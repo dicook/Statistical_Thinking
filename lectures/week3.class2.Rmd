@@ -124,7 +124,7 @@ grid.arrange(p1, p2, p3, p4, ncol=2)
 
 $$
 \begin{aligned}
-L(\theta) &=P(X_1=x_1,X_2=x_2, ... ,X_n=x_n~|~\theta) \\      &=f(x_1;\theta)f(x_2;\theta)\cdots(x_n;\theta) \\
+L(\theta) &=P(X_1=x_1,X_2=x_2, ... ,X_n=x_n~|~\theta) \\      &=f(x_1|\theta)f(x_2|\theta)\cdots f(x_n|\theta) \\
 &=\prod_{i=1}^n f(x_i;\theta)
 \end{aligned}
 $$
