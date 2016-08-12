@@ -15,6 +15,8 @@ css: default.css
 library(knitr)
 opts_chunk$set(
   message = FALSE,
+  warning=FALSE,
+  error=FALSE,
   cache = FALSE,
   echo=FALSE,
   fig.height = 2,
@@ -65,12 +67,12 @@ ggplot(df, aes(x=x, y=d)) + geom_line() + xlab("") + ylab("") +
 - Why the normal model is so fundamental 
 - Regardless what distribution $X$ has, the mean of a sample will have a normal distribution, if the sample size is large:
 
-"Let $\{X_1, ..., X_n\}$ be a random sample of size $n$ — that is, a sequence of independent and identically distributed random variables drawn from a distribution mean given by $\mu$ and finite variance given by $\sigma^2$. The sample average is defined $\bar{X} = \sum_{i=1}^{n} X_i/n$, then as $n$ gets large the distribution of $\bar{X}$ approximates $N(\mu, \sigma^2/n)$."
+"Let $\{X_1, ..., X_n\}$ be a random sample of size $n$ — that is, a sequence of independent and identically distributed random variables drawn from a distribution mean given by $\mu$ and finite variance given by $\sigma^2$. The sample average is defined $\bar{X} = \sum_{i=1}^{n} X_i/n$, then as $n$ gets large the distribution of $\bar{X}$ approximates $N(\mu, \sigma/\sqrt{n})$."
 
 ## Example: Uniform parent
 
 ```{r fig.align='center', fig.width=8, fig.height=5}
-rs <- runif(1000000)
+rs <- runif(10000000)
 x2 <- apply(matrix(rs, ncol=2), 1, mean)
 x20 <- apply(matrix(rs, ncol=20), 1, mean)
 x50 <- apply(matrix(rs, ncol=50), 1, mean)
@@ -122,7 +124,7 @@ grid.arrange(p1, p2, p3, p4, ncol=2)
 
 $$
 \begin{aligned}
-L(\theta) &=P(X_1=x_1,X_2=x_2, ... ,X_n=x_n) \\      &=f(x_1;\theta)f(x_2;\theta)\cdots(x_n;\theta) \\
+L(\theta) &=P(X_1=x_1,X_2=x_2, ... ,X_n=x_n~|~\theta) \\      &=f(x_1;\theta)f(x_2;\theta)\cdots(x_n;\theta) \\
 &=\prod_{i=1}^n f(x_i;\theta)
 \end{aligned}
 $$
@@ -277,32 +279,32 @@ p1 <- ggplot(aus_math, aes(x=PV1MATH, y=q)) +
   geom_abline(intercept=0, slope=1) +
   geom_point() + xlim(c(-5, 5)) + ylim(c(-5, 5)) +
   xlab("Sample quantiles") + ylab("Theoretical quantile") +
-  theme(aspect.ratio=1)
+  theme(aspect.ratio=1) + ggtitle("(a)")
 p2 <- ggplot(aus_math, aes(x=s1, y=q)) + 
   geom_abline(intercept=0, slope=1) +
   geom_point() + xlim(c(-5, 5)) + ylim(c(-5, 5)) +
   xlab("Sample quantiles") + ylab("Theoretical quantile") +
-  theme(aspect.ratio=1)
+  theme(aspect.ratio=1) + ggtitle("(b)")
 p3 <- ggplot(aus_math, aes(x=s2, y=q)) + 
   geom_abline(intercept=0, slope=1) +
   geom_point() + xlim(c(-5, 5)) + ylim(c(-5, 5)) +
   xlab("Sample quantiles") + ylab("Theoretical quantile") +
-  theme(aspect.ratio=1)
+  theme(aspect.ratio=1) + ggtitle("(c)")
 p4 <- ggplot(aus_math, aes(x=s3, y=q)) + 
   geom_abline(intercept=0, slope=1) +
   geom_point() + xlim(c(-5, 5)) + ylim(c(-5, 5)) +
   xlab("Sample quantiles") + ylab("Theoretical quantile") +
-  theme(aspect.ratio=1)
+  theme(aspect.ratio=1) + ggtitle("(d)")
 p5 <- ggplot(aus_math, aes(x=s4, y=q)) + 
   geom_abline(intercept=0, slope=1) +
   geom_point() + xlim(c(-5, 5)) + ylim(c(-5, 5)) +
   xlab("Sample quantiles") + ylab("Theoretical quantile") +
-  theme(aspect.ratio=1)
+  theme(aspect.ratio=1) + ggtitle("(e)")
 p6 <- ggplot(aus_math, aes(x=s5, y=q)) + 
   geom_abline(intercept=0, slope=1) +
   geom_point() + xlim(c(-5, 5)) + ylim(c(-5, 5)) +
   xlab("Sample quantiles") + ylab("Theoretical quantile") +
-  theme(aspect.ratio=1)
+  theme(aspect.ratio=1) + ggtitle("(f)")
 grid.arrange(p1, p2, p3, p4, p5, p6, ncol=3)
 ```
 
@@ -333,27 +335,27 @@ df <- data.frame(re=sort(scale(rexp(100))), rp=sort(scale(rpareto(100, 1))),
 p1 <- ggplot(df, aes(x=re, y=rp)) + 
   geom_abline(intercept=0, slope=1) +
   geom_point() + xlab("") + ylab("") +
-  theme(aspect.ratio=1)
+  theme(aspect.ratio=1) + ggtitle("(a)")
 p2 <- ggplot(df, aes(x=re, y=re2)) + 
   geom_abline(intercept=0, slope=1) +
   geom_point() + xlab("") + ylab("") +
-  theme(aspect.ratio=1)
+  theme(aspect.ratio=1) + ggtitle("(b)")
 p3 <- ggplot(df, aes(x=re, y=re3)) + 
   geom_abline(intercept=0, slope=1) +
   geom_point() + xlab("") + ylab("") +
-  theme(aspect.ratio=1)
+  theme(aspect.ratio=1) + ggtitle("(c)")
 p4 <- ggplot(df, aes(x=re, y=re3)) + 
   geom_abline(intercept=0, slope=1) +
   geom_point() + xlab("") + ylab("") +
-  theme(aspect.ratio=1)
+  theme(aspect.ratio=1) + ggtitle("(d)")
 p5 <- ggplot(df, aes(x=re, y=re4)) + 
   geom_abline(intercept=0, slope=1) +
   geom_point() + xlab("") + ylab("") +
-  theme(aspect.ratio=1)
+  theme(aspect.ratio=1) + ggtitle("(e)")
 p6 <- ggplot(df, aes(x=re, y=re5)) + 
   geom_abline(intercept=0, slope=1) +
   geom_point() + xlab("") + ylab("") +
-  theme(aspect.ratio=1)
+  theme(aspect.ratio=1) + ggtitle("(f)")
 grid.arrange(p1, p2, p3, p4, p5, p6, ncol=3)
 ```
 
