@@ -26,10 +26,24 @@ Vocabulary: permutation, association, hypothesis, p-value, pseudo-random number 
 * Topic 2: Statistical distributions for decision theory (1.5 weeks)
 Di: Aug 11-18
 
-  - statistical distributions, simulation, density, quantiles;
-      exponential, pareto, weibull, gamma, lognormal, 
-  - extreme value distributions
+  - Week 3, Class 1:  Random numbers
+       Mapping random numbers to events for simulation
+       Statistical distributions
+        READING: CT6, Section 1.3-1.9
 
+  - Lab 3: Hypothesis testing using permutation
+
+  - Week 3, Class 2:  Random variables
+      Central limit theorem
+      Density functions
+      Quantiles
+      Estimation
+      Goodness of fit
+
+   - Week 4, Class 1: 
+
+   - Lab 4: Finding the best distribution to model olympic medals, estimate number of medals Australia will earn?
+ 
 * Topic 3: Linear models for credibility theory (1.5 weeks) (Linear models)
 Di: Aug 19-26
 
