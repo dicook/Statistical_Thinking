@@ -30,15 +30,10 @@ pnorm(1.9, mean = 2, sd = 0.5, lower.tail = FALSE)
 pnorm(2.2, mean = 2, sd = 0.5) - pnorm(1.8, mean = 2, sd = 0.5)
 
 ## ---- ex-quantile
-qnorm(0.53, mean = -3, sd = 4)
-qnorm(0.12, mean = -3, sd = 4)
-qnorm(0.84, mean = -3, sd = 4)
-qnorm(1.2, mean = -3, sd = 4)
+qnorm(c(0.53, 0.12, 0.84, 1.2), mean = -3, sd = 4)
 
 ## ---- ex-dens
-dnorm(-1, mean = -1.2, sd = 0.8)
-dnorm(-0.2, mean = -1.2, sd = 0.8)
-dnorm(-2, mean = -1.2, sd = 0.8)
+dnorm(c(-1, -0.2, -2), mean = -1.2, sd = 0.8)
 
 ## ---- ex-weibull
 xgrid <- seq(0, 7, 0.01)
