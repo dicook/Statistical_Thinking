@@ -121,6 +121,6 @@ fitdistr(X2$x, "gamma")
 ## ---- q3
 # install.packages("xts")
 # install.packages("sp")
-# install.packages("CASdatasets", repos = "http://cas.uqam.ca/pub/R/")
+# install.packages("CASdatasets", repos = "http://cas.uqam.ca/pub/R/", type = "source")
 library(CASdatasets)
 data(danishuni)

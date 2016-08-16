@@ -216,7 +216,7 @@ code may solve the issue.
 ```r
 # install.packages("xts")
 # install.packages("sp")
-# install.packages("CASdatasets", repos = "http://cas.uqam.ca/pub/R/")
+# install.packages("CASdatasets", repos = "http://cas.uqam.ca/pub/R/", type = "source")
 library(CASdatasets)
 data(danishuni)
 ```
