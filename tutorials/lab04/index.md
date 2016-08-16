@@ -83,12 +83,13 @@ dnorm(c(-1, -0.2, -2), mean = -1.2, sd = 0.8)
 
 
 ```r
+library(ggplot2)
+library(dplyr)
 xgrid <- seq(0, 7, 0.01)
 df_weibull <- data.frame(x = xgrid,
                          y1 = dweibull(xgrid, shape = 2, scale = 2.5),
                          y2 = dweibull(xgrid, shape = 1, scale = 2.5),
                          y3 = dweibull(xgrid, shape = 1, scale = 1))
-library(ggplot2)
 df_weibull %>% 
   ggplot(aes(x = xgrid)) +
   geom_line(aes(y = y1), col = "red") +

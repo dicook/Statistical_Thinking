@@ -91,12 +91,13 @@ Earo Wang <br> slides on <a href="http://bit.ly/etc2420-lab04" class="uri">http:
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dnorm</span>(<span class="kw">c</span>(-<span class="dv">1</span>, -<span class="fl">0.2</span>, -<span class="dv">2</span>), <span class="dt">mean =</span> -<span class="fl">1.2</span>, <span class="dt">sd =</span> <span class="fl">0.8</span>)</code></pre></div>
 <pre><code>## [1] 0.4833351 0.2283114 0.3024634</code></pre>
 <h2 id="plot-the-density-curves-for-weibull">Plot the density curves for Weibull</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">xgrid &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">7</span>, <span class="fl">0.01</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
+<span class="kw">library</span>(dplyr)
+xgrid &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">7</span>, <span class="fl">0.01</span>)
 df_weibull &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> xgrid,
                          <span class="dt">y1 =</span> <span class="kw">dweibull</span>(xgrid, <span class="dt">shape =</span> <span class="dv">2</span>, <span class="dt">scale =</span> <span class="fl">2.5</span>),
                          <span class="dt">y2 =</span> <span class="kw">dweibull</span>(xgrid, <span class="dt">shape =</span> <span class="dv">1</span>, <span class="dt">scale =</span> <span class="fl">2.5</span>),
                          <span class="dt">y3 =</span> <span class="kw">dweibull</span>(xgrid, <span class="dt">shape =</span> <span class="dv">1</span>, <span class="dt">scale =</span> <span class="dv">1</span>))
-<span class="kw">library</span>(ggplot2)
 df_weibull %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> xgrid)) +
 <span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y =</span> y1), <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>) +
