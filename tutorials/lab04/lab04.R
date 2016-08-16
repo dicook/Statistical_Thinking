@@ -72,9 +72,9 @@ df_gamma %>%
 
 ## ---- q2-df
 set.seed(123)
-gamma_df <- data.frame(x = rgamma(n = 267, 1.2, 0.25))
+X2 <- data.frame(x = rgamma(n = 267, 1.2, 0.25))
 ## ---- q2-hist
-ggplot(gamma_df, aes(x = x)) +
+ggplot(X2, aes(x = x)) +
   geom_histogram(binwidth = 2)
 
 ## ---- q2-nmle
@@ -95,7 +95,7 @@ beta <- seq(0.18, 0.32, 0.005)
 g <- expand.grid(x = alpha, y = beta) # all possible combinations of alpha and beta
 g$l <- 0
 for (i in 1:nrow(g)) {
-  g$l[i] <- nmle(gamma_df$x, g$x[i], g$y[i])
+  g$l[i] <- nmle(X2$x, g$x[i], g$y[i])
 }
 ## ---- q2-plot2
 ggplot(g, aes(x = x, y = y, fill = l)) + 
@@ -115,7 +115,7 @@ saveWidget(p, "3dscatter.html")
 
 ## ---- q2-fit
 library(MASS)
-fitdistr(gamma_df$x, "gamma")
+fitdistr(X2$x, "gamma")
 
 ## ---- q3
 # install.packages("xts")

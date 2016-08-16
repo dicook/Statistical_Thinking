@@ -148,7 +148,7 @@ df_gamma %>%
 
 ```r
 set.seed(123)
-gamma_df <- data.frame(x = rgamma(n = 267, 1.2, 0.25))
+X2 <- data.frame(x = rgamma(n = 267, 1.2, 0.25))
 ```
 
 ## Histogram for the sample
@@ -183,7 +183,7 @@ beta <- seq(0.18, 0.32, 0.005)
 g <- expand.grid(x = alpha, y = beta) # all possible combinations of alpha and beta
 g$l <- 0
 for (i in 1:nrow(g)) {
-  g$l[i] <- nmle(gamma_df$x, g$x[i], g$y[i])
+  g$l[i] <- nmle(X2$x, g$x[i], g$y[i])
 }
 ```
 
@@ -199,7 +199,7 @@ for (i in 1:nrow(g)) {
 
 ```r
 library(MASS)
-fitdistr(gamma_df$x, "gamma")
+fitdistr(X2$x, "gamma")
 ```
 
 ```

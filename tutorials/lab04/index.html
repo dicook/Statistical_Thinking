@@ -140,7 +140,7 @@ df_gamma &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span 
 <div id="likelihood-function" class="slide section level1">
 <h1>Likelihood function</h1>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">123</span>)
-gamma_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">rgamma</span>(<span class="dt">n =</span> <span class="dv">267</span>, <span class="fl">1.2</span>, <span class="fl">0.25</span>))</code></pre></div>
+X2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">rgamma</span>(<span class="dt">n =</span> <span class="dv">267</span>, <span class="fl">1.2</span>, <span class="fl">0.25</span>))</code></pre></div>
 <h2 id="histogram-for-the-sample">Histogram for the sample</h2>
 <p><img src="figure/q2-hist-1.png" title="plot of chunk q2-hist" alt="plot of chunk q2-hist" style="display: block; margin: auto;" /></p>
 <h2 id="compute-the-likelihood-function">Compute the likelihood function</h2>
@@ -160,7 +160,7 @@ beta &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">
 g &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">x =</span> alpha, <span class="dt">y =</span> beta) <span class="co"># all possible combinations of alpha and beta</span>
 g$l &lt;-<span class="st"> </span><span class="dv">0</span>
 for (i in <span class="dv">1</span>:<span class="kw">nrow</span>(g)) {
-  g$l[i] &lt;-<span class="st"> </span><span class="kw">nmle</span>(gamma_df$x, g$x[i], g$y[i])
+  g$l[i] &lt;-<span class="st"> </span><span class="kw">nmle</span>(X2$x, g$x[i], g$y[i])
 }</code></pre></div>
 <p><img src="figure/q2-plot2-1.png" title="plot of chunk q2-plot2" alt="plot of chunk q2-plot2" style="display: block; margin: auto;" /></p>
 <h2 id="interactive-3d-scatter-plot-using-plotly">Interactive 3D scatter plot using <code>plotly</code></h2>
@@ -168,7 +168,7 @@ for (i in <span class="dv">1</span>:<span class="kw">nrow</span>(g)) {
 </iframe>
 <h2 id="find-the-mle-estimates-for-alpha-beta">Find the MLE estimates for <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\beta\)</span></h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(MASS)
-<span class="kw">fitdistr</span>(gamma_df$x, <span class="st">&quot;gamma&quot;</span>)</code></pre></div>
+<span class="kw">fitdistr</span>(X2$x, <span class="st">&quot;gamma&quot;</span>)</code></pre></div>
 <pre><code>##      shape         rate   
 ##   1.23994762   0.28051981 
 ##  (0.09624333) (0.02667898)</code></pre>
