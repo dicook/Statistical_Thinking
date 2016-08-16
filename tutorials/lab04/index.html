@@ -84,7 +84,7 @@ Earo Wang <br> slides on <a href="http://bit.ly/etc2420-lab04" class="uri">http:
 </ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">pnorm</span>(<span class="fl">2.2</span>, <span class="dt">mean =</span> <span class="dv">2</span>, <span class="dt">sd =</span> <span class="fl">0.5</span>) -<span class="st"> </span><span class="kw">pnorm</span>(<span class="fl">1.8</span>, <span class="dt">mean =</span> <span class="dv">2</span>, <span class="dt">sd =</span> <span class="fl">0.5</span>)</code></pre></div>
 <pre><code>## [1] 0.3108435</code></pre>
-<h2 id="compute-the-quantile-value-for-n-3-4">Compute the quantile value for <span class="math inline">\(N(-3, 4)\)</span></h2>
+<h2 id="compute-the-quantile-values-for-n-3-4">Compute the quantile values for <span class="math inline">\(N(-3, 4)\)</span></h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">qnorm</span>(<span class="fl">0.53</span>, <span class="dt">mean =</span> -<span class="dv">3</span>, <span class="dt">sd =</span> <span class="dv">4</span>)</code></pre></div>
 <pre><code>## [1] -2.698921</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">qnorm</span>(<span class="fl">0.12</span>, <span class="dt">mean =</span> -<span class="dv">3</span>, <span class="dt">sd =</span> <span class="dv">4</span>)</code></pre></div>
@@ -154,7 +154,7 @@ df_gamma &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span 
 <h2 id="compute-the-likelihood-function">Compute the likelihood function</h2>
 <p><span class="math display">\[
 \begin{aligned}
-L(\alpha, \beta) &amp;=P(X_1=x_1,X_2=x_2, ... ,X_n=x_n~\big\vert~\alpha, \beta) \\      
+L(\alpha, \beta) &amp;=\Pr(X_1=x_1,X_2=x_2, ... ,X_n=x_n~\big\vert~\alpha, \beta) \\      
 &amp;=f(x_1\big\vert\alpha, \beta)f(x_2\big\vert\alpha, \beta)\cdots f(x_n\big\vert\alpha, \beta) \\
 &amp;=\prod_{i=1}^n f(x_i;\alpha, \beta)
 \end{aligned}
@@ -171,7 +171,7 @@ for (i in <span class="dv">1</span>:<span class="kw">nrow</span>(g)) {
   g$l[i] &lt;-<span class="st"> </span><span class="kw">nmle</span>(X2$x, g$x[i], g$y[i])
 }</code></pre></div>
 <p><img src="figure/q2-plot2-1.png" title="plot of chunk q2-plot2" alt="plot of chunk q2-plot2" style="display: block; margin: auto;" /></p>
-<h2 id="interactive-3d-scatter-plot">Interactive 3D scatter plot</h2>
+<h2 id="interactive-3d-scatter-plot-using-plotly">Interactive 3D scatter plot using <code>plotly</code></h2>
 <iframe src="3dscatter.html" height="100%" width="70%" align="middle">
 </iframe>
 <h2 id="find-the-mle-estimates-for-alpha-beta">Find the MLE estimates for <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\beta\)</span></h2>

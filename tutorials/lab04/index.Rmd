@@ -40,7 +40,7 @@ read_chunk("lab04.R")
 ```{r ex-prob3}
 ```
 
-## Compute the quantile value for $N(-3, 4)$
+## Compute the quantile values for $N(-3, 4)$
 
 ```{r ex-quantile}
 ```
@@ -88,7 +88,7 @@ $$  1 - 0.5^{(1/n)} ~~~ i=1 \\
 
 $$
 \begin{aligned}
-L(\alpha, \beta) &=P(X_1=x_1,X_2=x_2, ... ,X_n=x_n~\big\vert~\alpha, \beta) \\      
+L(\alpha, \beta) &=\Pr(X_1=x_1,X_2=x_2, ... ,X_n=x_n~\big\vert~\alpha, \beta) \\      
 &=f(x_1\big\vert\alpha, \beta)f(x_2\big\vert\alpha, \beta)\cdots f(x_n\big\vert\alpha, \beta) \\
 &=\prod_{i=1}^n f(x_i;\alpha, \beta)
 \end{aligned}
@@ -108,7 +108,7 @@ $$
 ```{r q2-plot2, echo = FALSE}
 ```
 
-## Interactive 3D scatter plot
+## Interactive 3D scatter plot using `plotly`
 
 <iframe src="3dscatter.html" height = "100%" width = "70%" align = "middle">
 </iframe>

@@ -57,7 +57,7 @@ pnorm(2.2, mean = 2, sd = 0.5) - pnorm(1.8, mean = 2, sd = 0.5)
 ## [1] 0.3108435
 ```
 
-## Compute the quantile value for $N(-3, 4)$
+## Compute the quantile values for $N(-3, 4)$
 
 
 ```r
@@ -193,7 +193,7 @@ df_gamma %>%
 
 $$
 \begin{aligned}
-L(\alpha, \beta) &=P(X_1=x_1,X_2=x_2, ... ,X_n=x_n~\big\vert~\alpha, \beta) \\      
+L(\alpha, \beta) &=\Pr(X_1=x_1,X_2=x_2, ... ,X_n=x_n~\big\vert~\alpha, \beta) \\      
 &=f(x_1\big\vert\alpha, \beta)f(x_2\big\vert\alpha, \beta)\cdots f(x_n\big\vert\alpha, \beta) \\
 &=\prod_{i=1}^n f(x_i;\alpha, \beta)
 \end{aligned}
@@ -223,7 +223,7 @@ for (i in 1:nrow(g)) {
 
 <img src="figure/q2-plot2-1.png" title="plot of chunk q2-plot2" alt="plot of chunk q2-plot2" style="display: block; margin: auto;" />
 
-## Interactive 3D scatter plot
+## Interactive 3D scatter plot using `plotly`
 
 <iframe src="3dscatter.html" height = "100%" width = "70%" align = "middle">
 </iframe>
