@@ -70,8 +70,8 @@ Earo Wang <br> slides on <a href="http://bit.ly/etc2420-lab04" class="uri">http:
 <ul>
 <li><span class="math inline">\(\Pr(X &lt; 1.3)\)</span></li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">pnorm</span>(<span class="fl">0.3</span>, <span class="dt">mean =</span> <span class="dv">2</span>, <span class="dt">sd =</span> <span class="fl">0.5</span>)</code></pre></div>
-<pre><code>## [1] 0.0003369293</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">pnorm</span>(<span class="fl">1.3</span>, <span class="dt">mean =</span> <span class="dv">2</span>, <span class="dt">sd =</span> <span class="fl">0.5</span>)</code></pre></div>
+<pre><code>## [1] 0.08075666</code></pre>
 <ul>
 <li><span class="math inline">\(\Pr(X &gt; 1.9) = 1 - \Pr(X \le 1.9)\)</span></li>
 </ul>
@@ -149,6 +149,8 @@ df_gamma &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span 
 </div>
 <div id="likelihood-function" class="slide section level1">
 <h1>Likelihood function</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">123</span>)
+gamma_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="kw">rgamma</span>(<span class="dt">n =</span> <span class="dv">267</span>, <span class="fl">1.2</span>, <span class="fl">0.25</span>))</code></pre></div>
 <h2 id="histogram-for-the-sample">Histogram for the sample</h2>
 <p><img src="figure/q2-hist-1.png" title="plot of chunk q2-hist" alt="plot of chunk q2-hist" style="display: block; margin: auto;" /></p>
 <h2 id="compute-the-likelihood-function">Compute the likelihood function</h2>
@@ -165,10 +167,10 @@ L(\alpha, \beta) &amp;=\Pr(X_1=x_1,X_2=x_2, ... ,X_n=x_n~\big\vert~\alpha, \beta
 <h2 id="plot-the-likelihood-function-for-a-range-of-values-of-alpha-and-beta">Plot the likelihood function for a range of values of <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span></h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">alpha &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.9</span>, <span class="fl">1.5</span>, <span class="fl">0.01</span>)
 beta &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.18</span>, <span class="fl">0.32</span>, <span class="fl">0.005</span>)
-g &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">x =</span> alpha, <span class="dt">y =</span> beta) <span class="co"># all possible combintations of alpha and beta</span>
+g &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">x =</span> alpha, <span class="dt">y =</span> beta) <span class="co"># all possible combinations of alpha and beta</span>
 g$l &lt;-<span class="st"> </span><span class="dv">0</span>
 for (i in <span class="dv">1</span>:<span class="kw">nrow</span>(g)) {
-  g$l[i] &lt;-<span class="st"> </span><span class="kw">nmle</span>(X2$x, g$x[i], g$y[i])
+  g$l[i] &lt;-<span class="st"> </span><span class="kw">nmle</span>(gamma_df$x, g$x[i], g$y[i])
 }</code></pre></div>
 <p><img src="figure/q2-plot2-1.png" title="plot of chunk q2-plot2" alt="plot of chunk q2-plot2" style="display: block; margin: auto;" /></p>
 <h2 id="interactive-3d-scatter-plot-using-plotly">Interactive 3D scatter plot using <code>plotly</code></h2>
@@ -176,7 +178,7 @@ for (i in <span class="dv">1</span>:<span class="kw">nrow</span>(g)) {
 </iframe>
 <h2 id="find-the-mle-estimates-for-alpha-beta">Find the MLE estimates for <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\beta\)</span></h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(MASS)
-<span class="kw">fitdistr</span>(X2$x, <span class="st">&quot;gamma&quot;</span>)</code></pre></div>
+<span class="kw">fitdistr</span>(gamma_df$x, <span class="st">&quot;gamma&quot;</span>)</code></pre></div>
 <pre><code>##      shape         rate   
 ##   1.23994762   0.28051981 
 ##  (0.09624333) (0.02667898)</code></pre>
@@ -192,6 +194,7 @@ for (i in <span class="dv">1</span>:<span class="kw">nrow</span>(g)) {
 <h2 id="online-r-resources">Online R resources</h2>
 <ul>
 <li><a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Distributions.html">A list of distribution functions in R</a></li>
+<li><a href="http://tutorials.iq.harvard.edu/R/Rgraphics/Rgraphics.html">Introduction to R Graphics with ggplot2</a></li>
 <li><a href="http://www.cookbook-r.com/Graphs/">Cookbook for R</a></li>
 </ul>
 <h2 id="consultation-hours">Consultation hours</h2>

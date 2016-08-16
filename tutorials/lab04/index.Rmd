@@ -79,6 +79,9 @@ $$  1 - 0.5^{(1/n)} ~~~ i=1 \\
 
 # Likelihood function
 
+```{r q2-df}
+```
+
 ## Histogram for the sample
 
 ```{r q2-hist, echo = FALSE}
@@ -121,7 +124,7 @@ $$
 p.s. if you have trouble in installing the `CASdatasets` package, the following
 code may solve the issue.
 
-```{r q3}
+```{r q3, eval = FALSE}
 ```
 
 # Misc
@@ -129,6 +132,7 @@ code may solve the issue.
 ## Online R resources
 
 * [A list of distribution functions in R](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Distributions.html)
+* [Introduction to R Graphics with ggplot2](http://tutorials.iq.harvard.edu/R/Rgraphics/Rgraphics.html)
 * [Cookbook for R](http://www.cookbook-r.com/Graphs/)
 
 ## Consultation hours

@@ -20,11 +20,11 @@ date: Lab 04
 
 
 ```r
-pnorm(0.3, mean = 2, sd = 0.5)
+pnorm(1.3, mean = 2, sd = 0.5)
 ```
 
 ```
-## [1] 0.0003369293
+## [1] 0.08075666
 ```
 
 + $\Pr(X > 1.9) = 1 - \Pr(X \le 1.9)$
@@ -185,6 +185,12 @@ df_gamma %>%
 
 # Likelihood function
 
+
+```r
+set.seed(123)
+gamma_df <- data.frame(x = rgamma(n = 267, 1.2, 0.25))
+```
+
 ## Histogram for the sample
 
 <img src="figure/q2-hist-1.png" title="plot of chunk q2-hist" alt="plot of chunk q2-hist" style="display: block; margin: auto;" />
@@ -214,10 +220,10 @@ nmle <- function(x, alpha, beta) {
 ```r
 alpha <- seq(0.9, 1.5, 0.01)
 beta <- seq(0.18, 0.32, 0.005)
-g <- expand.grid(x = alpha, y = beta) # all possible combintations of alpha and beta
+g <- expand.grid(x = alpha, y = beta) # all possible combinations of alpha and beta
 g$l <- 0
 for (i in 1:nrow(g)) {
-  g$l[i] <- nmle(X2$x, g$x[i], g$y[i])
+  g$l[i] <- nmle(gamma_df$x, g$x[i], g$y[i])
 }
 ```
 
@@ -233,7 +239,7 @@ for (i in 1:nrow(g)) {
 
 ```r
 library(MASS)
-fitdistr(X2$x, "gamma")
+fitdistr(gamma_df$x, "gamma")
 ```
 
 ```
@@ -259,6 +265,7 @@ data(danishuni)
 ## Online R resources
 
 * [A list of distribution functions in R](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Distributions.html)
+* [Introduction to R Graphics with ggplot2](http://tutorials.iq.harvard.edu/R/Rgraphics/Rgraphics.html)
 * [Cookbook for R](http://www.cookbook-r.com/Graphs/)
 
 ## Consultation hours

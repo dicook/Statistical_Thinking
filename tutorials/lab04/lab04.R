@@ -22,7 +22,7 @@ ggplot() +
             size = 8, col = "#2166ac", inherit.aes = FALSE)
 
 ## ---- ex-prob1
-pnorm(0.3, mean = 2, sd = 0.5)
+pnorm(1.3, mean = 2, sd = 0.5)
 ## ---- ex-prob2
 pnorm(1.9, mean = 2, sd = 0.5, lower.tail = FALSE)
 1 - pnorm(1.9, mean = 2, sd = 0.5)
@@ -75,10 +75,11 @@ df_gamma %>%
   ylab("Theoretical quantiles") +
   coord_equal()
 
-## ---- q2-hist
+## ---- q2-df
 set.seed(123)
-X2 <- data.frame(x = rgamma(n = 267, 1.2, 0.25))
-ggplot(X2, aes(x = x)) +
+gamma_df <- data.frame(x = rgamma(n = 267, 1.2, 0.25))
+## ---- q2-hist
+ggplot(gamma_df, aes(x = x)) +
   geom_histogram(binwidth = 2)
 
 ## ---- q2-nmle
@@ -96,10 +97,10 @@ nmle <- function(x, alpha, beta) {
 ## ---- q2-plot1
 alpha <- seq(0.9, 1.5, 0.01)
 beta <- seq(0.18, 0.32, 0.005)
-g <- expand.grid(x = alpha, y = beta) # all possible combintations of alpha and beta
+g <- expand.grid(x = alpha, y = beta) # all possible combinations of alpha and beta
 g$l <- 0
 for (i in 1:nrow(g)) {
-  g$l[i] <- nmle(X2$x, g$x[i], g$y[i])
+  g$l[i] <- nmle(gamma_df$x, g$x[i], g$y[i])
 }
 ## ---- q2-plot2
 ggplot(g, aes(x = x, y = y, fill = l)) + 
@@ -119,7 +120,7 @@ saveWidget(p, "3dscatter.html")
 
 ## ---- q2-fit
 library(MASS)
-fitdistr(X2$x, "gamma")
+fitdistr(gamma_df$x, "gamma")
 
 ## ---- q3
 # install.packages("xts")
