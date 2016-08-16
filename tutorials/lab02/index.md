@@ -208,7 +208,7 @@ ppc_play <- function(choice = 1, strategy = "switch") {
 # View this slides in your browser
 
 <center>
-<http://rawgit.com/earowang/Statistical_Thinking/gh-pages/tutorials/lab02/index.html>
+<http://bit.ly/etc2420-lab02>
 </center>
 
 ## Manual control

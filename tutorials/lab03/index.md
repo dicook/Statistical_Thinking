@@ -23,7 +23,7 @@ rpois(n = 10, lambda = 3)
 ```
 
 ```
-##  [1] 3 3 2 3 9 2 4 2 6 2
+##  [1] 0 3 5 5 2 1 4 5 2 1
 ```
 * Matrix
 
@@ -247,7 +247,7 @@ ggplot(data = pdif_df, aes(x = value)) +
 # View this slides in your browser
 
 <center>
-<http://rawgit.com/earowang/Statistical_Thinking/gh-pages/tutorials/lab03/index.html>
+<http://bit.ly/etc2420-lab03>
 </center>
 
 ## Manual control

@@ -130,7 +130,7 @@ The code above does the same thing. Which piece of R code is more efficient?
 # View this slides in your browser
 
 <center>
-<http://rawgit.com/earowang/Statistical_Thinking/gh-pages/tutorials/lab02/index.html>
+<http://bit.ly/etc2420-lab02>
 </center>
 
 ## Manual control
