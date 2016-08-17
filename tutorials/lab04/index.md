@@ -190,7 +190,7 @@ for (i in 1:nrow(g)) {
 
 <img src="figure/q2-plot2-1.png" title="plot of chunk q2-plot2" alt="plot of chunk q2-plot2" style="display: block; margin: auto;" />
 
-## Interactive 3D scatter plot using `plotly`
+## Interactive 3D surface plot using `plotly`
 
 <iframe src="3dscatter.html" height = "100%" width = "70%" align = "middle">
 </iframe>
