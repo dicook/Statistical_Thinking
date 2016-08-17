@@ -108,27 +108,12 @@ ggplot(g, aes(x = x, y = y, fill = l)) +
   theme(aspect.ratio = 1)
 
 ## ---- q2-plotly
-set.seed(123)
-x <- rgamma(n = 267, 1.2, 0.25)
-
-nmle <- function(x, alpha, beta) {
-  likelihood <- prod(dgamma(x, alpha, beta))
-  return(likelihood)
-}
-
-alpha <- seq(0.9, 1.5, 0.01)
-beta <- seq(0.18, 0.32, 0.005)
-m <- matrix(NA, nrow = length(alpha), ncol = length(beta))
-for (i in seq_along(alpha)) {
-  for (j in seq_along(beta)) {
-    m[i, j] <- nmle(x, alpha[i], beta[j])
-  }
-}
-
+m <- matrix(g$l, nrow = length(alpha))
 library(plotly)
 library(htmlwidgets)
 # there must be a precision issue with the colorbar...
-p <- plot_ly(x = ~alpha, y = ~beta, z = ~10^200*m) %>% add_surface()
+p <- plot_ly(z = ~10^200*m) %>% add_surface()
+# p <- plot_ly(x = ~alpha, y = ~beta, z = ~10^200*m) %>% add_surface()
 saveWidget(p, "3dscatter.html")
 
 ## ---- q2-fit
