@@ -263,10 +263,10 @@ n <- 201
 df1 <- data.frame(Total=df$Total+1,  
                  q=qpareto(c(1 - 0.5^(1/n), (2:(n-1) - 0.3175) / 
                                 (n + 0.365),0.5^(1/n)), 
-                            0.94))
+                            0.96))
 df2 <- data.frame(x=seq(1,104,1),
                  d=dpareto(seq(1,104,1), 
-                            0.94))
+                            0.96))
 p1 <- ggplot(df1, aes(x=Total)) + geom_histogram(aes(y=..density..)) +
   geom_line(data=df2, aes(x=x, y=d), colour="red") +
   ylim(c(0,0.25))

@@ -1,0 +1,201 @@
+---
+title: 'Statistical Methods for Insurance: Linear Models'
+author: Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monash
+  University
+date: "W4.C1"
+output:
+  ioslides_presentation:
+    transition: default
+    widescreen: yes
+  beamer_presentation: default
+css: default.css
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE,
+  echo=FALSE,
+  fig.height = 2,
+  fig.width = 5,
+  collapse = TRUE,
+  comment = "#>"
+)
+options(digits=2)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readr)
+library(gridExtra)
+```
+
+## Overview of this class
+
+- Fitting a linear model to olympic medal tally
+- Review of linear regression
+- READING: Ch 5, Diez, Barr, Cetinkaya-Rundel
+
+## Modeling Olympic medal counts
+
+```{r}
+olympics2008 <- read_csv("../data/olympics2008.csv")
+olympics2012 <- read_csv("../data/olympics2012.csv")
+
+gdp2008 <- read_delim("../data/gdp2008.csv", delim="\t",
+                      col_names=FALSE)[,3:4]
+colnames(gdp2008) <- c("Country", "GDP")
+oly_gdp2008 <- merge(olympics2008, gdp2008, by="Country", all.x=TRUE)
+
+gdp2012 <- read_delim("../data/gdp2012.csv", delim="\t",
+                      col_names=FALSE)[,1:2]
+colnames(gdp2012) <- c("Country", "GDP")
+oly_gdp2012 <- merge(olympics2012, gdp2012, by="Country", all.x=TRUE)
+
+oly_gdp2012 <- merge(oly_gdp2012, olympics2008[,c("Country","Total")],
+                     by="Country", all.x=TRUE)
+colnames(oly_gdp2012)[7] <- "Total"
+colnames(oly_gdp2012)[13] <- "Total.2008"
+oly_gdp2012[oly_gdp2012$Country=="HongKongChina", "Population"] <- 7155000
+oly_gdp2012[is.na(oly_gdp2012$Total.2008), "Total.2008"] <- 0
+oly12_lm <- glm(Total~Total.2008+Population+GDP, data=oly_gdp2012)
+library(broom)
+kable(tidy(oly12_lm))
+```
+
+$$M_{2012} = M_{2008} + Population + GDP + \varepsilon$$
+
+## Model summary
+
+```{r}
+glance(oly12_lm)
+```
+
+## Fit and residuals
+
+```{r fig.align='center', fig.width=8, fig.height=4}
+oly_gdp2012_diag <- augment(oly12_lm)
+oly_gdp2012_diag$Country <- oly_gdp2012$Country
+p1 <- ggplot(oly_gdp2012_diag, aes(x=.fitted, y=Total, 
+                                   label=Country)) +
+  geom_point() + ylab("Observed Count") + xlab("Fitted") +
+  theme(aspect.ratio=1)
+p2 <- ggplot(oly_gdp2012_diag, aes(x=.fitted, y=.resid, label=Country)) + geom_point() + ylab("Residuals") + xlab("Fitted") +
+  theme(aspect.ratio=1)
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Make plots interactive
+
+```{r fig.height=5, fig.width=5, fig.show='asis'}
+library(plotly)
+ggplotly(p2)
+```
+
+## Make plots interactive
+
+```{r fig.height=5, fig.width=5, fig.show='asis'}
+ggplotly(p1)
+```
+
+## Simple linear model
+
+$$Y = \beta_0 + \beta_1 X + \varepsilon$$
+
+- Explains how response variable ($Y$) changes in relation to explanatory variable ($X$), on average.
+- Use line to predict value of $Y$ for a given value of $X$
+
+```{r fig.align='center', fig.width=5, fig.height=3}
+library(xkcd)
+x <- runif(100) - 0.5
+df <- data.frame(x=x, y=-3*x+5+rnorm(100))
+ggplot(df, aes(x=x, y=y)) + geom_point() + 
+  geom_smooth(method="lm", se=F) + xlab("X") + ylab("Y") +
+  geom_text(aes(x=0.35, y=7,
+                label="linear model"), colour="blue", size=4) +
+  theme_bw() +
+  theme_xkcd()
+```
+
+## Observed, fitted, residuals
+
+- Observed value is $Y$ (a point on plot)
+- Fitted value is $\hat{Y}$, a value that lies on the line
+- Residual is the difference between observed and fitted, $e=Y-\hat{Y}$
+
+![](regression.png)
+
+## Fitting process
+
+- Minimizing the sum of squared residuals produces the best fitting line.
+- Minimizes $\sum e^2$
+- Line that is closest to the points, as a whole.
+
+## Parameter interpretation
+
+- Line of best fit: $\hat{Y}=b_0+b_1X$
+- $b_0$ is the intercept of the line with y-axis
+- $b_1$ is the slope of the line
+
+## Calculating manually
+
+Given standard deviation of $X$, $s_x$, standard deviation of $Y$, $s_y$, and the correlation, $r$,  between the two, the slope is computed by
+
+$$b_1 = r\frac{s_y}{s_x}$$
+
+and given the sample means $\bar{X}, \bar{Y}$
+
+$$b_0 = \bar{Y} - b_1\bar{X}$$
+
+## YOUR TURN
+
+Is the point $\bar{X}, \bar{Y}$ on the regression line?
+
+## Prediction
+
+For given $X$ values, plug these into the model equation to predict $Y$, 
+
+$$\hat{Y} = b_0 + b_1 X$$
+
+## Goodness of fit
+
+- $R^2$ is the proportion of variation in $Y$ that is explained by $X$. Computed by  
+$$ R^2 = 1- \frac{\sum e^2}{\sum Y^2} $$
+
+- Deviance: up to a constant, minus twice the maximized log-likelihood
+
+## Reading residual plots
+
+- Make a histogram and normal probability plot of the residuals - for a good fit the shape should be pretty symmetric and bell-shaped
+- Plot the residuals against the fitted values - for a good fit should be just a random splatter, no patterns
+
+## Residual plots
+
+![](residuals.png)
+
+## Diagnostics
+
+- Influential points: leverage (diagonal elements of hat matrix, values $> 2p/n$ would indicate cases with high influence), cooksd (Cooks distance, measures the change in the residual when the case is removed)
+- Collinearity between explanatory variables (multiple regression): variance inflation factor
+
+## Cautions
+
+- Association is not causation
+- Linear association only
+- Extrapolation outside the range of the data is not recommended
+
+## Anscombe's quartet
+
+![](anscombe.png)
+
+Always plot the data, because very different patterns can lead to the same correlation. 
+
+## Resources
+
+- [Statistics online textbook, Diez, Barr, Cetinkaya-Rundel](https://www.openintro.org/stat/textbook.php?stat_book=isrs)
+- [Ancombe's quartet](http://en.wikipedia.org/wiki/Anscombe's_quartet)
+
+## Share and share alike
+
+This work is licensed under the Creative Commons Attribution-Noncommercial 3.0 United States License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/ 3.0/us/ or send a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
