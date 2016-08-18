@@ -112,7 +112,7 @@ m <- matrix(g$l, nrow = length(alpha))
 library(plotly)
 library(htmlwidgets)
 # there must be a precision issue with the colorbar...
-p <- plot_ly(z = ~10^200*m) %>% add_surface()
+p <- plot_ly(x = ~beta, y = ~alpha, z = ~10^200*m) %>% add_surface()
 # p <- plot_ly(x = ~alpha, y = ~beta, z = ~10^200*m) %>% add_surface()
 saveWidget(p, "3dscatter.html")
 
