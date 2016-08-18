@@ -54,7 +54,7 @@ on the same plot.
 ## Question 1
 
 1. Simulate samples of size $n=$ 30, 100, 500 from these distributions
-    a. Lognormal(2, 5)
+    a. Lognormal(2, 0.5)
     b. Gamma(2, 4)
     
 2. Make a QQ-plot of each these samples. 

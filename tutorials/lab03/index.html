@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Earo Wang   earo.wang@gmail.com" />
+  <title>ETC2420/5242   Testing hypotheses using permutation</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+    href="http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css" />
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+   href="../myslidy.css" />
+  <script src="http://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js"
+    charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">ETC2420/5242 <br> Testing hypotheses using permutation</h1>
+  <p class="author">
+Earo Wang <br> <script type="text/javascript">
+<!--
+h='&#x67;&#x6d;&#x61;&#x69;&#108;&#46;&#x63;&#x6f;&#x6d;';a='&#64;';n='&#x65;&#x61;&#114;&#x6f;&#46;&#x77;&#x61;&#110;&#x67;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\/'+'a'+'>');
+// -->
+</script><noscript>&#x65;&#x61;&#114;&#x6f;&#46;&#x77;&#x61;&#110;&#x67;&#32;&#x61;&#116;&#32;&#x67;&#x6d;&#x61;&#x69;&#108;&#32;&#100;&#x6f;&#116;&#32;&#x63;&#x6f;&#x6d;</noscript>
+  </p>
+  <p class="date">Lab 03</p>
+</div>
+<div id="data-structures-----data-frame" class="slide section level1">
+<h1>Data structures --- data frame</h1>
+<ul>
+<li>Vector</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(<span class="st">&quot;pig&quot;</span>, <span class="st">&quot;pig&quot;</span>, <span class="st">&quot;car&quot;</span>)</code></pre></div>
+<pre><code>## [1] &quot;pig&quot; &quot;pig&quot; &quot;car&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rpois</span>(<span class="dt">n =</span> <span class="dv">10</span>, <span class="dt">lambda =</span> <span class="dv">3</span>)</code></pre></div>
+<pre><code>##  [1] 0 3 5 5 2 1 4 5 2 1</code></pre>
+<ul>
+<li>Matrix</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">matrix</span>(<span class="dv">1</span>:<span class="dv">9</span>, <span class="dt">nrow =</span> <span class="dv">3</span>)</code></pre></div>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    4    7
+## [2,]    2    5    8
+## [3,]    3    6    9</code></pre>
+<ul>
+<li>Array</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">array</span>(<span class="dv">1</span>:<span class="dv">12</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">3</span>))</code></pre></div>
+<pre><code>## , , 1
+## 
+##      [,1] [,2]
+## [1,]    1    3
+## [2,]    2    4
+## 
+## , , 2
+## 
+##      [,1] [,2]
+## [1,]    5    7
+## [2,]    6    8
+## 
+## , , 3
+## 
+##      [,1] [,2]
+## [1,]    9   11
+## [2,]   10   12</code></pre>
+<ul>
+<li>List</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">list</span>(<span class="dt">x =</span> <span class="dv">10</span>:<span class="dv">1</span>, <span class="dt">y =</span> <span class="kw">list</span>(<span class="dt">a =</span> <span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>, <span class="ot">TRUE</span>), <span class="dt">b =</span> <span class="kw">c</span>(<span class="st">&quot;pig&quot;</span>, <span class="st">&quot;pig&quot;</span>, <span class="st">&quot;car&quot;</span>)))</code></pre></div>
+<pre><code>## $x
+##  [1] 10  9  8  7  6  5  4  3  2  1
+## 
+## $y
+## $y$a
+## [1]  TRUE FALSE  TRUE
+## 
+## $y$b
+## [1] &quot;pig&quot; &quot;pig&quot; &quot;car&quot;</code></pre>
+<ul>
+<li><strong>Data frame</strong>
+<ul>
+<li><code>economics</code>, <code>gapminder</code> and <code>pedestrian</code> datasets that you looked at in the first week are all data frames.</li>
+</ul></li>
+<li>More on data structures in R, please read one of the chapters in <a href="http://adv-r.had.co.nz/Data-structures.html">Advanced R</a>.</li>
+</ul>
+<h2 id="create-a-data-frame">Create a data frame</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
+<span class="kw">library</span>(tidyr)
+<span class="co"># Create a data frame</span>
+yawn_expt &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">group =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;treatment&quot;</span>, <span class="dv">34</span>), <span class="kw">rep</span>(<span class="st">&quot;control&quot;</span>, <span class="dv">16</span>)),
+                        <span class="dt">yawn =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;yes&quot;</span>, <span class="dv">10</span>), <span class="kw">rep</span>(<span class="st">&quot;no&quot;</span>, <span class="dv">24</span>),
+                                 <span class="kw">rep</span>(<span class="st">&quot;yes&quot;</span>, <span class="dv">4</span>), <span class="kw">rep</span>(<span class="st">&quot;no&quot;</span>, <span class="dv">12</span>)))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Ways to take a look at the data frame</span>
+<span class="kw">head</span>(yawn_expt) <span class="co"># the first rows to display</span>
+<span class="kw">tail</span>(yawn_expt) <span class="co"># the last rows to display</span>
+<span class="kw">glimpse</span>(yawn_expt)</code></pre></div>
+</div>
+<div id="make-a-contingency-table" class="slide section level1">
+<h1>Make a contingency table</h1>
+<center>
+<table>
+<thead>
+<tr class="header">
+<th align="left">group</th>
+<th align="right">no</th>
+<th align="right">yes</th>
+<th align="right">total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">control</td>
+<td align="right">12</td>
+<td align="right">4</td>
+<td align="right">16</td>
+</tr>
+<tr class="even">
+<td align="left">treatment</td>
+<td align="right">24</td>
+<td align="right">10</td>
+<td align="right">34</td>
+</tr>
+</tbody>
+</table>
+</center>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Make a contigency table </span>
+long_yawn &lt;-<span class="st"> </span><span class="kw">tally</span>(<span class="kw">group_by</span>(yawn_expt, group, yawn))
+wide_yawn &lt;-<span class="st"> </span><span class="kw">spread</span>(long_yawn, yawn, n)
+tbl_yawn &lt;-<span class="st"> </span><span class="kw">mutate</span>(wide_yawn, <span class="dt">total =</span> <span class="kw">sum</span>(no, yes))
+tbl_yawn</code></pre></div>
+<pre><code>## Source: local data frame [2 x 4]
+## Groups: group [2]
+## 
+##       group    no   yes total
+##       &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+## 1   control    12     4    16
+## 2 treatment    24    10    34</code></pre>
+<ul>
+<li>However, the R code above is NOT readable, since it needs reading from right to left.</li>
+<li>&quot;Piping&quot; with <code>%&gt;%</code> has been introduced to make code more readable.</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Make a contigency table with pipe %&gt;%</span>
+yawn_expt %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(group, yawn) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">tally</span>() %&gt;%
+<span class="st">  </span><span class="kw">spread</span>(yawn, n) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">group_by</span>(group) %&gt;%
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">total =</span> <span class="kw">sum</span>(no, yes))</code></pre></div>
+<pre><code>## Source: local data frame [2 x 4]
+## Groups: group [2]
+## 
+##       group    no   yes total
+##       &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+## 1   control    12     4    16
+## 2 treatment    24    10    34</code></pre>
+</div>
+<div id="permutation-test" class="slide section level1">
+<h1>Permutation test</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">prop_dif &lt;-<span class="st"> </span>function(dat) {
+  permute_yawn &lt;-<span class="st"> </span>dat %&gt;%<span class="st"> </span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">yawn =</span> <span class="kw">sample</span>(yawn)) <span class="co"># permutate yawn variable</span>
+  <span class="co"># You&#39;re expected to write the rest of the function</span>
+}</code></pre></div>
+<ul>
+<li>Set seed to make results reproducible</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># give a seed to randomly sample from 1:10</span>
+<span class="kw">set.seed</span>(<span class="dv">1234</span>) 
+<span class="kw">sample</span>(<span class="dv">1</span>:<span class="dv">10</span>)</code></pre></div>
+<pre><code>##  [1]  2  6  5  8  9  4  1  7 10  3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># retrieve the last random sample by using the same seed</span>
+<span class="kw">set.seed</span>(<span class="dv">1234</span>) 
+<span class="kw">sample</span>(<span class="dv">1</span>:<span class="dv">10</span>)</code></pre></div>
+<pre><code>##  [1]  2  6  5  8  9  4  1  7 10  3</code></pre>
+<ul>
+<li>Run the function 10000 times</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">2016</span>) 
+diff_prop &lt;-<span class="st"> </span><span class="kw">numeric</span>(<span class="dt">length =</span> <span class="dv">10000</span>)
+for (i in <span class="dv">1</span>:<span class="dv">10000</span>) {
+  <span class="co"># Writing a for-loop is easy peasy for you ;)</span>
+}</code></pre></div>
+<ul>
+<li>Make a histogram</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
+pdif_df &lt;-<span class="st"> </span><span class="kw">as_data_frame</span>(diff_prop) <span class="co"># convert numerics to data frame</span>
+<span class="kw">ggplot</span>(<span class="dt">data =</span> pdif_df, <span class="kw">aes</span>(<span class="dt">x =</span> value)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">binwidth =</span> <span class="fl">0.025</span>)</code></pre></div>
+<p><img src="figure/histogram-1.png" title="plot of chunk histogram" alt="plot of chunk histogram" style="display: block; margin: auto;" /></p>
+<ul>
+<li>Draw a vertical line on the plot that represents the difference for the actual data
+<ul>
+<li>It's your turn to figure out how to draw a vertical line using <code>ggplot2</code>.</li>
+</ul></li>
+</ul>
+<p><img src="figure/vline-1.png" title="plot of chunk vline" alt="plot of chunk vline" style="display: block; margin: auto;" /></p>
+</div>
+<div id="misc" class="slide section level1">
+<h1>Misc</h1>
+<h2 id="online-r-resources">Online R resources</h2>
+<ul>
+<li><a href="https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf">Data wrangling cheet sheet</a> about <code>dplyr</code> and <code>tidyr</code></li>
+<li><a href="https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf">Data visualization cheet sheet</a> about <code>ggplot2</code></li>
+<li><a href="https://www.coursera.org/learn/r-programming">R programming course</a> on Coursera starts this week!</li>
+</ul>
+<h2 id="consultation-hours">Consultation hours</h2>
+<ul>
+<li>Earo
+<ul>
+<li><strong>Time</strong>: 13:30 to 15:00 on Thursday</li>
+<li><strong>Venue</strong>: Level 11/W1106, Menzies Building</li>
+</ul></li>
+<li>Nathaniel
+<ul>
+<li><strong>Time</strong>: 14:00 to 15:00 on Tuesday</li>
+<li><strong>Venue</strong>: Level 11/W1106, Menzies Building</li>
+</ul></li>
+</ul>
+</div>
+<div id="view-this-slides-in-your-browser" class="slide section level1">
+<h1>View this slides in your browser</h1>
+<center>
+<a href="http://bit.ly/etc2420-lab03" class="uri">http://bit.ly/etc2420-lab03</a>
+</center>
+<h2 id="manual-control">Manual control</h2>
+<ul>
+<li><strong>Left/Right arrow</strong>: page up/down; or click to page down</li>
+<li><strong>C</strong>: toggle table of content</li>
+<li><strong>A</strong>: display current or all slides</li>
+<li><strong>S</strong>: make fonts smaller</li>
+<li><strong>B</strong>: make fonts bigger</li>
+</ul>
+<p><meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" /></p>
+</div>
+</body>
+</html>

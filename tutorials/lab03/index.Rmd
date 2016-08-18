@@ -1,0 +1,126 @@
+---
+title: "ETC2420/5242 <br> Testing hypotheses using permutation"
+author: Earo Wang <br> <earo.wang@gmail.com>
+date: Lab 03
+---
+
+```{r initial, echo = FALSE, cache = FALSE, results = 'hide'}
+opts_chunk$set(warning = FALSE, message = FALSE, 
+			   fig.path = 'figure/', cache.path = 'cache/', 
+			   fig.align = 'center', dev = 'png', fig.width = 12, fig.height = 7, 
+			   fig.show = 'hold', cache = TRUE, external  =  TRUE,
+         dev = 'Cairo_png')
+read_chunk("lab03.R")
+```
+
+# Data structures --- data frame
+
+* Vector
+```{r vector}
+```
+* Matrix
+```{r matrix}
+```
+* Array
+```{r array}
+```
+* List
+```{r list}
+```
+* **Data frame**
+    + `economics`, `gapminder` and `pedestrian` datasets that you looked at in the
+      first week are all data frames.
+* More on data structures in R, please read one of the chapters in [Advanced R](http://adv-r.had.co.nz/Data-structures.html).
+
+## Create a data frame
+
+```{r df}
+```
+
+```{r glimpse, eval = FALSE}
+```
+
+# Make a contingency table
+
+```{r table1, echo = FALSE, results = "hide"}
+```
+
+<center>
+```{r kable, echo = FALSE}
+```
+</center>
+
+```{r table1}
+```
+
+* However, the R code above is NOT readable, since it needs reading from right to left.
+* "Piping" with `%>%` has been introduced to make code more readable.
+
+```{r table2}
+```
+
+# Permutation test
+
+```{r prop_dif, eval = FALSE}
+```
+
+```{r prop_dif2, echo = FALSE}
+```
+
+* Set seed to make results reproducible
+
+```{r seed0}
+```
+
+* Run the function 10000 times
+
+```{r diff_prop, eval = FALSE}
+```
+
+```{r diff_prop1, echo = FALSE}
+```
+
+* Make a histogram
+
+```{r histogram}
+```
+
+* Draw a vertical line on the plot that represents the difference for the actual data
+    + It's your turn to figure out how to draw a vertical line using `ggplot2`.
+
+```{r vline, echo = FALSE}
+```
+
+# Misc
+
+## Online R resources
+
+* [Data wrangling cheet sheet](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
+  about `dplyr` and `tidyr`
+* [Data visualization cheet sheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
+  about `ggplot2`
+* [R programming course](https://www.coursera.org/learn/r-programming) on Coursera starts this week!
+
+## Consultation hours
+
+* Earo
+    * **Time**: 13:30 to 15:00 on Thursday
+    * **Venue**: Level 11/W1106, Menzies Building
+* Nathaniel
+    * **Time**: 14:00 to 15:00 on Tuesday
+    * **Venue**: Level 11/W1106, Menzies Building
+
+# View this slides in your browser
+
+<center>
+<http://bit.ly/etc2420-lab03>
+</center>
+
+## Manual control
+* **Left/Right arrow**: page up/down; or click to page down
+* **C**: toggle table of content
+* **A**: display current or all slides
+* **S**: make fonts smaller
+* **B**: make fonts bigger
+
+<meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" />

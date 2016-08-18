@@ -9,7 +9,7 @@ date: Lab 01
 # View this slides in your browser
 
 <center>
-<http://rawgit.com/earowang/Statistical_Thinking/gh-pages/tutorials/lab01/index.html>
+<http://bit.ly/etc2420-lab01> 
 </center>
 
 ## Manual control
