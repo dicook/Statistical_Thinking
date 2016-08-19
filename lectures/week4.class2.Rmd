@@ -2,7 +2,7 @@
 title: 'Statistical Methods for Insurance: Linear Models'
 author: Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monash
   University
-date: "W4.C1"
+date: "W4.C2"
 output:
   ioslides_presentation:
     transition: default
@@ -59,12 +59,14 @@ colnames(oly_gdp2012)[7] <- "Total"
 colnames(oly_gdp2012)[13] <- "Total.2008"
 oly_gdp2012[oly_gdp2012$Country=="HongKongChina", "Population"] <- 7155000
 oly_gdp2012[is.na(oly_gdp2012$Total.2008), "Total.2008"] <- 0
-oly12_lm <- glm(Total~Total.2008+Population+GDP, data=oly_gdp2012)
+oly_gdp2012 <- oly_gdp2012 %>%
+  mutate(Pop_std=scale(Population), GDP_std=scale(GDP))
+oly12_lm <- glm(Total~Total.2008+Pop_std+GDP_std, data=oly_gdp2012)
 library(broom)
 kable(tidy(oly12_lm))
 ```
 
-$$M_{2012} = M_{2008} + Population + GDP + \varepsilon$$
+$$M_{2012} = \beta_0 + \beta_1 M_{2008} + \beta_2 Population + \beta_3 GDP + \varepsilon$$
 
 ## Model summary
 
