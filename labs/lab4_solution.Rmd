@@ -158,6 +158,22 @@ p2 <- ggplot(df, aes(x=x1, y=qg)) +
 grid.arrange(p1, p2, ncol=2)
 ```
 d. Which is the better fit to the sample? `Neither!! Maybe we should try a pareto?`
+e. Re-do steps a-d after log-transforming the `Loss`.
+```{r echo=TRUE}
+n <- nrow(danishuni)
+df <- data.frame(x1=log10(sort(danishuni$Loss+1)))
+df$qln = qlnorm(c(1 - 0.5^(1/n), (2:(n-1) - 0.3175) / 
+                       (n + 0.365),0.5^(1/n)), 0.78695, 0.7655451) 
+df$qg = qgamma(c(1 - 0.5^(1/n), (2:(n-1) - 0.3175) / 
+                       (n + 0.365),0.5^(1/n)), 1.2976, 0.38333) 
+p1 <- ggplot(df, aes(x=x1, y=qln)) + 
+  geom_smooth(method="lm") +
+  geom_point() + theme(aspect.ratio=1)
+p2 <- ggplot(df, aes(x=x1, y=qg)) + 
+  geom_smooth(method="lm") +
+  geom_point() + theme(aspect.ratio=1)
+grid.arrange(p1, p2, ncol=2)
+```
 
 ## TURN IN 
 
