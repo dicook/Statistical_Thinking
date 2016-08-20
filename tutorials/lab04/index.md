@@ -175,8 +175,6 @@ nmle <- function(x, alpha, beta) {
 
 
 
-## Plot the likelihood function for a range of values of $\alpha$ and $\beta$
-
 
 ```r
 alpha <- seq(0.9, 1.5, 0.01)
@@ -187,6 +185,8 @@ for (i in 1:nrow(g)) {
   g$l[i] <- nmle(X2$x, g$x[i], g$y[i])
 }
 ```
+
+## Plot the likelihood function for a range of values of $\alpha$ and $\beta$
 
 <img src="figure/q2-plot2-1.png" title="plot of chunk q2-plot2" alt="plot of chunk q2-plot2" style="display: block; margin: auto;" />
 

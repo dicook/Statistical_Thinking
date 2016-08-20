@@ -103,10 +103,10 @@ $$
 ```{r q2-nmle-fun, echo = FALSE}
 ```
 
-## Plot the likelihood function for a range of values of $\alpha$ and $\beta$
-
 ```{r q2-plot1}
 ```
+
+## Plot the likelihood function for a range of values of $\alpha$ and $\beta$
 
 ```{r q2-plot2, echo = FALSE}
 ```

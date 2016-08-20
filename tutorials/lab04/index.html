@@ -155,7 +155,6 @@ L(\alpha, \beta) &amp;=\Pr(X_1=x_1,X_2=x_2, ... ,X_n=x_n~\big\vert~\alpha, \beta
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nmle &lt;-<span class="st"> </span>function(x, alpha, beta) {
   <span class="co"># L(alpha, beta) = product of joint density functions</span>
 }</code></pre></div>
-<h2 id="plot-the-likelihood-function-for-a-range-of-values-of-alpha-and-beta">Plot the likelihood function for a range of values of <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span></h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">alpha &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.9</span>, <span class="fl">1.5</span>, <span class="fl">0.01</span>)
 beta &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.18</span>, <span class="fl">0.32</span>, <span class="fl">0.005</span>)
 g &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">x =</span> alpha, <span class="dt">y =</span> beta) <span class="co"># all possible combinations of alpha and beta</span>
@@ -163,6 +162,7 @@ g$l &lt;-<span class="st"> </span><span class="dv">0</span>
 for (i in <span class="dv">1</span>:<span class="kw">nrow</span>(g)) {
   g$l[i] &lt;-<span class="st"> </span><span class="kw">nmle</span>(X2$x, g$x[i], g$y[i])
 }</code></pre></div>
+<h2 id="plot-the-likelihood-function-for-a-range-of-values-of-alpha-and-beta">Plot the likelihood function for a range of values of <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span></h2>
 <p><img src="figure/q2-plot2-1.png" title="plot of chunk q2-plot2" alt="plot of chunk q2-plot2" style="display: block; margin: auto;" /></p>
 <h2 id="interactive-3d-surface-plot-using-plotly">Interactive 3D surface plot using <code>plotly</code></h2>
 <iframe src="3dscatter.html" height="100%" width="70%" align="middle">
