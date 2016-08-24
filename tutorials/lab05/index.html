@@ -232,7 +232,7 @@ Hat matrix <span class="math inline">\(H\)</span>
 </div>
 <div id="fitting-many-models-at-a-time-using-purrr" class="slide section level1">
 <h1>Fitting many models at a time (using <code>purrr</code>)</h1>
-<p>There exists a more <strong>elegant</strong> way to fit many models than a <code>for loop</code>.</p>
+<p>There exists a more <strong>elegant</strong> (lazy) way to fit many models than a <code>for loop</code>.</p>
 <h2 id="data-structures-----lists">Data structures --- lists</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># df = a list of data.frame</span>
 list_df &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">df =</span> <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="dv">1</span>:<span class="dv">5</span>, <span class="dt">y =</span> <span class="dv">1</span>:<span class="dv">5</span> +<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">5</span>)))

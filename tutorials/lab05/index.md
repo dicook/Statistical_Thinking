@@ -247,7 +247,7 @@ $$\hat{y} = Hy = X\hat{\beta}$$
 
 # Fitting many models at a time (using `purrr`)
 
-There exists a more **elegant** way to fit many models than a `for loop`.
+There exists a more **elegant** (lazy) way to fit many models than a `for loop`.
 
 ## Data structures --- lists
 
