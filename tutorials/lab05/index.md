@@ -44,7 +44,7 @@ glimpse(gapminder)
 
 ## Data visualisation
 
-* It's difficult to process numerical information in raw form.
+* It's difficult for us to process numerical information in raw form.
 * That's why statistical graphics come to play.
 
 
@@ -254,29 +254,29 @@ There exists a more **elegant** way to fit many models than a `for loop`.
 
 ```r
 # df1 = a list of data.frame
-list_df <- list(df1 = data.frame(x = 1:5, y = 1:5 + rnorm(5)))
+list_df <- list(df = data.frame(x = 1:5, y = 1:5 + rnorm(5)))
 # adding a new element called ols that is an lm object
-list_df$ols <- lm(y ~ x, data = list_df$df1)
+list_df$ols <- lm(y ~ x, data = list_df$df)
 list_df
 ```
 
 ```
-## $df1
-##   x        y
-## 1 1 1.588618
-## 2 2 1.624073
-## 3 3 3.453704
-## 4 4 3.269980
-## 5 5 5.328819
+## $df
+##   x          y
+## 1 1  0.5823573
+## 2 2 -0.5230919
+## 3 3  1.8772345
+## 4 4  5.1236248
+## 5 5  5.7854215
 ## 
 ## $ols
 ## 
 ## Call:
-## lm(formula = y ~ x, data = list_df$df1)
+## lm(formula = y ~ x, data = list_df$df)
 ## 
 ## Coefficients:
 ## (Intercept)            x  
-##      0.3151       0.9126
+##      -2.247        1.605
 ```
 
 ## Nesting the data into a list
@@ -442,13 +442,38 @@ head(country_fit)
 ## #   df.residual <int>
 ```
 
+# When to use `::` in R
+
+* When two different packages have the same function name, for example, there is
+  a function called `is.weekend()` from both the `chron` and `tseries` packages loaded 
+  into R. `chron::is.weekend()` tells R to use `is.weekend()` from `chron` instead
+  of `tseries`.
+
+
+```r
+library(chron)
+library(tseries)
+chron::is.weekend() # use is.weekend() from the package chron
+# tseries::is.weekend()
+```
+
+* In the lab instruction, the `purrr::map` and `broom::tidy` are unnecessary, since
+  there are no conflicting function names in the current R session. However, Di
+  uses `::` to indicate that `map` is from `purrr` and `tidy` is from `broom`.
+
+
+```r
+country_coefs <- by_country %>% 
+  unnest(model %>% purrr::map(broom::tidy))
+```
+
 # Misc
 
 ## Online R resources
 
 * [R for data science](http://r4ds.had.co.nz/lists.html) 
 * [Managing many models](http://wombat2016.org/slides/hadley.pdf) given by Hadley Wickham
-  at Wombat 2016, along with its [youtube video](https://www.youtube.com/watch?v=hRNUgwAFZtQ)
+  at Wombat 2016, along with the [youtube video](https://www.youtube.com/watch?v=hRNUgwAFZtQ)
 
 ## Consultation hours
 

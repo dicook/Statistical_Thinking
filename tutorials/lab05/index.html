@@ -97,7 +97,7 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\
 ## $ gdpPercap &lt;dbl&gt; 779.4453, 820.8530, 853.1007, 836.1971, 739.9811, 78...</code></pre>
 <h2 id="data-visualisation">Data visualisation</h2>
 <ul>
-<li>It's difficult to process numerical information in raw form.</li>
+<li>It's difficult for us to process numerical information in raw form.</li>
 <li>That's why statistical graphics come to play.</li>
 </ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data =</span> gapminder, <span class="kw">aes</span>(<span class="dt">x =</span> year, <span class="dt">y =</span> lifeExp, <span class="dt">group =</span> country)) +
@@ -235,26 +235,26 @@ Hat matrix <span class="math inline">\(H\)</span>
 <p>There exists a more <strong>elegant</strong> way to fit many models than a <code>for loop</code>.</p>
 <h2 id="data-structures-----lists">Data structures --- lists</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># df1 = a list of data.frame</span>
-list_df &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">df1 =</span> <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="dv">1</span>:<span class="dv">5</span>, <span class="dt">y =</span> <span class="dv">1</span>:<span class="dv">5</span> +<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">5</span>)))
+list_df &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">df =</span> <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="dv">1</span>:<span class="dv">5</span>, <span class="dt">y =</span> <span class="dv">1</span>:<span class="dv">5</span> +<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">5</span>)))
 <span class="co"># adding a new element called ols that is an lm object</span>
-list_df$ols &lt;-<span class="st"> </span><span class="kw">lm</span>(y ~<span class="st"> </span>x, <span class="dt">data =</span> list_df$df1)
+list_df$ols &lt;-<span class="st"> </span><span class="kw">lm</span>(y ~<span class="st"> </span>x, <span class="dt">data =</span> list_df$df)
 list_df</code></pre></div>
-<pre><code>## $df1
-##   x        y
-## 1 1 1.588618
-## 2 2 1.624073
-## 3 3 3.453704
-## 4 4 3.269980
-## 5 5 5.328819
+<pre><code>## $df
+##   x          y
+## 1 1  0.5823573
+## 2 2 -0.5230919
+## 3 3  1.8772345
+## 4 4  5.1236248
+## 5 5  5.7854215
 ## 
 ## $ols
 ## 
 ## Call:
-## lm(formula = y ~ x, data = list_df$df1)
+## lm(formula = y ~ x, data = list_df$df)
 ## 
 ## Coefficients:
 ## (Intercept)            x  
-##      0.3151       0.9126</code></pre>
+##      -2.247        1.605</code></pre>
 <h2 id="nesting-the-data-into-a-list">Nesting the data into a list</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">by_country &lt;-<span class="st"> </span>gapminder2 %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">select</span>(country, year1950, lifeExp, continent) %&gt;%
@@ -399,12 +399,27 @@ list_df</code></pre></div>
 ## #   df &lt;int&gt;, logLik &lt;dbl&gt;, AIC &lt;dbl&gt;, BIC &lt;dbl&gt;, deviance &lt;dbl&gt;,
 ## #   df.residual &lt;int&gt;</code></pre>
 </div>
+<div id="when-to-use-in-r" class="slide section level1">
+<h1>When to use <code>::</code> in R</h1>
+<ul>
+<li>When two different packages have the same function name, for example, there is a function called <code>is.weekend()</code> from both the <code>chron</code> and <code>tseries</code> packages loaded into R. <code>chron::is.weekend()</code> tells R to use <code>is.weekend()</code> from <code>chron</code> instead of <code>tseries</code>.</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(chron)
+<span class="kw">library</span>(tseries)
+chron::<span class="kw">is.weekend</span>() <span class="co"># use is.weekend() from the package chron</span>
+<span class="co"># tseries::is.weekend()</span></code></pre></div>
+<ul>
+<li>In the lab instruction, the <code>purrr::map</code> and <code>broom::tidy</code> are unnecessary, since there are no conflicting function names in the current R session. However, Di uses <code>::</code> to indicate that <code>map</code> is from <code>purrr</code> and <code>tidy</code> is from <code>broom</code>.</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">country_coefs &lt;-<span class="st"> </span>by_country %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">unnest</span>(model %&gt;%<span class="st"> </span>purrr::<span class="kw">map</span>(broom::tidy))</code></pre></div>
+</div>
 <div id="misc" class="slide section level1">
 <h1>Misc</h1>
 <h2 id="online-r-resources">Online R resources</h2>
 <ul>
 <li><a href="http://r4ds.had.co.nz/lists.html">R for data science</a></li>
-<li><a href="http://wombat2016.org/slides/hadley.pdf">Managing many models</a> given by Hadley Wickham at Wombat 2016, along with its <a href="https://www.youtube.com/watch?v=hRNUgwAFZtQ">youtube video</a></li>
+<li><a href="http://wombat2016.org/slides/hadley.pdf">Managing many models</a> given by Hadley Wickham at Wombat 2016, along with the <a href="https://www.youtube.com/watch?v=hRNUgwAFZtQ">youtube video</a></li>
 </ul>
 <h2 id="consultation-hours">Consultation hours</h2>
 <ul>
