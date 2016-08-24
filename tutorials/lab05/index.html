@@ -240,12 +240,12 @@ list_df &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="
 list_df$ols &lt;-<span class="st"> </span><span class="kw">lm</span>(y ~<span class="st"> </span>x, <span class="dt">data =</span> list_df$df)
 list_df</code></pre></div>
 <pre><code>## $df
-##   x        y
-## 1 1 1.981736
-## 2 2 3.309304
-## 3 3 3.590043
-## 4 4 2.723392
-## 5 5 5.153070
+##   x         y
+## 1 1 0.3201869
+## 2 2 3.3699710
+## 3 3 2.8905162
+## 4 4 3.1772788
+## 5 5 5.8349161
 ## 
 ## $ols
 ## 
@@ -254,7 +254,7 @@ list_df</code></pre></div>
 ## 
 ## Coefficients:
 ## (Intercept)            x  
-##      1.6245       0.5757</code></pre>
+##     -0.1325       1.0837</code></pre>
 <h2 id="nesting-the-data-into-a-list">Nesting the data into a list</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">by_country &lt;-<span class="st"> </span>gapminder2 %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">select</span>(country, year1950, lifeExp, continent) %&gt;%
@@ -402,12 +402,12 @@ list_df</code></pre></div>
 <div id="when-to-use-in-r" class="slide section level1">
 <h1>When to use <code>::</code> in R</h1>
 <ul>
-<li>When two different packages have the same function name, for example, there is a function called <code>is.weekend()</code> from both the <code>chron</code> and <code>tseries</code> packages loaded into R. <code>chron::is.weekend()</code> tells R to use <code>is.weekend()</code> from <code>chron</code> instead of <code>tseries</code>.</li>
+<li>When two different packages have the same function name, for example, there is a function called <code>filter()</code> from both the <code>stats</code> and <code>dplyr</code> packages loaded into R. <code>stats::filter()</code> tells R to use <code>filter()</code> from <code>stats</code> instead of <code>dplyr</code>.</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(chron)
-<span class="kw">library</span>(tseries)
-chron::<span class="kw">is.weekend</span>() <span class="co"># use is.weekend() from the package chron</span>
-<span class="co"># tseries::is.weekend()</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># library(stats) # it&#39;s one of base packages that are always loaded when starting R</span>
+<span class="kw">library</span>(dplyr)
+stats::<span class="kw">filter</span>() <span class="co"># linear filtering on a time series</span>
+dplyr::<span class="kw">filter</span>() <span class="co"># return rows with matching conditions</span></code></pre></div>
 <ul>
 <li>In the lab instruction, the <code>purrr::map</code> and <code>broom::tidy</code> are unnecessary, since there are no conflicting function names in the current R session. However, Di uses <code>::</code> to indicate that <code>map</code> is from <code>purrr</code> and <code>tidy</code> is from <code>broom</code>.</li>
 </ul>

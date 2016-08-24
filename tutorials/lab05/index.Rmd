@@ -134,15 +134,15 @@ There exists a more **elegant** way to fit many models than a `for loop`.
 # When to use `::` in R
 
 * When two different packages have the same function name, for example, there is
-  a function called `is.weekend()` from both the `chron` and `tseries` packages loaded 
-  into R. `chron::is.weekend()` tells R to use `is.weekend()` from `chron` instead
-  of `tseries`.
+  a function called `filter()` from both the `stats` and `dplyr` packages loaded 
+  into R. `stats::filter()` tells R to use `filter()` from `stats` instead
+  of `dplyr`.
 
 ```{r, eval = FALSE}
-library(chron)
-library(tseries)
-chron::is.weekend() # use is.weekend() from the package chron
-# tseries::is.weekend()
+# library(stats) # it's one of base packages that are always loaded when starting R
+library(dplyr)
+stats::filter() # linear filtering on a time series
+dplyr::filter() # return rows with matching conditions
 ```
 
 * In the lab instruction, the `purrr::map` and `broom::tidy` are unnecessary, since

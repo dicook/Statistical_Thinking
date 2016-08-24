@@ -262,12 +262,12 @@ list_df
 
 ```
 ## $df
-##   x        y
-## 1 1 1.981736
-## 2 2 3.309304
-## 3 3 3.590043
-## 4 4 2.723392
-## 5 5 5.153070
+##   x         y
+## 1 1 0.3201869
+## 2 2 3.3699710
+## 3 3 2.8905162
+## 4 4 3.1772788
+## 5 5 5.8349161
 ## 
 ## $ols
 ## 
@@ -276,7 +276,7 @@ list_df
 ## 
 ## Coefficients:
 ## (Intercept)            x  
-##      1.6245       0.5757
+##     -0.1325       1.0837
 ```
 
 ## Nesting the data into a list
@@ -445,16 +445,16 @@ head(country_fit)
 # When to use `::` in R
 
 * When two different packages have the same function name, for example, there is
-  a function called `is.weekend()` from both the `chron` and `tseries` packages loaded 
-  into R. `chron::is.weekend()` tells R to use `is.weekend()` from `chron` instead
-  of `tseries`.
+  a function called `filter()` from both the `stats` and `dplyr` packages loaded 
+  into R. `stats::filter()` tells R to use `filter()` from `stats` instead
+  of `dplyr`.
 
 
 ```r
-library(chron)
-library(tseries)
-chron::is.weekend() # use is.weekend() from the package chron
-# tseries::is.weekend()
+# library(stats) # it's one of base packages that are always loaded when starting R
+library(dplyr)
+stats::filter() # linear filtering on a time series
+dplyr::filter() # return rows with matching conditions
 ```
 
 * In the lab instruction, the `purrr::map` and `broom::tidy` are unnecessary, since
