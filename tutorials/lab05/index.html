@@ -234,18 +234,18 @@ Hat matrix <span class="math inline">\(H\)</span>
 <h1>Fitting many models at a time (using <code>purrr</code>)</h1>
 <p>There exists a more <strong>elegant</strong> way to fit many models than a <code>for loop</code>.</p>
 <h2 id="data-structures-----lists">Data structures --- lists</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># df1 = a list of data.frame</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># df = a list of data.frame</span>
 list_df &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">df =</span> <span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="dv">1</span>:<span class="dv">5</span>, <span class="dt">y =</span> <span class="dv">1</span>:<span class="dv">5</span> +<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">5</span>)))
 <span class="co"># adding a new element called ols that is an lm object</span>
 list_df$ols &lt;-<span class="st"> </span><span class="kw">lm</span>(y ~<span class="st"> </span>x, <span class="dt">data =</span> list_df$df)
 list_df</code></pre></div>
 <pre><code>## $df
-##   x          y
-## 1 1  0.5823573
-## 2 2 -0.5230919
-## 3 3  1.8772345
-## 4 4  5.1236248
-## 5 5  5.7854215
+##   x        y
+## 1 1 1.981736
+## 2 2 3.309304
+## 3 3 3.590043
+## 4 4 2.723392
+## 5 5 5.153070
 ## 
 ## $ols
 ## 
@@ -254,7 +254,7 @@ list_df</code></pre></div>
 ## 
 ## Coefficients:
 ## (Intercept)            x  
-##      -2.247        1.605</code></pre>
+##      1.6245       0.5757</code></pre>
 <h2 id="nesting-the-data-into-a-list">Nesting the data into a list</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">by_country &lt;-<span class="st"> </span>gapminder2 %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">select</span>(country, year1950, lifeExp, continent) %&gt;%

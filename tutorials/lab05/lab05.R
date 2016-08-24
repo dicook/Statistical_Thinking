@@ -49,7 +49,7 @@ oz_diag <- augment(oz_lm) # additional information like residuals
 oz_diag
 
 ## ---- list
-# df1 = a list of data.frame
+# df = a list of data.frame
 list_df <- list(df = data.frame(x = 1:5, y = 1:5 + rnorm(5)))
 # adding a new element called ols that is an lm object
 list_df$ols <- lm(y ~ x, data = list_df$df)

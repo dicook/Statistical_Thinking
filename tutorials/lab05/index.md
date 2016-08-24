@@ -253,7 +253,7 @@ There exists a more **elegant** way to fit many models than a `for loop`.
 
 
 ```r
-# df1 = a list of data.frame
+# df = a list of data.frame
 list_df <- list(df = data.frame(x = 1:5, y = 1:5 + rnorm(5)))
 # adding a new element called ols that is an lm object
 list_df$ols <- lm(y ~ x, data = list_df$df)
@@ -262,12 +262,12 @@ list_df
 
 ```
 ## $df
-##   x          y
-## 1 1  0.5823573
-## 2 2 -0.5230919
-## 3 3  1.8772345
-## 4 4  5.1236248
-## 5 5  5.7854215
+##   x        y
+## 1 1 1.981736
+## 2 2 3.309304
+## 3 3 3.590043
+## 4 4 2.723392
+## 5 5 5.153070
 ## 
 ## $ols
 ## 
@@ -276,7 +276,7 @@ list_df
 ## 
 ## Coefficients:
 ## (Intercept)            x  
-##      -2.247        1.605
+##      1.6245       0.5757
 ```
 
 ## Nesting the data into a list
