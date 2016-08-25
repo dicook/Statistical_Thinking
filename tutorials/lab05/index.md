@@ -245,6 +245,14 @@ oz_diag
 $$H = X(X'X)^{-1}X' $$
 $$\hat{y} = Hy = X\hat{\beta}$$
 
+
+```r
+ggplot(oz_diag, aes(x = .hat)) +
+  geom_dotplot(binwidth = 0.02)
+```
+
+<img src="figure/hat-1.png" title="plot of chunk hat" alt="plot of chunk hat" style="display: block; margin: auto;" />
+
 # Fitting many models at a time (using `purrr`)
 
 There exists a more **elegant** (lazy) way to fit many models than a `for loop`.

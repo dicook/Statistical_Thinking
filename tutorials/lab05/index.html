@@ -229,6 +229,9 @@ Hat matrix <span class="math inline">\(H\)</span>
 </ol>
 </ul>
 <p><span class="math display">\[H = X(X&#39;X)^{-1}X&#39; \]</span> <span class="math display">\[\hat{y} = Hy = X\hat{\beta}\]</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(oz_diag, <span class="kw">aes</span>(<span class="dt">x =</span> .hat)) +
+<span class="st">  </span><span class="kw">geom_dotplot</span>(<span class="dt">binwidth =</span> <span class="fl">0.02</span>)</code></pre></div>
+<p><img src="figure/hat-1.png" title="plot of chunk hat" alt="plot of chunk hat" style="display: block; margin: auto;" /></p>
 </div>
 <div id="fitting-many-models-at-a-time-using-purrr" class="slide section level1">
 <h1>Fitting many models at a time (using <code>purrr</code>)</h1>

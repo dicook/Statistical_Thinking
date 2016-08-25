@@ -48,6 +48,10 @@ oz_fit
 oz_diag <- augment(oz_lm) # additional information like residuals
 oz_diag
 
+## ---- hat
+ggplot(oz_diag, aes(x = .hat)) +
+  geom_dotplot(binwidth = 0.02)
+
 ## ---- list
 # df = a list of data.frame
 list_df <- list(df = data.frame(x = 1:5, y = 1:5 + rnorm(5)))

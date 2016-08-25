@@ -83,6 +83,9 @@ $$\widehat{\mathrm{lifeExp}}_{i} = \hat{\beta}_0 + \hat{\beta}_1 \times \mathrm{
 $$H = X(X'X)^{-1}X' $$
 $$\hat{y} = Hy = X\hat{\beta}$$
 
+```{r hat}
+```
+
 # Fitting many models at a time (using `purrr`)
 
 There exists a more **elegant** (lazy) way to fit many models than a `for loop`.
