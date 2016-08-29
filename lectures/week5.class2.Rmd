@@ -1,0 +1,307 @@
+---
+title: 'Statistical Methods for Insurance: Linear Models'
+author: Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monash
+  University
+date: "W5.C2"
+output:
+  ioslides_presentation:
+    transition: default
+    widescreen: yes
+  beamer_presentation: default
+css: default.css
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  error = FALSE, 
+  cache = FALSE,
+  echo=FALSE,
+  fig.height = 2,
+  fig.width = 5,
+  collapse = TRUE,
+  comment = "#>"
+)
+options(digits=2)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readr)
+library(gridExtra)
+```
+
+## Fit all possible models
+
+Olympic medal tallies:
+
+- Response: M2012
+- Explanatory variables: M2008, M2004, Pop, GDP
+- Pop and GDP are standardised; Medal counts are on the log10 scale
+
+## Your turn
+
+What are the possible models? How many are there?
+
+## Quick check
+
+```{r fig.align='center', fig.width=8, fig.height=4}
+oly_gdp2012 <- read.csv("../data/olympics_gdp_all.csv")
+oly_gdp2012_tf <- oly_gdp2012 %>% 
+  select(M2012, M2008, M2004, Pop_std, GDP_std)
+rownames(oly_gdp2012_tf) <- oly_gdp2012$Country
+oly_gdp2012_tf$M2004 <- log10(oly_gdp2012_tf$M2004+1)
+oly_gdp2012_tf$M2008 <- log10(oly_gdp2012_tf$M2008+1)
+oly_gdp2012_tf$M2012 <- log10(oly_gdp2012_tf$M2012+1)
+p1 <- ggplot(oly_gdp2012_tf, aes(x=M2008, y=GDP_std)) + geom_point()
+p2 <- ggplot(oly_gdp2012_tf, aes(x=M2008, y=Pop_std)) + geom_point()
+library(gridExtra)
+grid.arrange(p1, p2, ncol=2)
+```
+
+Need to log transform GDP and Pop, too.
+
+##
+
+```{r fig.align='center', fig.width=8, fig.height=4}
+oly_gdp2012_tf$GDP_std <- log10(oly_gdp2012_tf$GDP_std+1)
+oly_gdp2012_tf$Pop_std <- log10(oly_gdp2012_tf$Pop_std+1)
+p1 <- ggplot(oly_gdp2012_tf, aes(x=M2008, y=GDP_std)) + geom_point()
+p2 <- ggplot(oly_gdp2012_tf, aes(x=M2008, y=Pop_std)) + geom_point()
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Fit them - first one
+
+```{r results='hide'}
+library(meifly)
+oly_gdp2012_tf_models <- fitall(oly_gdp2012_tf[,1], 
+                                oly_gdp2012_tf[,-1], "lm")
+```
+
+```{r}
+summary(oly_gdp2012_tf_models[[1]])
+```
+
+## Second one 
+
+```{r}
+summary(oly_gdp2012_tf_models[[2]])
+```
+
+## Model fit summaries
+
+- Extract the model fit statistics, adjusted $R^2$, $R^2$, AIC, BIC, for each model, and display these against the degrees of freedom
+- Flip AIC and BIC, so that the direction matches other statistics
+- Helps choose best model
+- How different is the best model from the next best model
+
+##
+
+```{r fig.align='center', fig.width=10, fig.height=4}
+library(GGally)
+library(tidyr)
+library(purrr)
+library(broom)
+oly_gdp2012_tf_models_sum <- oly_gdp2012_tf_models %>%
+  map_df(glance) %>%
+  mutate(model = 1:15) %>%
+  mutate(negBIC = -1*BIC, negAIC = -1*AIC) 
+mod_desc <- NULL
+for (i in 1:15)
+  mod_desc <- c(mod_desc, as.character(summary(oly_gdp2012_tf_models[[i]])$call)[2])
+mod_desc <- data.frame(model=1:15, label=mod_desc)
+oly_gdp2012_tf_models_sum <- merge(oly_gdp2012_tf_models_sum, 
+                                   mod_desc, by="model")
+
+oly_gdp2012_tf_models_sum_m <- oly_gdp2012_tf_models_sum %>%
+  gather(fit_stat, val, r.squared, adj.r.squared, logLik, negAIC, 
+         negBIC, -BIC, -AIC, -deviance, -df, -label, -model, -statistic, -sigma) %>%
+  #group_by(fit_stat) %>% #mutate(stdval = rescale01(val)) %>%
+  group_by(fit_stat, df) %>% 
+  mutate(rank = min_rank(desc(val)))
+oly_gdp2012_tf_models_sum_m$fit_stat <-
+  factor(oly_gdp2012_tf_models_sum_m$fit_stat, 
+         levels=c("r.squared", "adj.r.squared", "logLik", 
+                  "negAIC", "negBIC"))
+ggplot(oly_gdp2012_tf_models_sum_m, aes(df, val)) +
+  geom_point() +
+  geom_line(data=filter(oly_gdp2012_tf_models_sum_m, rank == 1)) +
+  facet_wrap(~fit_stat, ncol = 5, scales = "free_y") +
+  xlab("Degrees of Freedom") +
+  ylab("Values")
+```
+
+## What do we learn?
+
+- Not a lot of improvement by adding more variables to the model with one variable 
+- Maybe gain a small amount with two variables
+- There is a big difference between the best and worst model
+
+## Interactive
+
+```{r fig.align='center', fig.width=5, fig.height=5, fig.show='hold'}
+library(plotly)
+p1 <- ggplot(oly_gdp2012_tf_models_sum, 
+            aes(df, adj.r.squared, label=label)) +
+  geom_point() +
+  ylim(c(0,1)) +
+  xlab("Degrees of Freedom") +
+  ylab("Adj R2")
+ggplotly(p1)
+```
+
+## What do we learn
+
+- The best single variable model uses M2008. The next best single variable model uses M2004. 
+- The best two variable model uses M2008 and GDP, but there is very little difference between the next two models (M2008, Pop; M2008, M2004).
+
+##
+
+```{r fig.align='center', fig.width=5, fig.height=5, fig.show='hold'}
+library(plotly)
+p2 <- ggplot(oly_gdp2012_tf_models_sum, 
+            aes(df, logLik, label=label)) +
+  geom_point() +
+  ylim(c(-50, 35)) + 
+  xlab("Degrees of Freedom") +
+  ylab("logLik")
+ggplotly(p2)
+```
+
+##
+
+```{r fig.align='center', fig.width=5, fig.height=5, fig.show='hold'}
+p3 <- ggplot(oly_gdp2012_tf_models_sum, 
+            aes(df, negBIC, label=label)) +
+  geom_point() +
+  ylim(c(-110, 50)) +
+  xlab("Degrees of Freedom") +
+  ylab("-BIC")
+ggplotly(p3)
+```
+
+## Coefficients for each model
+
+- Extract the parameter estimates for each model 
+- Plot these against the explanatory variable name
+- Connect values corresponding to the same model with lines
+
+##
+
+```{r fig.align='center', fig.width=8, fig.height=4}
+oly_gdp2012_tf_models_coef <- coefficients(oly_gdp2012_tf_models)
+oly_gdp2012_tf_models_coef <- merge(oly_gdp2012_tf_models_coef, mod_desc, by="model")
+ggplot(data = oly_gdp2012_tf_models_coef, aes(x=variable, y=std)) +
+  geom_point() + geom_line(aes(group=model)) +
+      ylab("Standardized Estimates") + xlab("Variable")
+```
+
+##
+
+```{r fig.align='center', fig.width=10, fig.height=5}
+p <- ggplot(data = oly_gdp2012_tf_models_coef, 
+            aes(x=variable, y=std, label=label)) +
+  geom_point() + geom_line(aes(group=model)) +
+      ylab("Standardized Estimates") + xlab("Variable")
+ggplotly(p)
+```
+
+## What do we learn
+
+- If M2008 is in the model, its coefficient is big and coefficients for other variables are really small. 
+- M2004 has a high coefficient, if M2008 is not in the model - it substitutes for M2008.
+- GDP and Pop only have high coefficients when M2008 and M2004 are not in the model. 
+
+## Balance complexity vs accuracy
+
+- Choose the simplest model that explains almost as much as a more complex model.
+
+- Choosing here between a single variable model using M2008, and adding GDP. 
+
+## Model A
+
+```{r}
+m_A <- lm(M2012~M2008, data=oly_gdp2012_tf)
+summary(m_A)
+```
+
+## Model B
+
+```{r}
+m_B <- lm(M2012~M2008+GDP_std, data=oly_gdp2012_tf)
+summary(m_B)
+```
+
+## Model comparison 
+
+```{r}
+anova(m_A, m_B)
+```
+
+## Your turn
+
+How much more explanatory power do we get by including GDP?
+
+## Diagnostics
+
+```{r fig.align='center', fig.width=8, fig.height=4}
+m_B_diag <- augment(m_B)
+p1 <- ggplot(m_B_diag, aes(x=.fitted, y=M2012)) + geom_point()
+p2 <- ggplot(m_B_diag, aes(y=.resid, x=.fitted)) + geom_point()
+library(gridExtra)
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Diagnostics
+
+```{r fig.align='center', fig.width=8, fig.height=4}
+m_B_diag <- augment(m_B)
+p1 <- ggplot(m_B_diag, aes(x=.hat)) + geom_histogram()
+p2 <- ggplot(m_B_diag, aes(x=.cooksd)) + geom_histogram()
+grid.arrange(p1, p2, ncol=2)
+```
+
+Hmm, do we have a problem with one observation?
+
+##
+
+```{r fig.align='center', fig.width=4, fig.height=4}
+p <- ggplot(m_B_diag, aes(x=.fitted, y=.cooksd, label=.rownames)) + geom_point()
+ggplotly(p)
+```
+
+## VIFs
+
+```{r fig.align='center', fig.width=4, fig.height=4}
+library(car)
+vif(m_B)
+ggplot(m_B_diag, aes(x=M2008, y=GDP_std)) + geom_point()
+m_B_coef <- coefficients(m_B)
+```
+
+## Final model
+
+- $log10(M2012+1)=$ `r m_B_coef[1]` $+$ `r m_B_coef[2]` $log10(M2008+1)+$ `r m_B_coef[3]` $log10(GDP_{std}+1)+\varepsilon$
+
+- Predict the medal count for Australia $M2008=46$ and $GDP=1507000000000$ ($GDP_{std}=0.3720791$). 
+
+- `r m_B_coef[1]`$+$ `r m_B_coef[2]` $log10(46+1)+$ `r m_B_coef[3]` $log10(0.3720791+1)$ = `r m_B_coef[1]+m_B_coef[2]*log10(46+1)+m_B_coef[3]*log10(0.3720791+1)`
+
+- The observed count for 2012 was 35 medals. What will the estimated medal count be?
+
+## ??
+
+```{r fig.align='center', fig.width=4, fig.height=4}
+p1 <- ggplot(m_B_diag, aes(x=.fitted, y=M2012, label=.rownames)) + geom_point()
+ggplotly(p1)
+```
+
+## Resources
+
+- [Statistics online textbook, Diez, Barr, Cetinkaya-Rundel](https://www.openintro.org/stat/textbook.php?stat_book=isrs)
+
+## Share and share alike
+
+This work is licensed under the Creative Commons Attribution-Noncommercial 3.0 United States License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/ 3.0/us/ or send a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
