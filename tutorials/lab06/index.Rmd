@@ -1,0 +1,34 @@
+---
+title: "ETC2420/5242 <br> Linear regression in R"
+author: Earo Wang <br> <earo.wang@gmail.com>
+date: Lab 06
+---
+
+```{r initial, echo = FALSE, cache = FALSE, results = 'hide'}
+opts_chunk$set(warning = FALSE, message = FALSE, 
+			   fig.path = 'figure/', cache.path = 'cache/', 
+			   fig.align = 'center', dev = 'png', fig.width = 10, fig.height = 6, 
+			   fig.show = 'hold', cache = TRUE, external  =  TRUE,
+         dev = 'Cairo_png')
+read_chunk("lab06.R")
+```
+
+
+# Misc
+
+## Online R resources
+
+* [R for data science](http://r4ds.had.co.nz/lists.html) 
+* [Managing many models](http://wombat2016.org/slides/hadley.pdf) given by Hadley Wickham
+  at Wombat 2016, along with the [youtube video](https://www.youtube.com/watch?v=hRNUgwAFZtQ)
+
+## Consultation hours
+
+* Earo
+    * **Time**: 13:30 to 15:00 on Thursday
+    * **Venue**: Level 11/W1106, Menzies Building
+* Nathaniel
+    * **Time**: 14:00 to 15:00 on Tuesday
+    * **Venue**: Level 11/W1106, Menzies Building
+
+<meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" />
