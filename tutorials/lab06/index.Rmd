@@ -107,7 +107,11 @@ Well... a shortcut to remove all the missing cases.
 ```{r inter}
 ```
 
-# Consultation hours
+# Misc
+
+[Nathaniel's lab help file](http://dicook.github.io/Statistical_Thinking/tutorials/lab06/lab6help.pdf)
+
+## Consultation hours
 
 * Earo
     * **Time**: 13:30 to 15:00 on Thursday

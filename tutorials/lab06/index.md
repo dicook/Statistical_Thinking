@@ -263,7 +263,11 @@ ggplot(aus_nomiss,
 
 <img src="figure/inter-1.png" title="plot of chunk inter" alt="plot of chunk inter" style="display: block; margin: auto;" />
 
-# Consultation hours
+# Misc
+
+[Nathaniel's lab help file](http://dicook.github.io/Statistical_Thinking/tutorials/lab06/lab6help.pdf)
+
+## Consultation hours
 
 * Earo
     * **Time**: 13:30 to 15:00 on Thursday
