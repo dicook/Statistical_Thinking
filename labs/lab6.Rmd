@@ -92,7 +92,7 @@ We need to replace the codes for missing, with NAs, so that R will handle these 
 australia <- australia %>% 
   select(math, ST04Q01, ST06Q01, ST57Q01, ST15Q01, ST19Q01, ST26Q01, ST26Q02, ST26Q04, ST26Q06, ST27Q02, ST28Q01, SENWGT_STU)
 australia$ST06Q01[australia$ST06Q01 > 9990] <- NA
-australia$ST57Q01[australia$ST57Q02 > 9990] <- NA
+australia$ST57Q01[australia$ST57Q01 > 9990] <- NA
 australia$ST15Q01[australia$ST15Q01 > 6] <- NA
 australia$ST19Q01[australia$ST19Q01 > 6] <- NA
 australia$ST26Q01[australia$ST26Q01 > 6] <- NA
