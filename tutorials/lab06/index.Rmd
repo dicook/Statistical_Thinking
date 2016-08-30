@@ -1,5 +1,5 @@
 ---
-title: "ETC2420/5242 <br> Linear regression in R"
+title: "ETC2420/5242 <br> Multiple linear regression in R"
 author: Earo Wang <br> <earo.wang@gmail.com>
 date: Lab 06
 ---
@@ -13,16 +13,101 @@ opts_chunk$set(warning = FALSE, message = FALSE,
 read_chunk("lab06.R")
 ```
 
+# Hands-on data analysis with R
 
-# Misc
+<!-- break -->
 
-## Online R resources
+```{r library}
+```
 
-* [R for data science](http://r4ds.had.co.nz/lists.html) 
-* [Managing many models](http://wombat2016.org/slides/hadley.pdf) given by Hadley Wickham
-  at Wombat 2016, along with the [youtube video](https://www.youtube.com/watch?v=hRNUgwAFZtQ)
+## Get real data
 
-## Consultation hours
+* Real datasets come in different data files, such as `csv`, `txt`, `json`, `xml`,
+  and etc.
+    + Getting the current working directory in R
+
+```{r wd}
+```
+
+* Read the data in
+
+```{r read, results = "hide"}
+```
+
+```{r summary, echo = FALSE}
+```
+
+## Poke around the data using graphics
+
+* Look at the correlations using scatter matrix plots
+
+```{r mat, fig.width = 8, fig.height = 8}
+```
+
+```{r math}
+```
+
+* Look at the distribution of Australian schools
+
+```{r school}
+```
+
+## Clean the data
+
+* Making implicit missing data to explicit
+
+```{r na}
+```
+
+## Examine each of the variables (pre-modelling)
+
+```{r tally, results = "hide"}
+```
+
+I'm lazy... I wrap Di's code into a function and let `purrr::map()` to do the rest.
+
+```{r tally1, results = "hide"}
+```
+
+* Actions to take
+    + Drop `ST57Q01`
+    + Remove missing values
+
+```{r var}
+```
+
+Well... a shortcut to remove all the missing cases.
+
+```{r var1}
+```
+
+```{r dim}
+```
+
+## Transform the data
+
+```{r tran}
+```
+
+## Start with linear regression
+
+```{r model}
+```
+
+* Heteroscedasticity due to students' socioeconomic and demographic characteristics
+
+```{r hist}
+```
+
+## Fit weighted linear regression
+
+```{r model1}
+```
+
+```{r inter}
+```
+
+# Consultation hours
 
 * Earo
     * **Time**: 13:30 to 15:00 on Thursday

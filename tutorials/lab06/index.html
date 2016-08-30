@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Earo Wang   earo.wang@gmail.com" />
+  <title>ETC2420/5242   Multiple linear regression in R</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+    href="http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css" />
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+   href="../myslidy.css" />
+  <script src="http://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js"
+    charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">ETC2420/5242 <br> Multiple linear regression in R</h1>
+  <p class="author">
+Earo Wang <br> <script type="text/javascript">
+<!--
+h='&#x67;&#x6d;&#x61;&#x69;&#108;&#46;&#x63;&#x6f;&#x6d;';a='&#64;';n='&#x65;&#x61;&#114;&#x6f;&#46;&#x77;&#x61;&#110;&#x67;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\/'+'a'+'>');
+// -->
+</script><noscript>&#x65;&#x61;&#114;&#x6f;&#46;&#x77;&#x61;&#110;&#x67;&#32;&#x61;&#116;&#32;&#x67;&#x6d;&#x61;&#x69;&#108;&#32;&#100;&#x6f;&#116;&#32;&#x63;&#x6f;&#x6d;</noscript>
+  </p>
+  <p class="date">Lab 06</p>
+</div>
+<div id="hands-on-data-analysis-with-r" class="slide section level1">
+<h1>Hands-on data analysis with R</h1>
+<!-- break -->
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyr)
+<span class="kw">library</span>(dplyr)
+<span class="kw">library</span>(purrr)
+<span class="kw">library</span>(broom)
+<span class="kw">library</span>(ggplot2)</code></pre></div>
+<h2 id="get-real-data">Get real data</h2>
+<ul>
+<li>Real datasets come in different data files, such as <code>csv</code>, <code>txt</code>, <code>json</code>, <code>xml</code>, and etc.
+<ul>
+<li>Getting the current working directory in R</li>
+</ul></li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">getwd</span>() <span class="co"># getting the current working directory</span></code></pre></div>
+<pre><code>## [1] &quot;/home/earo/Teaching/Statistical_Thinking/tutorials/lab06&quot;</code></pre>
+<ul>
+<li>Read the data in</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">student2012.sub &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="st">&quot;../../data/student_sub.rds&quot;</span>) 
+australia &lt;-<span class="st"> </span>student2012.sub %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">filter</span>(CNT ==<span class="st"> &quot;AUS&quot;</span>)
+<span class="kw">summary</span>(australia)</code></pre></div>
+<pre><code>##      CNT               SCHOOLID        ST04Q01         ST06Q01    
+##  Length:14481       Min.   :  1.0   Min.   :1.000   Min.   :   4  
+##  Class :character   1st Qu.:194.0   1st Qu.:1.000   1st Qu.:   5  
+##  Mode  :character   Median :392.0   Median :2.000   Median :   5  
+##                     Mean   :388.9   Mean   :1.511   Mean   : 794  
+##                     3rd Qu.:583.0   3rd Qu.:2.000   3rd Qu.:   6  
+##                     Max.   :775.0   Max.   :2.000   Max.   :9999</code></pre>
+<h2 id="poke-around-the-data-using-graphics">Poke around the data using graphics</h2>
+<ul>
+<li>Look at the correlations using scatter matrix plots</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(GGally)
+<span class="kw">ggscatmat</span>(australia, <span class="dt">columns =</span> <span class="dv">35</span>:<span class="dv">39</span>)</code></pre></div>
+<p><img src="figure/mat-1.png" title="plot of chunk mat" alt="plot of chunk mat" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">australia &lt;-<span class="st"> </span>australia %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">math =</span> (PV1MATH +<span class="st"> </span>PV2MATH +<span class="st"> </span>PV3MATH +<span class="st"> </span>PV4MATH +<span class="st"> </span>PV5MATH) /<span class="st"> </span><span class="dv">5</span>)</code></pre></div>
+<ul>
+<li>Look at the distribution of Australian schools</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aus_schools &lt;-<span class="st"> </span>australia %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">group_by</span>(SCHOOLID) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">tally</span>() %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(n)) 
+<span class="kw">dim</span>(aus_schools)</code></pre></div>
+<pre><code>## [1] 775   2</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(aus_schools, <span class="kw">aes</span>(<span class="dt">x =</span> n)) +<span class="st"> </span><span class="kw">geom_histogram</span>()</code></pre></div>
+<p><img src="figure/school-1.png" title="plot of chunk school" alt="plot of chunk school" style="display: block; margin: auto;" /></p>
+<h2 id="clean-the-data">Clean the data</h2>
+<ul>
+<li>Making implicit missing data to explicit</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">australia &lt;-<span class="st"> </span>australia %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">select</span>(math, ST04Q01, ST06Q01, ST57Q01, ST15Q01, ST19Q01, ST26Q01, ST26Q02, 
+         ST26Q04, ST26Q06, ST27Q02, ST28Q01, SENWGT_STU)
+australia$ST06Q01[australia$ST06Q01 &gt;<span class="st"> </span><span class="dv">9990</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
+australia$ST57Q01[australia$ST57Q01 &gt;<span class="st"> </span><span class="dv">9990</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
+australia$ST15Q01[australia$ST15Q01 &gt;<span class="st"> </span><span class="dv">6</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
+australia$ST19Q01[australia$ST19Q01 &gt;<span class="st"> </span><span class="dv">6</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
+australia$ST26Q01[australia$ST26Q01 &gt;<span class="st"> </span><span class="dv">6</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
+australia$ST26Q02[australia$ST26Q02 &gt;<span class="st"> </span><span class="dv">6</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
+australia$ST26Q04[australia$ST26Q04 &gt;<span class="st"> </span><span class="dv">6</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
+australia$ST26Q06[australia$ST26Q06 &gt;<span class="st"> </span><span class="dv">6</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
+australia$ST27Q02[australia$ST27Q02 &gt;<span class="st"> </span><span class="dv">6</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
+australia$ST28Q01[australia$ST28Q01 &gt;<span class="st"> </span><span class="dv">6</span>] &lt;-<span class="st"> </span><span class="ot">NA</span></code></pre></div>
+<h2 id="examine-each-of-the-variables-pre-modelling">Examine each of the variables (pre-modelling)</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">australia %&gt;%<span class="st"> </span><span class="kw">group_by</span>(ST04Q01) %&gt;%<span class="st"> </span><span class="kw">tally</span>()
+australia %&gt;%<span class="st"> </span><span class="kw">group_by</span>(ST06Q01) %&gt;%<span class="st"> </span><span class="kw">tally</span>()
+australia %&gt;%<span class="st"> </span><span class="kw">group_by</span>(ST57Q01) %&gt;%<span class="st"> </span><span class="kw">tally</span>()
+australia %&gt;%<span class="st"> </span><span class="kw">group_by</span>(ST15Q01) %&gt;%<span class="st"> </span><span class="kw">tally</span>()
+australia %&gt;%<span class="st"> </span><span class="kw">group_by</span>(ST19Q01) %&gt;%<span class="st"> </span><span class="kw">tally</span>()
+australia %&gt;%<span class="st"> </span><span class="kw">group_by</span>(ST26Q01) %&gt;%<span class="st"> </span><span class="kw">tally</span>()
+australia %&gt;%<span class="st"> </span><span class="kw">group_by</span>(ST26Q02) %&gt;%<span class="st"> </span><span class="kw">tally</span>()
+australia %&gt;%<span class="st"> </span><span class="kw">group_by</span>(ST26Q04) %&gt;%<span class="st"> </span><span class="kw">tally</span>()
+australia %&gt;%<span class="st"> </span><span class="kw">group_by</span>(ST26Q06) %&gt;%<span class="st"> </span><span class="kw">tally</span>()
+australia %&gt;%<span class="st"> </span><span class="kw">group_by</span>(ST27Q02) %&gt;%<span class="st"> </span><span class="kw">tally</span>()
+australia %&gt;%<span class="st"> </span><span class="kw">group_by</span>(ST28Q01) %&gt;%<span class="st"> </span><span class="kw">tally</span>()</code></pre></div>
+<p>I'm lazy... I wrap Di's code into a function and let <code>purrr::map()</code> to do the rest.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">count_by &lt;-<span class="st"> </span>function(group_var) {
+  <span class="kw">require</span>(lazyeval)
+  australia %&gt;%<span class="st"> </span><span class="kw">group_by_</span>(group_var) %&gt;%<span class="st"> </span><span class="kw">tally</span>()
+}
+groups &lt;-<span class="st"> </span><span class="kw">colnames</span>(australia)[<span class="dv">2</span>:<span class="dv">12</span>]
+groups %&gt;%<span class="st"> </span><span class="kw">map</span>(count_by)</code></pre></div>
+<ul>
+<li>Actions to take
+<ul>
+<li>Drop <code>ST57Q01</code></li>
+<li>Remove missing values</li>
+</ul></li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">australia &lt;-<span class="st"> </span>australia %&gt;%<span class="st"> </span><span class="kw">select</span>(-ST57Q01) <span class="co"># drop ST57Q01</span>
+aus_nomiss &lt;-<span class="st"> </span>australia %&gt;%<span class="st"> </span><span class="kw">filter</span>(!<span class="kw">is.na</span>(ST04Q01)) %&gt;%
+<span class="st">  </span><span class="kw">filter</span>(!<span class="kw">is.na</span>(ST06Q01)) %&gt;%<span class="st"> </span><span class="kw">filter</span>(!<span class="kw">is.na</span>(ST15Q01)) %&gt;%
+<span class="st">  </span><span class="kw">filter</span>(!<span class="kw">is.na</span>(ST19Q01)) %&gt;%<span class="st"> </span><span class="kw">filter</span>(!<span class="kw">is.na</span>(ST26Q01)) %&gt;%
+<span class="st">  </span><span class="kw">filter</span>(!<span class="kw">is.na</span>(ST26Q02)) %&gt;%<span class="st"> </span><span class="kw">filter</span>(!<span class="kw">is.na</span>(ST26Q04)) %&gt;%
+<span class="st">  </span><span class="kw">filter</span>(!<span class="kw">is.na</span>(ST26Q06)) %&gt;%<span class="st"> </span><span class="kw">filter</span>(!<span class="kw">is.na</span>(ST27Q02)) %&gt;%
+<span class="st">  </span><span class="kw">filter</span>(!<span class="kw">is.na</span>(ST28Q01))</code></pre></div>
+<p>Well... a shortcut to remove all the missing cases.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aus_nomiss &lt;-<span class="st"> </span>australia %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">filter</span>(<span class="kw">complete.cases</span>(.))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dim</span>(australia); <span class="kw">dim</span>(aus_nomiss)</code></pre></div>
+<pre><code>## [1] 14481    12</code></pre>
+<pre><code>## [1] 11918    12</code></pre>
+<h2 id="transform-the-data">Transform the data</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aus_nomiss$ST04Q01 &lt;-<span class="st"> </span><span class="kw">factor</span>(aus_nomiss$ST04Q01)
+aus_nomiss$ST15Q01 &lt;-<span class="st"> </span><span class="kw">factor</span>(aus_nomiss$ST15Q01)
+aus_nomiss$ST15Q01 &lt;-<span class="st"> </span><span class="kw">factor</span>(aus_nomiss$ST15Q01)
+aus_nomiss$ST19Q01 &lt;-<span class="st"> </span><span class="kw">factor</span>(aus_nomiss$ST19Q01)
+aus_nomiss$ST26Q01 &lt;-<span class="st"> </span><span class="kw">factor</span>(aus_nomiss$ST26Q01)
+aus_nomiss$ST26Q02 &lt;-<span class="st"> </span><span class="kw">factor</span>(aus_nomiss$ST26Q02)
+aus_nomiss$ST26Q04 &lt;-<span class="st"> </span><span class="kw">factor</span>(aus_nomiss$ST26Q04)
+aus_nomiss$ST26Q06 &lt;-<span class="st"> </span><span class="kw">factor</span>(aus_nomiss$ST26Q06)
+aus_nomiss &lt;-<span class="st"> </span>aus_nomiss %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">math_std =</span> (math -<span class="st"> </span><span class="kw">mean</span>(math)) /<span class="st"> </span><span class="kw">sd</span>(math))
+aus_nomiss$ST06Q01 &lt;-<span class="st"> </span>aus_nomiss$ST06Q01 -<span class="st"> </span><span class="dv">4</span></code></pre></div>
+<h2 id="start-with-linear-regression">Start with linear regression</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aus_lm &lt;-<span class="st"> </span><span class="kw">lm</span>(math_std ~<span class="st"> </span>ST04Q01 +<span class="st"> </span>ST26Q04 +<span class="st"> </span>ST28Q01, <span class="dt">data =</span> aus_nomiss)
+aus_lm_aug &lt;-<span class="st"> </span><span class="kw">augment</span>(aus_lm)
+<span class="kw">ggplot</span>(aus_lm_aug, <span class="kw">aes</span>(<span class="dt">x =</span> .fitted, <span class="dt">y =</span> .resid)) +
+<span class="st">  </span><span class="kw">geom_point</span>()</code></pre></div>
+<p><img src="figure/model-1.png" title="plot of chunk model" alt="plot of chunk model" style="display: block; margin: auto;" /></p>
+<ul>
+<li>Heteroscedasticity due to students' socioeconomic and demographic characteristics</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(aus_nomiss, <span class="kw">aes</span>(<span class="dt">x =</span> SENWGT_STU)) +<span class="st"> </span><span class="kw">geom_histogram</span>()</code></pre></div>
+<p><img src="figure/hist-1.png" title="plot of chunk hist" alt="plot of chunk hist" style="display: block; margin: auto;" /></p>
+<h2 id="fit-weighted-linear-regression">Fit weighted linear regression</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aus_glm_test &lt;-<span class="st"> </span><span class="kw">glm</span>(math_std ~<span class="st"> </span>ST04Q01 +<span class="st"> </span>ST26Q04 +<span class="st"> </span>ST28Q01, <span class="dt">data =</span> aus_nomiss, 
+                    <span class="dt">weights =</span> SENWGT_STU)
+<span class="kw">summary</span>(aus_glm_test)</code></pre></div>
+<pre><code>## 
+## Call:
+## glm(formula = math_std ~ ST04Q01 + ST26Q04 + ST28Q01, data = aus_nomiss, 
+##     weights = SENWGT_STU)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -1.17644  -0.14944  -0.01805   0.13373   0.99936  
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.855925   0.025023 -34.206   &lt;2e-16 ***
+## ST04Q012     0.193580   0.016809  11.516   &lt;2e-16 ***
+## ST26Q042    -0.607698   0.064350  -9.444   &lt;2e-16 ***
+## ST28Q01      0.241709   0.006062  39.871   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.05947803)
+## 
+##     Null deviance: 819.22  on 11917  degrees of freedom
+## Residual deviance: 708.62  on 11914  degrees of freedom
+## AIC: 34896
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(aus_nomiss, 
+       <span class="kw">aes</span>(<span class="dt">x =</span> ST28Q01, <span class="dt">y =</span> math_std, <span class="dt">colour =</span> <span class="kw">interaction</span>(ST04Q01, ST26Q04))) +
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<p><img src="figure/inter-1.png" title="plot of chunk inter" alt="plot of chunk inter" style="display: block; margin: auto;" /></p>
+</div>
+<div id="consultation-hours" class="slide section level1">
+<h1>Consultation hours</h1>
+<ul>
+<li>Earo
+<ul>
+<li><strong>Time</strong>: 13:30 to 15:00 on Thursday</li>
+<li><strong>Venue</strong>: Level 11/W1106, Menzies Building</li>
+</ul></li>
+<li>Nathaniel
+<ul>
+<li><strong>Time</strong>: 14:00 to 15:00 on Tuesday</li>
+<li><strong>Venue</strong>: Level 11/W1106, Menzies Building</li>
+</ul></li>
+</ul>
+<p><meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" /></p>
+</div>
+</body>
+</html>
