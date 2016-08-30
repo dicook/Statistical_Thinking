@@ -90,7 +90,7 @@ We need to replace the codes for missing, with NAs, so that R will handle these 
 
 ```{r echo=TRUE}
 australia <- australia %>% 
-  select(math, ST04Q01, ST06Q01, ST57Q02, ST15Q01, ST19Q01, ST26Q01, ST26Q02, ST26Q04, ST26Q06, ST27Q02, ST28Q01, SENWGT_STU)
+  select(math, ST04Q01, ST06Q01, ST57Q01, ST15Q01, ST19Q01, ST26Q01, ST26Q02, ST26Q04, ST26Q06, ST27Q02, ST28Q01, SENWGT_STU)
 australia$ST06Q01[australia$ST06Q01 > 9990] <- NA
 australia$ST57Q01[australia$ST57Q02 > 9990] <- NA
 australia$ST15Q01[australia$ST15Q01 > 6] <- NA
@@ -108,7 +108,7 @@ Tabulate each of the variables, to examine the support that we have on each, and
 ```{r echo=TRUE}
 australia %>% group_by(ST04Q01) %>% tally()
 australia %>% group_by(ST06Q01) %>% tally()
-australia %>% group_by(ST57Q02) %>% tally()
+australia %>% group_by(ST57Q01) %>% tally()
 australia %>% group_by(ST15Q01) %>% tally()
 australia %>% group_by(ST19Q01) %>% tally()
 australia %>% group_by(ST26Q01) %>% tally()
@@ -120,11 +120,11 @@ australia %>% group_by(ST28Q01) %>% tally()
 ```
 
 - Gender is clearly ok
-- Most children start at age 5 or 6 in Australia, there is less data for 4 and 7 years olds, but probably ok
-- Students in Australia don't spend much time on homework. Beyond 3 hours per week the numbers dwindle dramatically. It will be necessary to combine groups, maybe 9 or more hours into one group. Most data is missing on this variable, though. So it might be better to just not use it for modeling.
-- Mothers full-time, part-time and at-home are large groups, number of mothers looking for work is low, but migt be ok
-- Fathers are mostly in full-time work, numers in all other categories are relatively low.
-- Most Australian 15 years olds have a desk, their own room, computer and internet! Numbers without these are low, but maybe still enough for modeling.
+- Most children start at age 5 or 6 in Australia, there is less data for 4 and 7 year olds, but probably ok
+- Students in Australia don't spend much time on homework. Two hours is the mode, and then numbers dwindle. It will be necessary to combine groups, maybe 9 or more hours into one group. Most data is missing on this variable, though - 42.5%. So it might be better to just not use it for modeling.
+- Mothers full-time, part-time and at-home are large groups, number of mothers looking for work is low, but might be ok
+- Fathers are mostly in full-time work, numbers in all other categories are relatively low.
+- Most Australian 15 year olds have a desk, their own room, computer and internet! Numbers without these are low, but maybe still enough for modeling.
 - Most households have three or more TVs! Households without a TV are very few, and may not be enough to be able to build a model.
 - Most households have between 26-100 books. Most of the categories have large numbers so all should be ok to use. 
 
@@ -134,7 +134,7 @@ Actions to take:
 - Remove any case with missings - hopefully this is not very much
 
 ```{r echo=TRUE}
-australia <- australia %>% select(-ST57Q02)
+australia <- australia %>% select(-ST57Q01)
 aus_nomiss <- australia %>% filter(!is.na(ST04Q01)) %>%
   filter(!is.na(ST06Q01)) %>% filter(!is.na(ST15Q01)) %>%
   filter(!is.na(ST19Q01)) %>% filter(!is.na(ST26Q01)) %>%
@@ -151,7 +151,7 @@ The students all have weights associated with them. This is an indication of how
 ggplot(aus_nomiss, aes(x=SENWGT_STU)) + geom_histogram()
 ```
 
-There is a lot of variation in the weights. The weights are bimodal (is the bmodality due to one of the variables in the study that we are using for the model?) with a few very large ones. It looks like we will need to take weight into account in the model.
+There is a lot of variation in the weights. The weights are bimodal (is the bimodality due to one of the variables in the study that we are using for the model?) with a few very large ones. It looks like we will need to take weight into account in the model.
 
 Model building will be done using:
 
@@ -237,7 +237,7 @@ aus_glm_augment <- augment(aus_glm)
 ggplot(aus_glm_augment, aes(x=.hat, y=.cooksd)) + geom_point()
 ```
 
-- What value would be considered to tbe the cutoff for considering a case to have high leverage?
+- What value would be considered to be the cutoff for considering a case to have high leverage?
 - How many cases have high influence?
 
 
