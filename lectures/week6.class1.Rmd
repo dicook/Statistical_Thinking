@@ -1,0 +1,513 @@
+---
+title: 'Statistical Methods for Insurance: Bootstrap, Permutation and Linear Models'
+author: Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monash
+  University
+date: "W6.C1"
+output:
+  ioslides_presentation:
+    transition: default
+    widescreen: yes
+  beamer_presentation: default
+css: default.css
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE,
+  echo=FALSE,
+  fig.align='center', 
+  fig.height = 4,
+  fig.width = 4,
+  collapse = TRUE,
+  comment = "#>"
+)
+options(digits=4)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readr)
+library(gridExtra)
+```
+
+## Overview of this class
+
+- Review of t-tests, confidence intervals and prediction intervals
+- Review of bootstrap and permutation
+- Application to linear models
+
+## Recall the olympics model
+
+Counts on the log scale
+
+```{r}
+olympics2008 <- read_csv("../data/olympics2008.csv")
+olympics2012 <- read_csv("../data/olympics2012.csv")
+
+oly <- merge(olympics2012[,c("Country","Total")],
+             olympics2008[,c("Country","Total")], by="Country",
+             all.x=TRUE)
+colnames(oly)[2] <- "M2012"
+colnames(oly)[3] <- "M2008"
+oly <- oly %>% filter(!is.na(M2008))
+oly$M2008 <- log10(oly$M2008+1)
+oly$M2012 <- log10(oly$M2012+1)
+
+oly_lm <- glm(M2012~M2008, data=oly)
+library(broom)
+kable(tidy(oly_lm))
+coefs <- tidy(oly_lm)
+```
+
+Model is $log10(M2012+1)=$ `r coefs[1,2]` $+$ `r coefs[2,2]` $log10(M2008+1)+\varepsilon$.
+
+## Your turn
+
+Write down the formula that was used to get the test statistic for the slope parameter.
+
+##
+
+```{r}
+ggplot(oly, aes(x=M2008, y=M2012)) + geom_point() + 
+  geom_abline(intercept=0.10043, slope=0.90103)
+```
+
+## Answer
+
+$$\frac{b_1}{SE(b_1)}$$ 
+
+where
+
+$$SE(b_1)=\frac{MSE}{\sqrt{\sum_{i=1}^n(x_i - \bar{x})^2}}$$
+
+and 
+
+$$ MSE=\sqrt{\frac{\sum_{i=1}^n (y_i - \hat{y}_i)^2}{(n - 2)}}$$
+
+Check the numbers in the table.
+
+## t-test
+
+$$H_o: \beta_1 = 0~~vs~~H_a: \beta_1 \neq 0$$
+
+```{r fig.align='center', fig.width=6, fig.height=3}
+n <- nrow(oly)
+df <- data.frame(t=seq(-5,5,0.1),  d=dt(seq(-5,5,0.1), n-1))
+ggplot(df, aes(x=t, y=d)) + geom_line() + ylab("density") + 
+  geom_hline(yintercept=0, colour="grey70") + 
+  geom_vline(xintercept=coefs[2,4], colour="red")
+```
+
+Decision: p-value is very small (twice the area to the right of red line), reject $H_o$
+
+Conclusion: The slope parameter for the regression model using the entire population is not 0.
+
+## Confidence interval for slope
+
+$$b_1 \pm t_{\alpha/2, n-2} SE(b_1)$$
+
+For $\alpha=0.05$, yielding 95% confidence level, $n=$ `r nrow(oly)`, $t_{\alpha/2, n-2}=$ `r qt(0.975, n-2)`, 
+
+`r coefs[2,2]` $\pm$ `r qt(0.975, n-2)` $\times$ `r coefs[2,3]` = (`r coefs[2,2]-qt(0.975, n-2)*coefs[2,3]` , `r coefs[2,2]+qt(0.975, n-2)*coefs[2,3]`)
+
+Explanation: We are 95% sure that the slope of a regression model fitted to the entire population is between 0.8 and 1.0.  
+
+## Confidence interval for predicted value
+
+For a given value of $x$, $\hat{y} \pm t_{\alpha/2, n-2}MSE\sqrt{\frac{1}{n}+\frac{n(x-\bar{X})^2}{n\sum_{i=1}^n(X_i-\bar{X})^2}}$
+
+```{r}
+newdat <- data.frame(M2008=seq(0, 2.2, 0.1), M2012=NA)
+oly_lm_p <- predict(oly_lm, newdat, se.fit=TRUE)
+newdat$M2012 <- oly_lm_p$fit
+newdat$se.fit <- oly_lm_p$se.fit
+ggplot(oly, aes(x=M2008, y=M2012)) + geom_point(alpha=0.3) + 
+  geom_abline(intercept=0.10043, slope=0.90103) + 
+  geom_linerange(data=newdat, aes(x=M2008, ymin=M2012-se.fit, ymax=M2012+se.fit), colour="red") +
+  geom_line(data=newdat, aes(x=M2008, y=M2012-se.fit), linetype=2) + 
+  geom_line(data=newdat, aes(x=M2008, y=M2012+se.fit), linetype=2)
+```
+
+## Prediction interval for NEW value
+
+For a given value of $x$, $\hat{y} \pm t_{\alpha/2, n-2}MSE\sqrt{1+\frac{1}{n}+\frac{n(x-\bar{X})^2}{n\sum_{i=1}^n(X_i-\bar{X})^2}}$
+
+MSE from model fit is `r sqrt(summary(oly_lm)$dispersion)`.
+
+```{r}
+ggplot(oly, aes(x=M2008, y=M2012)) + geom_point(alpha=0.3) + 
+  geom_abline(intercept=0.10043, slope=0.90103) + 
+  geom_linerange(data=newdat, aes(x=M2008, ymin=M2012-se.fit-0.18375, ymax=M2012+se.fit+0.18375), colour="red") +
+  geom_line(data=newdat, aes(x=M2008, y=M2012-se.fit-0.18375), linetype=2) + 
+  geom_line(data=newdat, aes(x=M2008, y=M2012+se.fit+0.18375), linetype=2)
+```
+
+## Computational approach
+
+- Hypothesis test can be conducted using permutation 
+- Confidence  and prediction intervals can be generated using bootstrap
+- WHY??? 
+- Classical methods have strict assumptions about the distribution of errors. Computational approaches relax these assumptions
+
+## Permutation hypothesis tests
+
+For regression, to test $H_o$, one column of the two is permuted to break association.
+
+```{r echo=TRUE}
+df <- data.frame(x=letters[1:5], y=letters[1:5])
+head(data.frame(df, py=sample(df$y)))
+```
+
+Make many more permutation sets. 
+
+## 
+
+```{r echo=TRUE, fig.width=8, fig.height=4}
+p1 <- ggplot(oly, aes(x=M2008, y=M2012)) + geom_point() + ggtitle("Original data")
+p2 <- ggplot(oly, aes(x=M2008, y=sample(M2012))) + geom_point() + ggtitle("Permuted response")
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Permutation distribution of intercept and slope
+
+```{r fig.width=8}
+est <- data.frame(int=rep(NA, 1000), slp=rep(NA, 1000))
+for (i in 1:1000) {
+  df <- oly
+  df$M2012 <- sample(oly$M2012)
+  dfcoefs <- coefficients(glm(M2012~M2008, data=df))
+  est$int[i] <- dfcoefs[1]
+  est$slp[i] <- dfcoefs[2]
+}
+p1 <- ggplot(est, aes(x=int)) + geom_histogram(binwidth=0.05) + 
+  geom_vline(xintercept=coefs[1,2], colour="red") + xlab("Intercept")
+p2 <- ggplot(est, aes(x=slp)) + geom_histogram(binwidth=0.05) + 
+  geom_vline(xintercept=coefs[2,2], colour="red") + xlab("Slope")
+grid.arrange(p1, p2, ncol=2)
+```
+
+Red lines indicate values from our data, which are far from the values obtained from the permuted data. 
+
+## Statistical significance
+
+- Permutation gives us samples consistent with $H_o: \beta_1=0$, whilst keeping the marginal distributions of X and Y the same.
+- In the example we see that the values from the permuted data, center on 0. We are seeing what the variation in $b_1$ might be, from one sample to another, if the parameter $\beta_1$ (slope computed for the whole population) is actually 0.
+- 
+- To compute the p-value, count the number of values computed on the permuted data that are more extreme than the values from the actual data.
+- In this example, the p-value is 0 for both intercept and slope. 
+
+## Confidence intervals via bootstrap
+
+1. Make a N boostrap samples (sample data rows, with replacement)
+2. Fit the model for each
+3. Compute lower and upper C% bounds, by sorting values and pulling the relevant ones, e.g. if N=1000, C=95, we would take the 25$^{th}$ and 975$^{th}$ values as the lower and upper CI bounds
+
+## Bootstrap samples
+
+```{r echo=TRUE}
+orig <- letters[1:10]
+orig
+boot1 <- sort(sample(orig, replace=TRUE))
+boot1
+```
+
+## Bootstrap confidence interval for the slope
+
+```{r fig.width=6, fig.height=3}
+bootci <- data.frame(int=rep(NA, 1000), slp=rep(NA, 1000))
+for (i in 1:1000) {
+  df <- oly[sample(nrow(oly), replace=TRUE), ]
+  dfcoefs <- coefficients(glm(M2012~M2008, data=df))
+  bootci$int[i] <- dfcoefs[1]
+  bootci$slp[i] <- dfcoefs[2]
+}
+p1 <- ggplot(bootci, aes(x=int)) + geom_histogram(binwidth=0.05) + 
+  geom_vline(xintercept=coefs[1,2], colour="red") + xlab("Intercept")
+p2 <- ggplot(bootci, aes(x=slp)) + geom_histogram(binwidth=0.05) + 
+  geom_vline(xintercept=coefs[2,2], colour="red") + xlab("Slope")
+grid.arrange(p1, p2, ncol=2)
+```
+
+- Intercept: (`r sort(bootci$int)[25]` , `r sort(bootci$int)[975]`)
+- Slope: (`r sort(bootci$slp)[25]` , `r sort(bootci$slp)[975]`)
+
+## Compare intervals
+
+```{r fig.width=6, fig.height=3}
+compare_ci <- data.frame(label=c("classical", "bootstrap"), 
+  l = c(coefs[2,2] - qt(0.975, n-2)*coefs[2,3], sort(bootci$slp)[25]),
+  u = c(coefs[2,2]+qt(0.975, n-2)*coefs[2,3], sort(bootci$slp)[975]))
+compare_ci
+ggplot(compare_ci) + geom_segment(aes(x=l, xend=u, y=label, yend=label), size=1) + 
+  geom_vline(xintercept=coefs[2,2], colour="red") + xlab("slope") + ylab("")
+```
+
+## Bootstrap confidence intervals for predicted value
+
+
+```{r fig.width=8, fig.height=4}
+bootci <- data.frame(M2008=newdat$M2008, l=rep(NA, nrow(newdat)), u=rep(NA, nrow(newdat)))
+for (j in 1:nrow(newdat)) {
+  x <- newdat[j,]
+  pred <- NULL
+  for (i in 1:1000) {
+    df <- oly[sample(nrow(oly), replace=TRUE), ]
+    df_lm <- glm(M2012~M2008, data=df)
+    pred <- c(pred, predict(df_lm, x))
+  }
+  pred <- sort(pred)
+  bootci$l[j] <- pred[25]
+  bootci$u[j] <- pred[975]
+}
+p1 <- ggplot(oly) + geom_point(aes(x=M2008, y=M2012), alpha=0.3) +
+  geom_abline(intercept=0.10043, slope=0.90103) + 
+  geom_linerange(data=bootci, aes(x=M2008, ymin=l, ymax=u), colour="red") +
+  geom_line(data=bootci, aes(x=M2008, y=l), linetype=2) + 
+  geom_line(data=bootci, aes(x=M2008, y=u), linetype=2) + 
+  ggtitle("Bootstrap ci for predictions")
+p2 <- ggplot(oly) + 
+  geom_line(data=bootci, aes(x=M2008, y=l), linetype=2) + 
+  geom_line(data=bootci, aes(x=M2008, y=u), linetype=2) + 
+  geom_line(data=newdat, aes(x=M2008, y=M2012-se.fit), linetype=1) + 
+  geom_line(data=newdat, aes(x=M2008, y=M2012+se.fit), linetype=1) +
+  ylab("M2012") + ggtitle("Comparison with t-intervals")
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Bootstrap prediction intervals for NEW values
+
+Procedure derives from bootstrapping residuals. 
+
+1. Compute the residuals from the fitted model 
+2. Bootstrap the residuals
+3. Find the desired quantiles of the residuals
+4. Compute prediction intervals by adding residual quantiles to fitted value
+
+## 
+
+```{r fig.width=8, fig.height=4}
+bootpi <- data.frame(l=rep(NA,1000), u=rep(NA, 1000))
+for (i in 1:1000) {
+  df <- oly[sample(nrow(oly), replace=TRUE), ]
+  df_lm <- glm(M2012~M2008, data=df)
+  res <- sort(residuals(df_lm))
+  bootpi$l[i] <- min(res)
+  bootpi$u[i] <- max(res)
+}
+bl <- sort(bootpi$l)[25]
+bu <- sort(bootpi$u)[975]
+newdat$bl <- newdat$M2012+bl
+newdat$bu <- newdat$M2012+bu
+p1 <- ggplot(oly) + geom_point(aes(x=M2008, y=M2012), alpha=0.3) +
+  geom_abline(intercept=0.10043, slope=0.90103) + 
+  geom_linerange(data=newdat, aes(x=M2008, ymin=bl, ymax=bu), colour="red") +
+  geom_line(data=newdat, aes(x=M2008, y=bl), linetype=2) + 
+  geom_line(data=newdat, aes(x=M2008, y=bu), linetype=2) + 
+  ggtitle("Bootstrap prediction intervals")
+p2 <- ggplot(oly) + 
+  geom_line(data=newdat, aes(x=M2008, y=bl), linetype=2) + 
+  geom_line(data=newdat, aes(x=M2008, y=bu), linetype=2) + 
+  geom_line(data=newdat, aes(x=M2008, y=M2012-se.fit-0.18375), linetype=1) + 
+  geom_line(data=newdat, aes(x=M2008, y=M2012+se.fit+0.18375), linetype=1) +
+  ylab("M2012") + ggtitle("Comparison with t-intervals")
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Example: 2000 US Elections
+
+![](butterfly_ballot.jpg)
+
+## Example: Confusing?
+
+![](palmballot.jpg)
+
+##
+
+```{r fig.width=5, fig.height=5}
+florida <- read_csv("../data/florida.csv")
+ggplot(data=florida, aes(x=Buchanan, y=Gore)) + geom_point() + 
+  geom_text(data=filter(florida, County=="PALM BEACH"), aes(label=County),
+            vjust="top", hjust="right") 
+```
+
+```{r eval=FALSE}
+florida <- read_csv("../data/florida.csv")
+p1 <- ggplot(data=florida, aes(x=Buchanan, y=Gore)) + geom_point() + geom_smooth(method="lm", se=F) + theme(aspect.ratio=1) 
+p2 <- ggplot(data=florida, aes(x=Buchanan, y=Gore)) + geom_point() + geom_smooth(method="lm", se=F) + theme(aspect.ratio=1) + scale_x_log10() + scale_y_log10() + xlab("log Buchanan counts") + ylab("log Gore counts")
+p3 <- ggplot(data=florida, aes(x=Buchanan, y=Bush)) + geom_point() + geom_smooth(method="lm", se=F) + theme(aspect.ratio=1) 
+p4 <- ggplot(data=florida, aes(x=Buchanan, y=Bush)) + geom_point() + geom_smooth(method="lm", se=F) + theme(aspect.ratio=1) + scale_x_log10() + scale_y_log10() + xlab("log Buchanan counts") + ylab("log Bush counts")
+grid.arrange(p1, p2, p3, p4, ncol=2)
+```
+
+##
+
+```{r}
+glimpse(florida)
+```
+
+## Fit model
+
+```{r}
+florida_lm <- glm(Log_Buchanan~`age 65 (%)` + Black + Hispanic + 
+                    college + `Income (Thousands)`, 
+                  data=filter(florida, County != "PALM BEACH"))
+kable(tidy(florida_lm))
+```
+
+## Predictors
+
+```{r fig.width=10, fig.height=2}
+p1 <- ggplot(florida, aes(x=`age 65 (%)`, y=Log_Buchanan, label=County)) + geom_point()
+p2 <- ggplot(florida, aes(x=Black, y=Log_Buchanan, label=County)) + geom_point()
+p3 <- ggplot(florida, aes(x=Hispanic, y=Log_Buchanan, label=County)) + geom_point()
+p4 <- ggplot(florida, aes(x=college, y=Log_Buchanan, label=County)) + geom_point()
+p5 <- ggplot(florida, aes(x=`Income (Thousands)`, y=Log_Buchanan, label=County)) + geom_point()
+grid.arrange(p1, p2, p3, p4, p5, ncol=5)
+```
+
+##
+
+```{r}
+library(plotly)
+ggplotly(p1)
+```
+
+##
+
+```{r}
+ggplotly(p2)
+```
+
+##
+
+```{r}
+ggplotly(p3)
+```
+
+##
+
+```{r}
+ggplotly(p4)
+```
+
+##
+
+```{r}
+ggplotly(p5)
+```
+
+## Check model
+
+```{r fig.width=8}
+florida_augment <- augment(florida_lm, data=filter(florida, County != "PALM BEACH"))
+p1 <- ggplot(florida_augment, aes(x=.fitted, y=Log_Buchanan, label=County)) + geom_point()
+p2 <- ggplot(florida_augment, aes(x=.fitted, y=.resid, label=County)) + geom_point()
+grid.arrange(p1, p2, ncol=2)
+```
+
+##
+
+```{r}
+ggplotly(p1)
+```
+
+##
+
+```{r}
+ggplotly(p2)
+```
+
+## Predict Palm Beach
+
+```{r echo=TRUE}
+pb <- florida %>% filter(County=="PALM BEACH")
+pb_p <- predict(florida_lm, pb)
+pb_e <- pb$Log_Buchanan - pb_p
+kable(cbind(pb$Log_Buchanan, pb_p, pb_e))
+```
+
+## Bootstrap confidence for predictions
+
+```{r fig.width=8, fig.height=4}
+florida_nopb <- florida %>% filter(County!="PALM BEACH")
+bootci <- florida_nopb
+bootci$l <- NA 
+bootci$u <- NA
+for (j in 1:nrow(florida_nopb)) {
+  x <- florida_nopb[j,]
+  pred <- NULL
+  for (i in 1:100) {
+    df <- florida_nopb[sample(nrow(florida_nopb), replace=TRUE), ]
+    df_lm <- glm(Log_Buchanan~`age 65 (%)` + Black + Hispanic + 
+                    college + `Income (Thousands)`, 
+                  data=df)
+    pred <- c(pred, predict(df_lm, x))
+  }
+  pred <- sort(pred)
+  bootci$l[j] <- mean(c(pred[2],pred[3]))
+  bootci$u[j] <- mean(c(pred[97], pred[98]))
+  #bootci$l[j] <- pred[25]
+  #bootci$u[j] <- pred[975]
+}
+florida_all <- florida
+florida_all$fitted <- predict(florida_lm, florida)
+bootci$fitted <- predict(florida_lm, bootci)
+p1 <- ggplot(florida_all) + geom_point(aes(x=fitted, y=Log_Buchanan)) +
+  geom_linerange(data=bootci, aes(x=fitted, ymin=l, ymax=u), colour="red") +
+  geom_line(data=bootci, aes(x=fitted, y=l), linetype=2) + 
+  geom_line(data=bootci, aes(x=fitted, y=u), linetype=2) + 
+  ggtitle("Bootstrap ci for predictions")
+florida_augment <- merge(florida_all, florida_augment, by="County", all.x=T)
+p2 <- ggplot(florida_all) + 
+  geom_line(data=bootci, aes(x=fitted, y=l), linetype=2) + 
+  geom_line(data=bootci, aes(x=fitted, y=u), linetype=2) + 
+  geom_line(data=florida_augment, aes(x=fitted, y=fitted-.se.fit), linetype=1) + 
+  geom_line(data=florida_augment, aes(x=fitted, y=fitted+.se.fit), linetype=1) +
+  ylab("Log_Buchanan") + ggtitle("Comparison with t-intervals")
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Bootstrap prediction intervals 
+
+```{r fig.width=5, fig.height=5}
+bootpi <- data.frame(l=rep(NA,1000), u=rep(NA, 1000))
+for (i in 1:1000) {
+  df <- florida_nopb[sample(nrow(florida_nopb), replace=TRUE), ]
+  df_lm <- glm(Log_Buchanan~`age 65 (%)` + Black + Hispanic + 
+                    college + `Income (Thousands)`, 
+                  data=df)
+  res <- sort(residuals(df_lm))
+  bootpi$l[i] <- min(res)
+  bootpi$u[i] <- max(res)
+}
+bl <- sort(bootpi$l)[25]
+bu <- sort(bootpi$u)[975]
+florida_all$bl <- florida_all$fitted+bl
+florida_all$bu <- florida_all$fitted+bu
+ggplot(florida_all) + geom_point(aes(x=fitted, y=Log_Buchanan)) +
+  geom_linerange(aes(x=fitted, ymin=bl, ymax=bu), colour="red") +
+  geom_line(aes(x=fitted, y=bl), linetype=2) + 
+  geom_line(aes(x=fitted, y=bu), linetype=2) + 
+  geom_text(data=filter(florida_all, County=="PALM BEACH"), 
+            aes(x=fitted, y=Log_Buchanan, label=County),
+            vjust="bottom", hjust="right") +
+  ggtitle("Bootstrap prediction intervals")
+```
+
+## Summary
+
+- The number of votes for Buchanan in Palm Beach County were much higher than could be expected given the demographic composition of the locaiton. 
+- This is evidence that the butterfly ballot may have caused some confusion, and error in voting intention.
+
+## Resources
+
+- [Statistics online textbook, Diez, Barr, Cetinkaya-Rundel](https://www.openintro.org/stat/textbook.php?stat_book=isrs)
+- [Mike Akritas PSU lecture notes](http://sites.stat.psu.edu/~mga/401/course.info/lesson8.pdf)
+- [Nice example for automotive costs](http://fmwww.bc.edu/cef00/papers/paper71.pdf)
+- [2000 US Election Florida undercount](http://www.ssc.wisc.edu/~bhansen/vote/florida.pdf)
+
+## Share and share alike
+
+This work is licensed under the Creative Commons Attribution-Noncommercial 3.0 United States License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/ 3.0/us/ or send a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
