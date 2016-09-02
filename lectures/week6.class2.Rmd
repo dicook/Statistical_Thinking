@@ -1,0 +1,432 @@
+---
+title: 'Statistical Methods for Insurance: Multilevel Models'
+author: Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monash
+  University
+date: "W6.C1"
+output:
+  ioslides_presentation:
+    transition: default
+    widescreen: yes
+  beamer_presentation: default
+css: default.css
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE,
+  echo=FALSE,
+  fig.height = 4,
+  fig.width = 4,
+  fig.align='center'
+)
+options(digits=3)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readr)
+library(gridExtra)
+library(broom)
+```
+
+## Overview of this class
+
+- Fixed effects vs random effects
+- Mixed effects models
+- Diagnostics
+
+## What is a multilevel model?
+
+- Observations are not independent, but belong to a hierarchy 
+- Example: individual level demographics (age, gender), and school level information (location, cours offerings, classroom resources)
+- Multilevel model enables fitting different types of dependencies
+
+## Fixed vs random
+
+- `Fixed effects` can be used when you know all the categories, e.g. age, gender, smoking status
+- `Random effects` are used when not all groups are captured, and we have a random selection of the groups, e.g. individuals (if you have multiple measurements), schools, hospitals 
+
+## Mixed effects models - a type of multilevel model
+
+For data organized in $g$ groups, consider a continuous response linear mixed-effects model (LME model) for each group $i$, $i=1, \ldots, g$:
+
+$$\underset{(n_i \times 1)}{{\bf y}_i} =  \underset{(n_i \times p)}{{\bf X}_i} \underset{(p \times 1)}{{\boldsymbol \beta}} + \underset{(n_i \times q)}{{\bf Z}_i} \underset{(q \times 1)}{{\bf b}_i} + \underset{(n_i \times 1)}{{\bf \varepsilon}_i}$$
+
+- ${\bf y}_i$ is the vector of outcomes for the $n_i$ level-1 units in group $i$
+- ${\bf X}_i$ and ${\bf Z}_i$ are design matrices for the fixed and random effects
+- ${\boldsymbol \beta}$ is a vector of $p$ fixed effects governing the global mean structure
+- ${\bf b}_i$ is a vector of $q$ random effects for between-group covariance 
+- ${\bf \varepsilon}_i$ is a vector of level-1 error terms for within-group covariance
+
+## Example
+
+```{r}
+library(HLMdiag)
+data(radon)
+radon <- radon %>% rename(storey=basement)
+```
+
+- Data: $radon$, 919 owner-occupied homes in 85 counties of Minnesota. Available in the `HLMdiag` package
+- Response: $log.radon$
+- Fixed: $storey$ (categorical), $uranium$ (quantitative)
+- Random: $county$ (house is a member of county)
+
+```{r}
+glimpse(radon)
+```
+
+## Take a look
+
+```{r}
+ggplot(radon, aes(x=uranium, y=log.radon)) + geom_point()
+```
+
+Plot of response vs covariate. What do you see?
+
+## Here's what we see 
+
+- Vertical stripes: each county is represented by an average uranium value
+- Weak linear association, lots of variation for houses within county
+- Four points inline horizontally at the base (be suspicious)
+- Some counties only have 2, 3 points
+- Scales?
+
+## Pre-processing
+
+- Counties with less than 4 observations removed
+- Four flat-line observations should be removed, really suspect these were erroneously coded missing values
+
+```{r}
+radon_keep <- radon %>% group_by(county) %>% 
+  tally() %>% filter(n > 4)
+radon_sub <- radon %>% 
+  filter(county %in% radon_keep$county & log.radon > -2)
+radon_sub$storey <- 
+  factor(radon_sub$storey, levels=c(0,1), 
+         labels=c("basement", "first floor"))
+```
+
+## Look again
+
+```{r fig.width=8}
+ggplot(radon_sub, aes(x=uranium, y=log.radon)) + 
+  geom_point() +
+  geom_smooth(method="lm", se=F) +
+  facet_wrap(~storey)
+```
+
+## Fit a simple model
+
+$$log.radon = \beta_0 + \beta_1 storey + \beta_2 uranium + \varepsilon$$
+
+```{r}
+radon_lm <- glm(log.radon ~ storey + uranium, 
+                data = radon_sub)
+summary(radon_lm)
+```
+
+## Your turn
+
+Make a sketch of what this model looks like.
+
+```{r echo=FALSE, eval=FALSE}
+radon_lm_fit <- radon_sub; radon_lm_fit$fit <- fitted(radon_lm)
+ggplot(radon_lm_fit, aes(x=uranium, y=log.radon, colour=storey)) + geom_point() + 
+  geom_line(aes(y=fit))
+```
+
+## Fit an interaction term
+
+```{r}
+radon_lm <- glm(log.radon ~ storey*uranium, data = radon_sub)
+summary(radon_lm)
+radon_lm_fit <- radon_sub; radon_lm_fit$fit <- fitted(radon_lm)
+```
+
+## What does this model look like?
+
+```{r fig.width=6}
+ggplot(radon_lm_fit, aes(x=uranium, y=log.radon, colour=storey)) +
+  geom_point(alpha=0.3) + 
+  geom_line(aes(y=fit), size=1)
+```
+
+## Your turn
+
+Write down the equation of the fitted model
+
+## Mixed effects model
+
+$$log.radon_{ij} = \beta_0 + \beta_1 storey_{ij} + \beta_2 uranium_i + b_{0i} + b_{1i} storey_{ij} + \varepsilon_{ij}$$
+
+$$~~~ i=1, ..., \#counties; j=1, ..., n_i$$
+
+```{r echo=TRUE, results='hide'}
+library(lme4)
+radon_lmer <- lmer(log.radon ~ storey + uranium + 
+  (storey | county.name), data = radon_sub)
+summary(radon_lmer)
+radon_lmer_fit <- augment(radon_lmer) 
+```
+
+## Your turn
+
+For the radon data:
+
+- What is $p$, $q$, $g$?
+- And hence $n_i, i=1, \dots, g$?
+
+$$log.radon_{ij} = \beta_0 + \beta_1 storey_{ij} + \beta_2 uranium_i + b_{0i} + b_{1i} storey_{ij} + \varepsilon_{ij}$$
+
+$$~~~ i=1, ..., \#counties; j=1, ..., n_i$$
+
+```{r eval=FALSE, echo=FALSE}
+# p=2 (storey, uranium)
+# q=1 (storey)
+length(unique(radon_sub$county.name)) # g
+radon_sub %>% group_by(county.name) %>% tally()
+```
+
+## Examining the model output: fixed effects
+
+```
+Fixed effects:
+                    Estimate Std. Error t value
+(Intercept)          1.48066    0.03856   38.40
+storeyfirst floor   -0.59011    0.11246   -5.25
+uranium              0.84600    0.09532    8.88
+```
+
+How do these compare with the simple linear model estimates?
+
+```
+Coefficients:
+                  Estimate Std. Error t value Pr(>|t|)    
+(Intercept)        1.44830    0.03131  46.254  < 2e-16 ***
+storeyfirst floor -0.61125    0.07332  -8.337 3.35e-16 ***
+uranium            0.83591    0.07422  11.262  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+```
+
+## Examining the model output: random effects
+
+```
+Random effects:
+ Groups      Name                Variance Std.Dev. Corr
+ county.name (Intercept)         0.01388  0.1178       
+             storeyfirst floor   0.22941  0.4790   0.02
+ Residual                        0.50694  0.7120       
+Number of obs: 796, groups:  county.name, 46
+```
+
+This is saying that the variance of the estimates for first floor observations is larger than the storey. 
+
+## What it looks like
+
+```{r fig.width=7}
+ggplot(radon_lmer_fit, aes(x=uranium, y=log.radon)) + 
+  geom_point(alpha=0.2) + 
+  geom_point(aes(y=.fitted, colour=county.name)) + 
+  facet_wrap(~storey) + theme(legend.position="none")
+```
+
+## Or like this
+
+```{r fig.width=6}
+ggplot(radon_lmer_fit, aes(x=uranium, y=log.radon)) + 
+  geom_point(alpha=0.2) + 
+  geom_point(aes(y=.fitted, colour=storey)) 
+```
+
+## Your turn
+
+How does the mixed effects model differ from the simple linear model? (Hint: Think about the variance.)
+
+```{r fig.width=6}
+ggplot(radon_lm_fit, aes(x=uranium, y=log.radon, colour=storey)) +
+  geom_point(alpha=0.3) + 
+  geom_line(aes(y=fit), size=1)
+```
+
+## Assumptions
+
+Recall:
+
+ $$\underset{(n_i \times 1)}{{\bf y}_i} =  \underset{(n_i \times p)}{{\bf X}_i} \underset{(p \times 1)}{{\boldsymbol \beta}} + \underset{(n_i \times q)}{{\bf Z}_i} \underset{(q \times 1)}{{\bf b}_i} + \underset{(n_i \times 1)}{{\boldsymbol \varepsilon}_i}$$
+
+- ${\bf b}_i$ is a random sample from $\mathcal{N}({\bf 0}, {\bf D})$ and independent from the level-1 error terms,  
+- ${\boldsymbol \varepsilon}_i$ follow a $\mathcal{N}({\bf 0},\sigma^2 {\bf R}_i)$ distribution 
+- ${\bf D}$ is a positive-definite $q \times q$ covariance matrix and ${\bf R}_i$ is a positive-definite $n_i \times n_i$ covariance matrix
+
+## Extract and examine level-1 residuals
+
+```{r fig.show='hide'}
+radon_lmer_fit$resid1 <-  HLMresid(radon_lmer, 
+           level=1)
+ggplot(radon_lmer_fit, aes(x=resid1)) + 
+  geom_histogram(binwidth=0.5) 
+```
+
+${\boldsymbol \varepsilon}_i \sim \mathcal{N}({\bf 0},\sigma^2 {\bf R}_i)$
+
+```{r echo=FALSE}
+ggplot(radon_lmer_fit, aes(x=resid1)) + 
+  geom_histogram(binwidth=0.5) 
+```
+
+Level-1 (observation level) look normal. 
+
+## qqplot
+
+```{r}
+ggplot_qqnorm(radon_lmer_fit$resid1, line="rlm") +
+  theme(aspect.ratio=1)
+```
+
+Level-1 (observation level) do look nearly normal. 
+
+## Examine within group
+
+Summary statistics
+
+```{r}
+radon_lmer_fit %>% group_by(county.name) %>%
+  summarise(m = mean(resid1), s = sd(resid1), n = length(resid1)) %>%
+  head()
+```
+
+##
+
+```{r echo=FALSE, fig.height=6}
+res.sum <- radon_lmer_fit %>% group_by(county.name) %>%
+  summarise(m = mean(resid1), s = sd(resid1), n = length(resid1))
+ord <- order(res.sum$m)
+radon_lmer_fit$county.name <- factor(radon_lmer_fit$county.name, levels=res.sum$county.name[ord])
+ggplot(radon_lmer_fit, aes(x=county.name, y=resid1)) + 
+  geom_point(alpha=0.5) + coord_flip()
+```
+
+## Learn
+
+There is some difference on average between counties, which means that residuals still have some structure related to the county location.
+
+## Normality tests
+
+Anderson-Darling, Cramer-von Mises, Lilliefors (Kolmogorov-Smirnov)
+
+```{r results='hide'}
+library("nortest")
+ad.test(radon_lmer_fit$resid1)
+cvm.test(radon_lmer_fit$resid1)
+lillie.test(radon_lmer_fit$resid1)
+```
+
+```{r echo=FALSE}
+ad.test(radon_lmer_fit$resid1)
+```
+
+all believe that the residuals are consistent with normality.
+
+## Conclusion about level-1 residuals
+
+The assumption: 
+
+$${\boldsymbol \varepsilon}_i \sim \mathcal{N}({\bf 0},\sigma^2 {\bf R}_i)$$
+
+is probably ok, at the worst it is not badly violated. 
+
+## Random effects
+
+$${\bf b}_i \sim \mathcal{N}({\bf 0}, {\bf D}), ~~~ i=1, \dots g$$
+
+where ${\bf D}$ allows for correlation between random effects within group, and these should be independent from the level-1 error
+
+```{r}
+rf <- HLMresid(radon_lmer, level="county.name") 
+# same as ranef(radon_lmer)
+rf$county.name <- rownames(rf)
+rf <- rf %>% rename(resid.basement=`(Intercept)`, 
+                    resid.ff=`storeyfirst floor`)
+radon_lmer_fit <- merge(radon_lmer_fit, rf, 
+                        by="county.name")
+```
+
+We have both intercepts (basement) and slopes (first floor)
+
+##
+
+```{r fig.width=8}
+p1 <- ggplot(radon_lmer_fit, aes(x=resid.basement)) + 
+  geom_histogram(binwidth=0.05) + ggtitle("basement")
+p2 <- ggplot(radon_lmer_fit, aes(x=resid.ff)) + 
+  geom_histogram(binwidth=0.2) + ggtitle("first floor")
+grid.arrange(p1, p2, ncol=2)
+```
+
+##
+
+```{r fig.width=8}
+p1 <- ggplot_qqnorm(radon_lmer_fit$resid.basement, line="rlm") +
+  theme(aspect.ratio=1) + ggtitle("basement")
+p2 <- ggplot_qqnorm(radon_lmer_fit$resid.ff, line="rlm") +
+  theme(aspect.ratio=1) + ggtitle("first floor")
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Should be no correlation 
+
+```{r}
+ggplot(radon_lmer_fit, aes(x=resid.basement, y=resid.ff)) + 
+  geom_point() + theme(aspect.ratio=1) 
+```
+
+## Fitted vs Observed
+
+Plotting the observed vs fitted values, gives a sense for how much of the response is explained by the model. Here we can see that there is still a lot of unexplained variation.
+
+```{r echo=FALSE}
+ggplot(radon_lmer_fit, aes(x=.fitted, y=log.radon)) + 
+  geom_point()  
+```
+
+## Goodness of fit
+
+From the linear model
+
+```{r}
+glance(radon_lm)
+```
+
+From the random effects model
+
+```{r}
+glance(radon_lmer)
+```
+
+Hmmm... deviance looks strange! Compute sum of squares of residuals instead:
+
+```{r}
+sum(radon_lmer_fit$resid1^2)
+```
+
+Which model is best?
+
+## Influence
+
+```{r}
+ggplot(radon_lmer_fit, aes(x=.fitted, y=.cooksd)) + geom_point()
+```
+
+No overly influential observations
+
+## Resources
+
+- [HLMDiag package explanation](https://www.jstatsoft.org/article/view/v056i05)
+- [HLM package](https://cran.r-project.org/web/packages/HLMdiag/index.html)
+
+## Share and share alike
+
+This work is licensed under the Creative Commons Attribution-Noncommercial 3.0 United States License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/ 3.0/us/ or send a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
