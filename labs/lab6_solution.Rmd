@@ -1,0 +1,331 @@
+---
+title: "ETC 2420/5242 Lab 6 2016"
+author: "Di Cook"
+date: "SOLUTION"
+output: pdf_document
+---
+
+```{r echo = FALSE, message = FALSE, warning = FALSE, warning = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  error = FALSE, 
+  echo = FALSE, 
+  collapse = TRUE,
+  comment = "#",
+  fig.height = 4,
+  fig.width = 8,
+  fig.align = "center",
+  cache = FALSE
+)
+library(knitr)
+```
+
+
+```{r fig.align='center', fig.width=7, fig.height=6}
+library("tidyr")
+library("dplyr")
+library("ggplot2")
+student2012.sub <- readRDS("../data/student_sub.rds") 
+australia <- student2012.sub[student2012.sub$CNT=="AUS",]
+```
+
+
+
+```{r eval=FALSE}
+library("GGally")
+ggscatmat(australia, columns=35:39)
+```
+
+```{r}
+australia <- australia %>% mutate(math = (PV1MATH+PV2MATH+PV3MATH+PV4MATH+PV5MATH)/5)
+```
+
+
+```{r eval=FALSE}
+australia %>% group_by(SCHOOLID) %>% 
+  tally() %>% 
+  arrange(desc(n)) -> aus_schools
+dim(aus_schools)
+ggplot(aus_schools, aes(x=n)) + geom_histogram()
+```
+
+A dictionary of variables that we will use further (in addition to the `math` variable we just created) is as follows:
+
+\begin{tabular}{llp{3in}}
+Variable name & Description & Coding\\\hline
+ST04Q01 & Gender & 1=Female, 2=Male\\
+ST06Q01 & Age when started school & Actual age, 9997-9999 indicate missing values\\
+ST57Q01 & Out-of-School Study Time - Homework & Hours per week, 9997-9999 indicate missing values\\
+ST15Q01 & Mother Current Job Status & 1=Full-time, 2=Part-time, 3=Not working, but looking for a job, 4=Other (inc stay-at-home), 7-9 indicate missing values\\
+ST19Q01 & Father Current Job Status &  1=Full-time, 2=Part-time, 3=Not working, but looking for a job, 4=Other (inc stay-at-home), 7-9 indicate missing values\\
+ST26Q01 & Possessions - desk  & 1=Yes, 2=No, 7-9 indicate missing values\\
+ST26Q02 & Possessions - own room  & 1=Yes, 2=No, 7-9 indicate missing values\\
+ST26Q04 & Possessions - computer  & 1=Yes, 2=No, 7-9 indicate missing values\\
+ST26Q06 & Possessions - Internet  & 1=Yes, 2=No, 7-9 indicate missing values\\
+ST27Q02 & How many - televisions & 1=None, 2=One, 3=Two, 4=Three or more,  7-9 indicate missing values\\
+ST28Q01 & How many books at home & 1=0-10, 2=11-25, 3=26-100, 4=101-200, 5=201-500, 6=More than 500, 7-9 indicate missing values\\
+SENWGT\_STU & Weight & Reflects how the student represents other students in Australia based on socioeconomic and demographic characteristics
+\end{tabular}
+
+
+```{r}
+australia <- australia %>% 
+  select(math, ST04Q01, ST06Q01, ST57Q02, ST15Q01, ST19Q01, ST26Q01, ST26Q02, ST26Q04, ST26Q06, ST27Q02, ST28Q01, SENWGT_STU)
+australia$ST06Q01[australia$ST06Q01 > 9990] <- NA
+australia$ST57Q01[australia$ST57Q02 > 9990] <- NA
+australia$ST15Q01[australia$ST15Q01 > 6] <- NA
+australia$ST19Q01[australia$ST19Q01 > 6] <- NA
+australia$ST26Q01[australia$ST26Q01 > 6] <- NA
+australia$ST26Q02[australia$ST26Q02 > 6] <- NA
+australia$ST26Q04[australia$ST26Q04 > 6] <- NA
+australia$ST26Q06[australia$ST26Q06 > 6] <- NA
+australia$ST27Q02[australia$ST27Q02 > 6] <- NA
+australia$ST28Q01[australia$ST28Q01 > 6] <- NA
+```
+
+
+```{r eval=FALSE}
+australia %>% group_by(ST04Q01) %>% tally()
+australia %>% group_by(ST06Q01) %>% tally()
+australia %>% group_by(ST57Q02) %>% tally()
+australia %>% group_by(ST15Q01) %>% tally()
+australia %>% group_by(ST19Q01) %>% tally()
+australia %>% group_by(ST26Q01) %>% tally()
+australia %>% group_by(ST26Q02) %>% tally()
+australia %>% group_by(ST26Q04) %>% tally()
+australia %>% group_by(ST26Q06) %>% tally()
+australia %>% group_by(ST27Q02) %>% tally()
+australia %>% group_by(ST28Q01) %>% tally()
+```
+
+
+
+```{r}
+australia <- australia %>% select(-ST57Q02)
+aus_nomiss <- australia %>% filter(!is.na(ST04Q01)) %>%
+  filter(!is.na(ST06Q01)) %>% filter(!is.na(ST15Q01)) %>%
+  filter(!is.na(ST19Q01)) %>% filter(!is.na(ST26Q01)) %>%
+  filter(!is.na(ST26Q02)) %>% filter(!is.na(ST26Q04)) %>%
+  filter(!is.na(ST26Q06)) %>% filter(!is.na(ST27Q02)) %>%
+  filter(!is.na(ST28Q01))
+```
+
+```{r eval=FALSE}
+ggplot(aus_nomiss, aes(x=SENWGT_STU)) + geom_histogram()
+```
+
+
+Model building will be done using:
+
+- Response: `math` (standardised)
+- Explanatory variables: `ST04Q01, ST06Q01, ST15Q01, ST19Q01, ST26Q01, ST26Q02, ST26Q04, ST26Q06, ST27Q02, ST28Q01`. Age at school start will be set to be 0 meaning age 4. 
+
+Some variables need to be treated as categorical variables, so it is best if they are forced to be factors before modeling:
+
+```{r}
+aus_nomiss$ST04Q01 <- factor(aus_nomiss$ST04Q01)
+aus_nomiss$ST15Q01 <- factor(aus_nomiss$ST15Q01)
+aus_nomiss$ST15Q01 <- factor(aus_nomiss$ST15Q01)
+aus_nomiss$ST19Q01 <- factor(aus_nomiss$ST19Q01)
+aus_nomiss$ST26Q01 <- factor(aus_nomiss$ST26Q01)
+aus_nomiss$ST26Q02 <- factor(aus_nomiss$ST26Q02)
+aus_nomiss$ST26Q04 <- factor(aus_nomiss$ST26Q04)
+aus_nomiss$ST26Q06 <- factor(aus_nomiss$ST26Q06)
+aus_nomiss <- aus_nomiss %>% mutate(math_std = (math-mean(math))/sd(math))
+aus_nomiss$ST06Q01 <- aus_nomiss$ST06Q01 - 4
+```
+
+Test the model fitting, by fitting a model for math against gender, books at home and whether they own a computer. 
+
+```{r eval=FALSE}
+aus_glm_test <- glm(math_std~ST04Q01+ST26Q04+ST28Q01, data=aus_nomiss, weights=SENWGT_STU)
+summary(aus_glm_test)
+```
+
+Sketch what this model looks like.
+
+```{r}
+ggplot(aus_nomiss, aes(x=ST28Q01, y=math_std, colour=interaction(ST04Q01, ST26Q04))) +
+  geom_smooth(method="lm", se=F)
+```
+
+## Question 1
+
+- Make plots of the response variable `math` against each of the possible explanatory variables. 
+- Which variables look like they should be most important for predicting math score?
+
+```{r echo=TRUE, fig.height=10}
+p1 <- ggplot(aus_nomiss, aes(x=ST04Q01, y=math_std)) + geom_boxplot()
+p2 <- ggplot(aus_nomiss, aes(x=ST06Q01, y=math_std)) + 
+  geom_point() + geom_smooth(method="lm", se=FALSE)
+p3 <- ggplot(aus_nomiss, aes(x=ST15Q01, y=math_std)) + 
+  geom_point() + geom_boxplot()
+p4 <- ggplot(aus_nomiss, aes(x=ST19Q01, y=math_std)) + 
+  geom_point() + geom_boxplot()
+p5 <- ggplot(aus_nomiss, aes(x=ST26Q01, y=math_std)) + 
+  geom_point() + geom_boxplot()
+p6 <- ggplot(aus_nomiss, aes(x=ST26Q02, y=math_std)) + 
+  geom_point() + geom_boxplot()
+p7 <- ggplot(aus_nomiss, aes(x=ST26Q04, y=math_std)) + 
+  geom_point() + geom_boxplot()
+p8 <- ggplot(aus_nomiss, aes(x=ST26Q06, y=math_std)) + 
+  geom_point() + geom_boxplot()
+p9 <- ggplot(aus_nomiss, aes(x=ST27Q02, y=math_std)) + 
+  geom_point() + geom_smooth(method="lm", se=FALSE)
+p10 <- ggplot(aus_nomiss, aes(x=ST28Q01, y=math_std)) + 
+  geom_point() + geom_smooth(method="lm", se=FALSE)
+library("gridExtra")
+grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, ncol=2)
+```
+
+`All of the variables look like they are associated with math scores, except for ST26Q02 (Possessions - own room)`
+
+## Question 2
+
+- Fit the weighted multiple regression model to all the explanatory variables.
+
+```{r}
+aus_glm <- glm(math_std~ST04Q01+ST06Q01+ST15Q01+ST19Q01+ST26Q01+ST26Q02+ST26Q04+ST26Q06+ST27Q02+ST28Q01, data=aus_nomiss, weights=SENWGT_STU)
+summary(aus_glm)
+```
+
+- Summarise the coefficients for the model fit.
+
+```{r}
+kable(summary(aus_glm)$coefficients)
+```
+
+- Not all variables are significant in the model. What variables can be dropped? Re-fit the model with this subset.
+
+`ST26Q02 (Possessions - own room) does not significantly add to the model. We re-fit the model without this variable. (You might think that ST15Q014, ST19Q013 should also be dropped, but these are dummy variables representing different levels of ST15Q01 and ST19Q01, and other levels have significant contributions. You could collapse the category with the base level for each variable, though, and re-fit.)`
+
+```{r}
+aus_glm <- glm(math_std~ST04Q01+ST06Q01+ST15Q01+ST19Q01+ST26Q01+ST26Q04+ST26Q06+ST27Q02+ST28Q01, data=aus_nomiss, weights=SENWGT_STU)
+summary(aus_glm)
+```
+
+## Question 3
+
+- Compute the leverage and influence statistics.
+
+```{r}
+library("broom")
+aus_glm_augment <- augment(aus_glm)
+ggplot(aus_glm_augment, aes(x=.hat, y=.cooksd)) + geom_point()
+```
+
+- What value would be considered to tbe the cutoff for considering a case to have high leverage? `2*p/n=2*13/11918=0.00218`
+- How many cases have high influence? `r aus_glm_augment %>% select(.hat) %>% filter(.hat>0.00218) %>% tally()` `cases would be considered to have high leverage. No cases would be considered to have high influence, the CooksD values are all very small.`
+
+## Question 4
+
+- Plot the observed vs fitted values. How good is the model for predicting math score? (Is it weak, moderate or strong?)
+
+```{r}
+ggplot(aus_glm_augment, aes(x=.fitted, y=math_std)) + geom_point()
+```
+
+`The model moderately explains math scores. There is a lot of variation in the scores that is clearly not explained by the predictors.`
+
+- Plot residuals vs fitted. What do you learn about the model fit by looking at this plot?
+
+```{r}
+ggplot(aus_glm_augment, aes(x=.fitted, y=.resid)) + geom_point()
+```
+
+`There is some heteroskedasticity. The variation in residuals at smaller fitted values is smaller than at larger values. `
+
+- Make a histogram of residuals, and a qqplot (normal probability plot). Do these look like a sample from a normal model?
+
+```{r}
+p1 <- ggplot(aus_glm_augment, aes(x=.resid)) + geom_histogram()
+n <- nrow(aus_nomiss)
+aus_glm_augment$q = qnorm(c(1 - 0.5^(1/n), (2:(n-1) - 0.3175) / 
+                       (n + 0.365),0.5^(1/n)), 0, 1) 
+p2 <- ggplot(aus_glm_augment, aes(x=sort(.resid), y=q)) + geom_point() +
+  geom_smooth(method="lm", se=FALSE) + theme(aspect.ratio=1)
+library("gridExtra")
+grid.arrange(p1, p2, ncol=2)
+```
+
+`Doesn't look entirely normal. The tails are a bit long. Small residuals are higher than expected and larger residuals are lower than expected.`
+
+## Question 5
+
+Compute the variance inflation factors. Do these indicate collinearity between predictors that needs to be addressed?
+
+```{r}
+library("car")
+vif(aus_glm)
+```
+
+`There is no multicollinearity problem. All the VIFs are low.`
+
+## Question 6
+
+Interpret the model: 
+
+- For male students how much does math score increase or decrease on average?
+- For each year delayed starting school what happens to average math score?
+- For a student who's mother is part-time, looking for work or other, how does the average math score change?
+- ....
+
+- `The base model is for female, started school at age 4, both parents worked full-time, had a desk, computer and internet, no TVs in the household, and 0-10 books. These students had an average standardised math score of 0.168205`
+- `A male student's, with otherwise the same demographics, had an average standardised math score of  0.168205 + 0.219131 = 0.387336`
+- `For each extra year delay in starting school average standardised math score decreased by 0.107002`
+- `A student who's Mum worked part-time saw an increased average of 0.089772, but who's Mum was looking for work saw a decrease of 0.210685. No difference for a Mum who was in the other category.`
+- `A student who's Dad was in any other category than full-time work saw a decrease in average math score of 0.076803, 0.081732, 0.169310 respectively.`
+- `Not having a desk, computer of internet decreased the average by 0.286384, 0.370127, 0.408397 respectively`
+- `Each additional TV in the household, up to 3 or more, corresponded to an average decrease in math score of 0.217575`
+- `More books in the household corresponded to an increase in average math score, 0.212939 for each category of book numbers. We used this variable as a continuous variable, which is debatable. It is forcing a linear relationship to a nonlinear coding. We could have forced it to be fit as a categorical variable, and then interpretation may have been a little simpler.` 
+
+## Question 7
+
+Using analysis of variance determine how much additional explanatory power including books in the model produces. 
+
+```{r}
+aus_glm_nobooks <- glm(math_std~ST04Q01+ST06Q01+ST15Q01+ST19Q01+ST26Q01+ST26Q04+ST26Q06+ST27Q02, data=aus_nomiss, weights=SENWGT_STU)
+```
+
+The gain is `r (aus_glm_nobooks$deviance-aus_glm$deviance)/aus_glm$null.deviance*100` percent. 
+
+## Question 8
+
+Predict the average math score for these demographic groups
+
+- Female student, started school at 4, mum and dad working full-time, has a desk, computer, own room, and internet, no TV at home and between 0-10 books at home.
+
+`0.168205`
+
+- Everything as before except for more than 3 TVs at home.
+
+`0.168205-3*0.217575=-0.48452`
+
+- Everything else as before except male student, and mum working part-time. 
+
+`0.168205+0.219131+0.089772=0.477108`
+
+`Compute the average and standard deviation of the math scores, to convert the standardised scores to raw numbers.`
+
+- `0.168205*92.19892+505.6558=521.16`
+- `-0.48452*92.19892+505.6558=460.98`
+- `0.477108*92.19892+505.6558=549.64`
+
+```{r}
+aus_nomiss %>% summarise(m=mean(math), s=sd(math))
+```
+
+## Question 9
+
+This plot shows just a few of the variables with linear models fit separately in each level of the categorical variables: math score is plotted against number of TVs in the household (ST27Q02), separately for fathers job status (ST19Q01), and coloured by mothers job status (ST15Q01). Is there evidence that an interaction term should be fitted to the model? Explain.
+
+```{r}
+ggplot(aus_nomiss, aes(x=ST27Q02, y=math_std)) + 
+  geom_point(alpha=0.2) +
+  facet_wrap(~ST15Q01, ncol=2) + 
+  geom_smooth(aes(colour=ST19Q01), method="lm", se=F)
+```
+
+`There is a small amount of evidence to suggest a interaction terms are needed. The lines are close to parallel, and mostly in the same order from top to bottom. Some slight crossing of the lines for the mother and father looking for work can be seen. It pretty weak, so the model will likely not be hugely improved by adding the complexity of interaction terms.`
+
