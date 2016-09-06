@@ -145,6 +145,6 @@ calc_res <- function(d, i) {
 }
 res <- boot(aus_nomiss, statistic = calc_res, R = 1000,
             weights = aus_nomiss$SENWGT_STU)
-l <- res$t[25, 1]
-u <- res$t[975, 2]
+l <- sort(res$t[, 1])[25]
+u <- sort(res$t[, 2])[925]
 pred_pi <- predict(aus_glm, new_data)
