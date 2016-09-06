@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Earo Wang   earo.wang@gmail.com" />
+  <title>ETC2420/5242   Bootstrapping in R</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+    href="http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css" />
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+   href="../myslidy.css" />
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+  <script src="http://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js"
+    charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">ETC2420/5242 <br> Bootstrapping in R</h1>
+  <p class="author">
+Earo Wang <br> <script type="text/javascript">
+<!--
+h='&#x67;&#x6d;&#x61;&#x69;&#108;&#46;&#x63;&#x6f;&#x6d;';a='&#64;';n='&#x65;&#x61;&#114;&#x6f;&#46;&#x77;&#x61;&#110;&#x67;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\/'+'a'+'>');
+// -->
+</script><noscript>&#x65;&#x61;&#114;&#x6f;&#46;&#x77;&#x61;&#110;&#x67;&#32;&#x61;&#116;&#32;&#x67;&#x6d;&#x61;&#x69;&#108;&#32;&#100;&#x6f;&#116;&#32;&#x63;&#x6f;&#x6d;</noscript>
+  </p>
+  <p class="date">Lab 07</p>
+</div>
+<div id="happy-bootstrapping" class="slide section level1">
+<h1>Happy bootstrapping</h1>
+<!-- break -->
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aus_glm &lt;-<span class="st"> </span><span class="kw">glm</span>(
+  math_std ~<span class="st"> </span>ST04Q01 +<span class="st"> </span>ST06Q01 +<span class="st"> </span>ST15Q01 +<span class="st"> </span>ST19Q01 +<span class="st"> </span>ST26Q01 +
+<span class="st">             </span>ST26Q04 +<span class="st"> </span>ST26Q06 +<span class="st"> </span>ST27Q02 +<span class="st"> </span>ST28Q01, 
+  <span class="dt">data =</span> aus_nomiss, 
+  <span class="dt">weights =</span> SENWGT_STU
+  )
+coef &lt;-<span class="st"> </span><span class="kw">summary</span>(aus_glm)$coefficients
+coef</code></pre></div>
+<pre><code>##                Estimate  Std. Error    t value      Pr(&gt;|t|)
+## (Intercept)  0.16820487 0.056138513   2.996247  2.738877e-03
+## ST04Q012     0.21913103 0.016491266  13.287702  5.255760e-40
+## ST06Q01     -0.10700244 0.012146342  -8.809437  1.431179e-18
+## ST15Q012     0.08977190 0.019997268   4.489208  7.216001e-06
+## ST15Q013    -0.21068542 0.044312283  -4.754560  2.012097e-06
+## ST15Q014    -0.01886587 0.021576831  -0.874358  3.819410e-01
+## ST19Q012    -0.07680318 0.034592158  -2.220248  2.642068e-02
+## ST19Q013    -0.08173197 0.050768898  -1.609883  1.074500e-01
+## ST19Q014    -0.16930988 0.034011827  -4.977971  6.515390e-07
+## ST26Q012    -0.28638383 0.031398635  -9.120901  8.639815e-20
+## ST26Q042    -0.37012730 0.066721745  -5.547326  2.962647e-08
+## ST26Q062    -0.40839738 0.058624923  -6.966276  3.425858e-12
+## ST27Q02     -0.21757546 0.012419415 -17.518978  7.270215e-68
+## ST28Q01      0.21293890 0.006056394  35.159355 9.686558e-258</code></pre>
+<h2 id="classical-confidence-intervals">Classical confidence intervals</h2>
+<p><span class="math display">\[
+\hat{\beta}_{14} \pm t_{\alpha/2, n - (k + 1)} \times \mathrm{S.E.}(\hat{\beta}_{14})
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="kw">nrow</span>(aus_nomiss) <span class="co"># no. of observations</span>
+beta_14 &lt;-<span class="st"> </span>coef[<span class="dv">14</span>, <span class="dv">1</span>] <span class="co"># coefficient</span>
+se_14 &lt;-<span class="st"> </span>coef[<span class="dv">14</span>, <span class="dv">2</span>] <span class="co"># standard error</span>
+df &lt;-<span class="st"> </span>n -<span class="st"> </span><span class="dv">14</span> <span class="co"># degree of freedom = n - (k + 1)</span>
+t_crit &lt;-<span class="st"> </span><span class="kw">qt</span>(<span class="fl">0.975</span>, df) <span class="co"># t critical value</span>
+<span class="kw">c</span>(beta_14 -<span class="st"> </span>t_crit *<span class="st"> </span>se_14, beta_14 +<span class="st"> </span>t_crit *<span class="st"> </span>se_14) <span class="co"># (lower, upper)</span></code></pre></div>
+<pre><code>## [1] 0.2010674 0.2248104</code></pre>
+<h2 id="hypothesis-test">Hypothesis test</h2>
+<p><span class="math display">\[
+\begin{align}
+H_{0}:&amp; \beta_{14} = 0 \\
+H_{1}: &amp; \beta_{14} \neq 0
+\end{align}
+\]</span></p>
+<p>Compare <span class="math inline">\(t_{crit}\)</span> and <span class="math inline">\(t_{test}\)</span> and decide to reject <span class="math inline">\(H_0\)</span> or not.</p>
+<h2 id="confidence-intervals-via-bootstrap">Confidence intervals via bootstrap</h2>
+<ol style="list-style-type: decimal">
+<li>Make a N boostrap samples (sample data rows, with replacement)</li>
+<li>Fit the model for each</li>
+<li>Compute lower and upper C% bounds, by sorting values and pulling the relevant ones, e.g. if N = 1000, C = 95, we would take the 25<span class="math inline">\(^{th}\)</span> and 975<span class="math inline">\(^{th}\)</span> values as the lower and upper CI bounds</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(boot)
+calc_stat &lt;-<span class="st"> </span>function(d, i) {
+  x &lt;-<span class="st"> </span>d[i,]
+  mod &lt;-<span class="st"> </span>FILL IN THE NECESSARY CODE
+  stat &lt;-<span class="st"> </span>FILL IN THE NECESSARY CODE
+  <span class="kw">return</span>(stat)
+}
+stat &lt;-<span class="st"> </span><span class="kw">boot</span>(aus_nomiss, <span class="dt">statistic =</span> calc_stat, <span class="dt">R =</span> <span class="dv">1000</span>,
+             <span class="dt">weights =</span> aus_nomiss$SENWGT_STU)
+stat</code></pre></div>
+<pre><code>## 
+## WEIGHTED BOOTSTRAP
+## 
+## 
+## Call:
+## boot(data = aus_nomiss, statistic = calc_stat, R = 1000, weights = aus_nomiss$SENWGT_STU)
+## 
+## 
+## Bootstrap Statistics :
+##      original       bias    std. error  mean(t*)
+## t1* 0.2129389 -0.005265462 0.006844996 0.2076734</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(<span class="kw">sort</span>(stat$t)[<span class="dv">25</span>], <span class="kw">sort</span>(stat$t)[<span class="dv">975</span>])</code></pre></div>
+<pre><code>## [1] 0.1934315 0.2204962</code></pre>
+<h2 id="confidence-intervals-for-predicted-value">Confidence intervals for predicted value</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">calc_pred &lt;-<span class="st"> </span>function(d, i, newd) {
+  x &lt;-<span class="st"> </span>d[i,]
+  mod &lt;-<span class="st"> </span>FILL IN THE NECESSARY CODE
+  pred &lt;-<span class="st"> </span>FILL IN THE NECESSARY CODE
+  <span class="kw">return</span>(pred)
+}</code></pre></div>
+<p>Now make a 95% bootstrap confidence interval for predicted value for a new student who is FEMALE, started school at 4, mother and father both work full-time, has a desk, computer and internet, two TVs and 26-100 books in the home. The weight for a student like this is 0.1041.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">new_data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
+  <span class="dt">ST04Q01 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), <span class="dt">ST06Q01 =</span> <span class="dv">0</span>, <span class="dt">ST05Q01 =</span> <span class="dv">0</span>, 
+  <span class="dt">ST15Q01 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), <span class="dt">ST19Q01 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), <span class="dt">ST26Q01 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), 
+  <span class="dt">ST26Q04 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), <span class="dt">ST26Q06 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), <span class="dt">ST27Q02 =</span> <span class="dv">3</span>, 
+  <span class="dt">ST28Q01 =</span> <span class="dv">3</span>, <span class="dt">math_std =</span> <span class="dv">0</span>, <span class="dt">SENWGT_STU =</span> <span class="fl">0.1041</span>
+  )
+pred_ci &lt;-<span class="st"> </span><span class="kw">boot</span>(aus_nomiss, <span class="dt">statistic =</span> calc_pred, <span class="dt">R =</span> <span class="dv">1000</span>,
+                <span class="dt">weights =</span> aus_nomiss$SENWGT_STU, <span class="dt">newd =</span> new_data)
+pred_ci</code></pre></div>
+<pre><code>## 
+## WEIGHTED BOOTSTRAP
+## 
+## 
+## Call:
+## boot(data = aus_nomiss, statistic = calc_pred, R = 1000, weights = aus_nomiss$SENWGT_STU, 
+##     newd = new_data)
+## 
+## 
+## Bootstrap Statistics :
+##      original     bias    std. error  mean(t*)
+## t1* 0.1542952 0.03155665  0.02504244 0.1858518</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(<span class="kw">sort</span>(pred_ci$t)[<span class="dv">25</span>], <span class="kw">sort</span>(pred_ci$t)[<span class="dv">975</span>])</code></pre></div>
+<pre><code>## [1] 0.1382045 0.2340002</code></pre>
+<p>Be sure to convert the values back into the actual math score range.</p>
+<h2 id="prediction-intervals">Prediction intervals</h2>
+<ol style="list-style-type: decimal">
+<li>Compute the residuals from the fitted model</li>
+<li>Bootstrap the residuals</li>
+<li>Find the desired quantiles of the residuals</li>
+<li>Compute prediction intervals by adding residual quantiles to fitted value</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">calc_res &lt;-<span class="st"> </span>function(d, i) {
+  x &lt;-<span class="st"> </span>d[i,]
+  mod &lt;-<span class="st"> </span>FILL IN THE NECESSARY CODE
+  res &lt;-<span class="st"> </span>FILL IN THE NECESSARY CODE
+  <span class="kw">return</span>(res)
+}</code></pre></div>
+<p><meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" /></p>
+</div>
+</body>
+</html>
