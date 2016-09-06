@@ -120,8 +120,8 @@ calc_stat <- function(d, i) {
 stat <- boot(aus_nomiss, statistic=calc_stat, R=1000,
      weights=aus_nomiss$SENWGT_STU)
 stat
-sort(stat$t)[5]
-sort(stat$t)[95]
+sort(stat$t)[25]
+sort(stat$t)[975]
 ```
 
 b. How does the bootstrap interval compare with the t-interval?
