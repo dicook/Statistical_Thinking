@@ -145,7 +145,7 @@ calc_res <- function(d, i) {
 res <- boot(aus_nomiss, statistic = calc_res, R = 1000,
             weights = aus_nomiss$SENWGT_STU)
 l <- sort(res$t[, 1])[25]
-u <- sort(res$t[, 2])[925]
+u <- sort(res$t[, 2])[975]
 actual_pred <- predict(aus_glm, new_data)
 c(actual_pred + l, actual_pred + u)
 
