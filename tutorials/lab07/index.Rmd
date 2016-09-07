@@ -41,7 +41,7 @@ H_{1}: & \beta_{14} \neq 0
 \end{align}
 $$
 
-Compare $t_{crit}$ and $t_{test}$ and decide to reject $H_0$ or not.
+Compare $0$ with the $t-$interval and decide to reject $H_0$ or not.
 
 ## Confidence intervals via bootstrap
 
