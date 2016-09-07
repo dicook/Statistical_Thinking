@@ -113,9 +113,8 @@ calc_pred <- function(d, i, newd) {
 
 ## ---- q3-data
 new_data <- data.frame(
-  ST04Q01 = factor(1), ST06Q01 = 0, ST05Q01 = 0, 
-  ST15Q01 = factor(1), ST19Q01 = factor(1), ST26Q01 = factor(1), 
-  ST26Q04 = factor(1), ST26Q06 = factor(1), ST27Q02 = 3, 
+  ST04Q01 = factor(1), ST06Q01 = 0, ST15Q01 = factor(1), ST19Q01 = factor(1), 
+  ST26Q01 = factor(1), ST26Q04 = factor(1), ST26Q06 = factor(1), ST27Q02 = 3, 
   ST28Q01 = 3, math_std = 0, SENWGT_STU = 0.1041
   )
 pred_ci <- boot(aus_nomiss, statistic = calc_pred, R = 1000,
@@ -147,4 +146,6 @@ res <- boot(aus_nomiss, statistic = calc_res, R = 1000,
             weights = aus_nomiss$SENWGT_STU)
 l <- sort(res$t[, 1])[25]
 u <- sort(res$t[, 2])[925]
-pred_pi <- predict(aus_glm, new_data)
+actual_pred <- predict(aus_glm, new_data)
+c(actual_pred + l, actual_pred + u)
+

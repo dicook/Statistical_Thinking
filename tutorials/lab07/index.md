@@ -136,9 +136,8 @@ Now make a 95% bootstrap confidence interval for predicted value for a new stude
 
 ```r
 new_data <- data.frame(
-  ST04Q01 = factor(1), ST06Q01 = 0, ST05Q01 = 0, 
-  ST15Q01 = factor(1), ST19Q01 = factor(1), ST26Q01 = factor(1), 
-  ST26Q04 = factor(1), ST26Q06 = factor(1), ST27Q02 = 3, 
+  ST04Q01 = factor(1), ST06Q01 = 0, ST15Q01 = factor(1), ST19Q01 = factor(1), 
+  ST26Q01 = factor(1), ST26Q04 = factor(1), ST26Q06 = factor(1), ST27Q02 = 3, 
   ST28Q01 = 3, math_std = 0, SENWGT_STU = 0.1041
   )
 pred_ci <- boot(aus_nomiss, statistic = calc_pred, R = 1000,

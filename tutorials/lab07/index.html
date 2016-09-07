@@ -150,9 +150,8 @@ stat</code></pre></div>
 }</code></pre></div>
 <p>Now make a 95% bootstrap confidence interval for predicted value for a new student who is FEMALE, started school at 4, mother and father both work full-time, has a desk, computer and internet, two TVs and 26-100 books in the home. The weight for a student like this is 0.1041.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">new_data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
-  <span class="dt">ST04Q01 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), <span class="dt">ST06Q01 =</span> <span class="dv">0</span>, <span class="dt">ST05Q01 =</span> <span class="dv">0</span>, 
-  <span class="dt">ST15Q01 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), <span class="dt">ST19Q01 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), <span class="dt">ST26Q01 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), 
-  <span class="dt">ST26Q04 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), <span class="dt">ST26Q06 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), <span class="dt">ST27Q02 =</span> <span class="dv">3</span>, 
+  <span class="dt">ST04Q01 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), <span class="dt">ST06Q01 =</span> <span class="dv">0</span>, <span class="dt">ST15Q01 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), <span class="dt">ST19Q01 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), 
+  <span class="dt">ST26Q01 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), <span class="dt">ST26Q04 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), <span class="dt">ST26Q06 =</span> <span class="kw">factor</span>(<span class="dv">1</span>), <span class="dt">ST27Q02 =</span> <span class="dv">3</span>, 
   <span class="dt">ST28Q01 =</span> <span class="dv">3</span>, <span class="dt">math_std =</span> <span class="dv">0</span>, <span class="dt">SENWGT_STU =</span> <span class="fl">0.1041</span>
   )
 pred_ci &lt;-<span class="st"> </span><span class="kw">boot</span>(aus_nomiss, <span class="dt">statistic =</span> calc_pred, <span class="dt">R =</span> <span class="dv">1000</span>,
