@@ -1,0 +1,184 @@
+---
+title: 'Statistical Methods for Insurance: Generalised Linear Models'
+author: Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monash
+  University
+date: "W7.C2"
+output:
+  ioslides_presentation:
+    transition: default
+    widescreen: yes
+  beamer_presentation: default
+css: default.css
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE,
+  echo=FALSE,
+  fig.height = 2,
+  fig.width = 5,
+  collapse = TRUE,
+  comment = "#>"
+)
+options(digits=2)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readr)
+library(gridExtra)
+library(broom)
+```
+
+## Generalised linear models
+
+- Overview
+- Types
+- Assumptions
+- Fitting
+- Examples
+
+
+## Overview
+
+- GLMs are a broad class of models for fitting different types of response variables distributions. 
+- The multiple linear regression model is a special case.
+
+## Three components
+
+- Random Component: probability distributin of the response variable
+- Systematic Component: explanatory variables
+- Link function: describes the relaionship between the random and systematic components
+
+## Multiple linear regression
+
+$$y_i = \beta_0+\beta_1x_1 + \beta_2x_2 + \varepsilon ~~~ or ~~~ E(Y_i)=\beta_0+\beta_1x_1+\beta_2x_2$$
+
+- Random component: $y_i$ has a normal distribution, and so $e_i \sim N(0,\sigma^2)$
+- Systematic component: $\beta_0+\beta_1x_1 + \beta_2x_2$
+- Link function: identity, just the systematic component
+
+## Poisson regression
+
+$$y_i = exp(\beta_0+\beta_1x_1+\beta_2x_2) + \varepsilon$$
+
+- $y_i$ takes integer values, 0, 1, 2, ...
+- Link function: $ln(\mu)$, name=`log`. (Think of $\mu$ as $\hat{y}$.)
+
+## Bernouilli, binomial regression
+
+$$y_i = \frac{exp(\beta_0+\beta_1x_1+\beta_2x_2)}{1+exp(\beta_0+\beta_1x_1+\beta_2x_2)} + \varepsilon$$
+
+- $y_i$ takes integer values, $\{ 0, 1\}$ (bernouilli), $\{ 0, 1, ..., n\}$ (binomial)
+- Let $\mu=\frac{exp(\beta_0+\beta_1x_1+\beta_2x_2)}{1+exp(\beta_0+\beta_1x_1+\beta_2x_2)}$, link function is $ln\frac{\mu}{1-\mu}$, name=`logit`
+
+## Assumptions
+
+- The data $y_1, y_2, ..., y_n$ are independently distributed, i.e., cases are independent.
+- The dependent variable $y_i$ does NOT need to be normally distributed, but it typically assumes a distribution from an exponential family (e.g. binomial, Poisson, multinomial, normal,...)
+- Linear relationship between the transformed response (see examples below)
+- Explanatory variables can be transformations of original variables
+- Homogeneity of variance does NOT need to be satisfied
+- Uses maximum likelihood estimation (MLE) to estimate the parameters
+- Goodness-of-fit measures rely on sufficiently large samples
+
+## Example: Olympics medal tally
+
+- Model medal counts on log_GDP
+- Medal counts = integer, suggests use a Poisson model. 
+
+```{r fig.align='center', fig.width=6, fig.height=4}
+oly_gdp2012 <- read.csv("../data/olympics_gdp_all.csv")
+oly_gdp2012 <- oly_gdp2012 %>% 
+  mutate(GDP_log=log10(GDP))
+
+ggplot(oly_gdp2012, aes(x=GDP_log, y=M2012)) + geom_point()
+```
+
+##
+
+```{r echo=TRUE}
+oly_glm <- glm(M2012~GDP_log, data=oly_gdp2012,
+               family=poisson(link=log))
+```
+
+```{r}
+kable(summary(oly_glm)$coefficients)
+```
+
+## Your turn
+
+Write down the formula of the fitted model.
+
+## What does this model look like?
+
+```{r fig.align='center', fig.width=8, fig.height=3.5}
+oly_augment <- augment(oly_glm) %>%
+  mutate(.fitted_exp = exp(.fitted)) %>% 
+  arrange(GDP_log)
+p1 <- ggplot(oly_gdp2012, aes(x=GDP_log, y=M2012)) + 
+  geom_point() +
+  geom_line(data=oly_augment, aes(x=GDP_log, y=.fitted_exp),
+            colour="red")
+p2 <- ggplot(oly_gdp2012, aes(x=GDP_log, y=log(M2012))) + 
+  geom_point() +
+  geom_line(data=oly_augment, aes(x=GDP_log, y=.fitted),
+            colour="red")
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Example: winning tennis matches
+
+We have data scraped from the web sites of the 2012 Grand Slam tennis tournaments. There are a lot of statistics on matches. Below we have the number of receiving points won, and whether the match was won or not. 
+
+```{r fig.align='center', fig.width=8, fig.height=4}
+tennis <- read_csv("../data/tennis_2012_wta.csv")
+p1 <- ggplot(tennis, aes(x=Receiving.Points.Won, y=won)) + geom_point()
+p2 <- ggplot(tennis, aes(x=Receiving.Points.Won, y=won)) + geom_jitter()
+grid.arrange(p1, p2, ncol=2)
+```
+
+## Your turn
+
+The response variable is binary. What type of GLM should be fit?
+
+## Model
+
+```{r echo=TRUE}
+tennis_glm <- glm(won~Receiving.Points.Won, data=tennis,
+                  family=binomial(link='logit'))
+```
+
+```{r}
+kable(summary(tennis_glm)$coefficients)
+```
+
+##
+
+```{r fig.align='center', fig.width=6, fig.height=4}
+tennis_augment <- augment(tennis_glm) %>% 
+  mutate(.fitted_ln=exp(.fitted)/(1+exp(.fitted))) %>%
+  arrange(Receiving.Points.Won)
+ggplot(tennis, aes(x=Receiving.Points.Won, y=won)) + geom_point() +
+  geom_line(data=tennis_augment, aes(x=Receiving.Points.Won, 
+                                y=.fitted_ln), colour="red")
+```
+
+## Your turn
+
+Write down the fitted model
+
+## Resources
+
+- [Beginners guide](https://www.analyticsvidhya.com/blog/2015/11/beginners-guide-on-logistic-regression-in-r/)
+- [Introduction to GLMs](https://onlinecourses.science.psu.edu/stat504/node/216)
+- [Quick-R GLMs](http://www.statmethods.net/advstats/glm.html)
+- [The Analysis Factor, Generalized Linear Models Parts 1-4](http://www.theanalysisfactor.com/resources/by-topic/r/)
+- [wikipedia](https://en.wikipedia.org/wiki/Generalized_linear_model)
+- [Do Smashes Win Matches?](http://onlinelibrary.wiley.com/doi/10.1111/j.1740-9713.2013.00665.x/full)
+
+## Share and share alike
+
+This work is licensed under the Creative Commons Attribution-Noncommercial 3.0 United States License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/ 3.0/us/ or send a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
