@@ -19,17 +19,34 @@ knitr::opts_chunk$set(
   cache = FALSE
 )
 library(knitr)
-```
-
-## Data
-
-```{r}
-# Read stations data
 library(readr)
 library(tidyr)
 library(dplyr)
 library(ggplot2)
 library(ggmap)
+library(lubridate)
+library(broom)
+```
+
+## Purpose
+
+In this lab we will pull data together from multiple sources to answer the question whether adverse weather affects pedestrian traffic in Melbourne.
+
+## Data
+
+- Melbourne Open data portal contains pedestrian counts by hour for numerous sites around the city.
+- The US Department of Commerce hosts a global data base on weather from ground stations collated by National Climatic Data Center.  
+
+## Getting started
+
+The list of weather stations is a small file. We will pull this data from the web first. And plot the locations for Australia on a map. Data can be found at this web site [http://www1.ncdc.noaa.gov/pub/data/ghcn/daily/](http://www1.ncdc.noaa.gov/pub/data/ghcn/daily/). Download the file `ghcnd-stations.txt`.
+
+The `read_table` function from the `readr` package uses whitespace to guess where records start and end, very convenient. We also will only read the station information for Australia, that have ids starting with `ASN`. I used a text editor to find the line numbers of the start and end of these records. 
+
+The `ggplot2` package has some basic maps included. To get the map of Australia we need to subset the world map based on the longitude and latitude of the station locations. Maps like this can be considered to be polygon data. We use these polygons as the background to the points corresponding to station locations. 
+
+```{r echo=TRUE}
+# Read stations data
 stations <- read_table("../data/ghcnd-stations.txt", 
   col_names=c("ID", "lat", "lon", "elev", "state", "name", 
               "v1", "v2", "v3"), skip=353, n_max=17081)
@@ -40,7 +57,11 @@ ggplot(oz, aes(x=long, y=lat)) + geom_path(aes(group=group)) +
   coord_quickmap() + 
   geom_point(data=stations, aes(x=lon, y=lat), 
              colour="red", alpha=0.5)
+```
 
+We are next going to get the sensor locations, and plot these on a google map of Melbourne. You need to go to the [Melbourne Open Data Portal site](https://data.melbourne.vic.gov.au/Transport-Movement/Pedestrian-Sensor-Locations/ygaw-6rzq) and export the locations as a csv file.
+
+```{r}
 # Get pedestrian sensor locations
 ped_loc <- read_csv("../data/Pedestrian_Sensor_Locations.csv")
 
@@ -49,7 +70,11 @@ melb <- get_map(location=c(mean(range(ped_loc$Longitude)),
 ggmap(melb) + geom_point(data=ped_loc, 
                          aes(x=Longitude, y=Latitude), 
                          colour="#c51b7d", alpha=0.5, size=3)
+```
 
+Our next step is to extract the nearest weather station near downtown. 
+
+```{r}
 # Choose a weather station close to pedestrian sensors
 melb_stns <- stations %>% filter(lon > min(ped_loc$Longitude), 
                                  lon < max(ped_loc$Longitude), 
@@ -61,135 +86,108 @@ ggmap(melb) + geom_point(data=ped_loc,
                          colour="#c51b7d", alpha=0.5, size=3) +
   geom_point(data=melb_stns, aes(x=lon, y=lat), 
              colour="#542788", size=6, shape=18)
+```
 
+## 
+
+```{r}
 # Read temp data
 melb_ghcn <- read_csv("../data/melb_ghcn.csv")
 melb_ghcn <- melb_ghcn %>% 
   select(stn_id, date, variable, value) %>%
   filter(variable %in% c("TMAX", "TMIN", "PRCP")) %>%
-  mutate(year=substr(date, 1, 4), month=substr(date, 5, 6),
-         mdate=substr(date, 7, 8)) %>%
-  mutate(date=as.Date(paste(mdate, month, year, sep="-"),
+  mutate(year=substr(date, 1, 4), month_num=substr(date, 5, 6),
+         mday=substr(date, 7, 8)) %>%
+  mutate(date=as.Date(paste(mday, month_num, year, sep="-"),
                       format="%d-%m-%Y")) %>%
-  mutate(mdate=as.numeric(mdate), month=as.numeric(month), 
+  mutate(mday=as.numeric(mday), month_num=as.numeric(month_num), 
          year=as.numeric(year), value = value/10)
 melb_ghcn_wide <- melb_ghcn %>% spread(variable, value)
+melb_ghcn_wide$PRCP[is.na(melb_ghcn_wide$PRCP)] <- 0
+date_mis <- melb_ghcn_wide$date[is.na(melb_ghcn_wide$TMAX)]
+melb_ghcn_wide$TMAX[is.na(melb_ghcn_wide$TMAX)] <-
+  melb_ghcn_wide$TMAX[melb_ghcn_wide$date == date_mis-days(1)]
+melb_ghcn_wide <- melb_ghcn_wide %>%
+  mutate(high_prcp = ifelse(PRCP>5, "rain", "none"), 
+         high_tmp = ifelse(TMAX>33, "hot", "not"), 
+         low_tmp = ifelse(TMIN<6, "cold", "not"))
+ggplot(melb_ghcn, aes(x=date, y=value)) + geom_point() + facet_wrap(~variable)
 
 # Read sensor counts
 ped_sub <- read_csv("../data/pedestrian_counts_sub.csv")
+ped_sub <- ped_sub %>% 
+  filter(year < 2015) %>%
+  dplyr::arrange(sensor_id, date, time) 
 
-# 
+# Combine data
+ped_weather <- left_join(ped_sub, melb_ghcn_wide, by="date")
+
+# Fit model
+ped_weather$time <- factor(ped_weather$time)
+ped_weather$high_prcp <- factor(ped_weather$high_prcp, levels=c("none", "rain"))
+ped_weather$high_tmp <- factor(ped_weather$high_tmp, levels=c("not", "hot"))
+ped_weather$low_tmp <- factor(ped_weather$low_tmp, levels=c("not", "cold"))
+
+ped_weather_fs <- ped_weather %>% filter(sensor_name == "Flagstaff Station")
+ped_weath_glm <- glm(count~day*time*month.x+year.x+TMAX+TMIN+PRCP,
+                     data=ped_weather_fs, family=poisson(link="log"))
+summary(ped_weath_glm)
+ped_weath_aug <- augment(ped_weath_glm)
+ped_weath_aug <- ped_weath_aug %>% mutate(.fitted_exp = exp(.fitted))
+ped_weath_aug <- ped_weath_aug %>% mutate(time = as.numeric(time), 
+  day = factor(day, levels=c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")), 
+  month.x = factor(month.x, levels=c("January", "February", "March", "April", 
+                                     "May", "June", "July", "August", "September",
+                                     "October", "November", "December")))
+
+ggplot(ped_weath_aug, aes(x=time, y=.fitted_exp)) + geom_line() +
+  facet_grid(month.x~day)
+
+ggplot(filter(ped_weather, sensor_name=="Bourke Street Mall (South)"), 
+       aes(x=time, y=count)) + geom_point() +
+  facet_grid(month~day)
+
+ped_weather_bsm <- ped_weather %>% filter(sensor_name == "Bourke Street Mall (South)")
+ped_weath_bsm_glm <- glm(count~day*time*month+high_tmp+low_tmp+high_prcp,
+                     data=ped_weather_bsm, family=poisson(link="log"))
+summary(ped_weath_bsm_glm)
+ped_weath_bsm_aug <- augment(ped_weath_bsm_glm)
+ped_weath_bsm_aug <- ped_weath_bsm_aug %>% mutate(.fitted_exp = exp(.fitted))
+ped_weath_bsm_aug <- ped_weath_bsm_aug %>% mutate(time = as.numeric(time), 
+  day = factor(day, levels=c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"), labels=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")), 
+  month = factor(month, levels=c("January", "February", "March", "April", 
+                                     "May", "June", "July", "August", "September",
+                                     "October", "November", "December"), 
+                 labels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
+                          "Oct", "Nov", "Dec")))
+
+ggplot(ped_weath_bsm_aug, aes(x=time, y=.fitted_exp)) + 
+  geom_point(aes(colour=interaction(high_prcp, high_tmp))) +
+  facet_grid(month~day)
+coef_bsm <- summary(ped_weath_bsm_glm)$coefficients
+grep("prcp", rownames(coef_bsm))
+grep("tmp", rownames(coef_bsm))
+coef_bsm[42:44,]
+
+
+# Find large residuals and explore reasons for these
 
 ```
 
 ## Reading
 
-- Read the code in the lecture notes on computing bootstrap confidence intervals for linear models from Week 6. 
-
-```{r}
-library("tidyr")
-library("dplyr")
-library("ggplot2")
-student2012.sub <- readRDS("../data/student_sub.rds") 
-australia <- student2012.sub[student2012.sub$CNT=="AUS",]
-australia <- australia %>% mutate(math = (PV1MATH+PV2MATH+PV3MATH+PV4MATH+PV5MATH)/5)
-```
-
-The variables that were used for modeling `math` was:
-
-\begin{tabular}{llp{3in}}
-Variable name & Description & Coding\\\hline
-ST04Q01 & Gender & 1=Female, 2=Male\\
-ST06Q01 & Age when started school & Actual age, 9997-9999 indicate missing values\\
-ST15Q01 & Mother Current Job Status & 1=Full-time, 2=Part-time, 3=Not working, but looking for a job, 4=Other (inc stay-at-home), 7-9 indicate missing values\\
-ST19Q01 & Father Current Job Status &  1=Full-time, 2=Part-time, 3=Not working, but looking for a job, 4=Other (inc stay-at-home), 7-9 indicate missing values\\
-ST26Q01 & Possessions - desk  & 1=Yes, 2=No, 7-9 indicate missing values\\
-ST26Q04 & Possessions - computer  & 1=Yes, 2=No, 7-9 indicate missing values\\
-ST26Q06 & Possessions - Internet  & 1=Yes, 2=No, 7-9 indicate missing values\\
-ST27Q02 & How many - televisions & 1=None, 2=One, 3=Two, 4=Three or more,  7-9 indicate missing values\\
-ST28Q01 & How many books at home & 1=0-10, 2=11-25, 3=26-100, 4=101-200, 5=201-500, 6=More than 500, 7-9 indicate missing values\\
-SENWGT\_STU & Weight & Reflects how the student represents other students in Australia based on socioeconomic and demographic characteristics
-\end{tabular}
-
-```{r}
-australia <- australia %>% 
-  select(math, SCHOOLID, ST04Q01, ST06Q01, ST57Q01, ST15Q01, ST19Q01, ST26Q01, ST26Q02, ST26Q04, ST26Q06, ST27Q02, ST28Q01, SENWGT_STU)
-australia$ST06Q01[australia$ST06Q01 > 9990] <- NA
-australia$ST57Q01[australia$ST57Q02 > 9990] <- NA
-australia$ST15Q01[australia$ST15Q01 > 6] <- NA
-australia$ST19Q01[australia$ST19Q01 > 6] <- NA
-australia$ST26Q01[australia$ST26Q01 > 6] <- NA
-australia$ST26Q02[australia$ST26Q02 > 6] <- NA
-australia$ST26Q04[australia$ST26Q04 > 6] <- NA
-australia$ST26Q06[australia$ST26Q06 > 6] <- NA
-australia$ST27Q02[australia$ST27Q02 > 6] <- NA
-australia$ST28Q01[australia$ST28Q01 > 6] <- NA
-australia <- australia %>% select(-ST57Q01)
-aus_nomiss <- australia %>% filter(!is.na(ST04Q01)) %>%
-  filter(!is.na(ST06Q01)) %>% filter(!is.na(ST15Q01)) %>%
-  filter(!is.na(ST19Q01)) %>% filter(!is.na(ST26Q01)) %>%
-  filter(!is.na(ST26Q02)) %>% filter(!is.na(ST26Q04)) %>%
-  filter(!is.na(ST26Q06)) %>% filter(!is.na(ST27Q02)) %>%
-  filter(!is.na(ST28Q01))
-```
-
-
-Model building will be done using:
-
-- Response: `math` (standardised)
-- Explanatory variables: `ST04Q01, ST06Q01, ST15Q01, ST19Q01, ST26Q01,  ST26Q04, ST26Q06, ST27Q02, ST28Q01`.
-
-```{r}
-aus_nomiss$SCHOOLID <- factor(aus_nomiss$SCHOOLID)
-aus_nomiss$ST04Q01 <- factor(aus_nomiss$ST04Q01)
-aus_nomiss$ST15Q01 <- factor(aus_nomiss$ST15Q01)
-aus_nomiss$ST15Q01 <- factor(aus_nomiss$ST15Q01)
-aus_nomiss$ST19Q01 <- factor(aus_nomiss$ST19Q01)
-aus_nomiss$ST26Q01 <- factor(aus_nomiss$ST26Q01)
-aus_nomiss$ST26Q02 <- factor(aus_nomiss$ST26Q02)
-aus_nomiss$ST26Q04 <- factor(aus_nomiss$ST26Q04)
-aus_nomiss$ST26Q06 <- factor(aus_nomiss$ST26Q06)
-aus_nomiss <- aus_nomiss %>% mutate(math_std = (math-mean(math))/sd(math))
-aus_nomiss$ST06Q01 <- aus_nomiss$ST06Q01 - 4
-```
 
 ## Question 1
 
-```{r}
-aus_glm <- glm(math_std~ST04Q01+ST06Q01+ST15Q01+ST19Q01+ST26Q01+ST26Q04+ST26Q06+ST27Q02+ST28Q01, data=aus_nomiss, weights=SENWGT_STU)
-```
-
-a. Compute and report the 95% confidence interval for the parameter for the number of books in the household (ST28Q01), using classical t-interval methods.
-b. Use this to test the hypothesis that ST28Q01 is not important for the model.
 
 ## Question 2
 
-a. The boot package can generate bootstrap samples for weighted data. To use the `boot` function for drawing samples, you need a function to compute the statistic of interest. Write the function to return the slope for ST28Q01 after fitting a `glm` to a bootstrap sample. The skeleton of the function `calc_stat` is below, where `d` is the data, and `i` is the vector of indices of the bootstrap sample. 
-
-```{r eval=FALSE, echo=TRUE}
-library(boot)
-calc_stat <- function(d, i) {
-  x <- d[i,]
-  mod <- FILL IN THE NECESSARY CODE
-  stat <- FILL IN THE NECESSARY CODE
-  return(stat)
-}
-stat <- boot(aus_nomiss, statistic=calc_stat, R=1000,
-     weights=aus_nomiss$SENWGT_STU)
-stat
-sort(stat$t)[25]
-sort(stat$t)[975]
-```
-
-b. How does the bootstrap interval compare with the t-interval?
 
 ## Question 3
 
-Now make a 95% bootstrap confidence interval for predicted value for a new student who is FEMALE, started school at 4, mother and father both work full-time, has a desk, computer and internet, two TVs and 26-100 books in the home. The weight for a student like this is 0.1041. Be sure to convert the values back into the actual math score range.
 
 ## Question 4
 
-Compute a bootstrap 95% prediction interval for the same student as in the previous question. Be sure to convert the values back into the actual math score range.
 
 ## TURN IN 
 
