@@ -1,0 +1,178 @@
+---
+title: "ETC 2420/5242 Lab 7 2016"
+author: "Di Cook"
+date: "SOLUTION"
+output: pdf_document
+---
+
+```{r echo = FALSE, message = FALSE, warning = FALSE, warning = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  error = FALSE, 
+  echo = FALSE, 
+  collapse = TRUE,
+  comment = "#",
+  fig.height = 4,
+  fig.width = 8,
+  fig.align = "center",
+  cache = FALSE
+)
+options(digits = 3)
+library(knitr)
+```
+
+```{r}
+library("tidyr")
+library("dplyr")
+library("ggplot2")
+student2012.sub <- readRDS("../data/student_sub.rds") 
+australia <- student2012.sub[student2012.sub$CNT=="AUS",]
+australia <- australia %>% mutate(math = (PV1MATH+PV2MATH+PV3MATH+PV4MATH+PV5MATH)/5)
+```
+
+
+```{r}
+australia <- australia %>% 
+  select(math, ST04Q01, ST06Q01, ST57Q01, ST15Q01, ST19Q01, ST26Q01, ST26Q02, ST26Q04, ST26Q06, ST27Q02, ST28Q01, SENWGT_STU)
+australia$ST06Q01[australia$ST06Q01 > 9990] <- NA
+australia$ST57Q01[australia$ST57Q02 > 9990] <- NA
+australia$ST15Q01[australia$ST15Q01 > 6] <- NA
+australia$ST19Q01[australia$ST19Q01 > 6] <- NA
+australia$ST26Q01[australia$ST26Q01 > 6] <- NA
+australia$ST26Q02[australia$ST26Q02 > 6] <- NA
+australia$ST26Q04[australia$ST26Q04 > 6] <- NA
+australia$ST26Q06[australia$ST26Q06 > 6] <- NA
+australia$ST27Q02[australia$ST27Q02 > 6] <- NA
+australia$ST28Q01[australia$ST28Q01 > 6] <- NA
+australia <- australia %>% select(-ST57Q01)
+aus_nomiss <- australia %>% filter(!is.na(ST04Q01)) %>%
+  filter(!is.na(ST06Q01)) %>% filter(!is.na(ST15Q01)) %>%
+  filter(!is.na(ST19Q01)) %>% filter(!is.na(ST26Q01)) %>%
+  filter(!is.na(ST26Q02)) %>% filter(!is.na(ST26Q04)) %>%
+  filter(!is.na(ST26Q06)) %>% filter(!is.na(ST27Q02)) %>%
+  filter(!is.na(ST28Q01))
+```
+
+
+Model building will be done using:
+
+- Response: `math` (standardised)
+- Explanatory variables: `ST04Q01, ST06Q01, ST15Q01, ST19Q01, ST26Q01,  ST26Q04, ST26Q06, ST27Q02, ST28Q01`.
+
+```{r}
+aus_nomiss$ST04Q01 <- factor(aus_nomiss$ST04Q01)
+aus_nomiss$ST15Q01 <- factor(aus_nomiss$ST15Q01)
+aus_nomiss$ST19Q01 <- factor(aus_nomiss$ST19Q01)
+aus_nomiss$ST26Q01 <- factor(aus_nomiss$ST26Q01)
+aus_nomiss$ST26Q02 <- factor(aus_nomiss$ST26Q02)
+aus_nomiss$ST26Q04 <- factor(aus_nomiss$ST26Q04)
+aus_nomiss$ST26Q06 <- factor(aus_nomiss$ST26Q06)
+aus_nomiss <- aus_nomiss %>% mutate(math_std = (math-mean(math))/sd(math))
+aus_nomiss$ST06Q01 <- aus_nomiss$ST06Q01 - 4
+```
+
+## Question 1 (3 pts)
+
+```{r}
+aus_glm <- glm(math_std~ST04Q01+ST06Q01+ST15Q01+ST19Q01+ST26Q01+ST26Q04+ST26Q06+ST27Q02+ST28Q01, data=aus_nomiss, weights=SENWGT_STU)
+coef <- summary(aus_glm)$coefficients
+n <- nrow(aus_nomiss)
+```
+
+a. Compute and report the 95% confidence interval for the parameter for the number of books in the household (ST28Q01), using classical t-interval methods.
+
+The 95% confidence interval is (`r coef[14,1]-qt(0.975, n-14)*coef[14,2]` , `r coef[14,1]+qt(0.975, n-14)*coef[14,2]`)
+
+b. Use this to test the hypothesis that ST28Q01 is not important for the model.
+
+`0 is outside the interval, so it is not a plausible value for the parameter.` $H_o$ `would be rejected, and the conclusion would be that the parameter is not 0.`
+
+## Question 2 (3 pts)
+
+a. The boot package can generate bootstrap samples for weighted data. To use the `boot` function for drawing samples, you need a function to compute the statistic of interest. Write the function to return the slope for ST28Q01 after fitting a `glm` to a bootstrap sample. The skeleton of the function `calc_stat` is below, where `d` is the data, and `i` is the vector of indices of the bootstrap sample. 
+
+```{r echo=TRUE}
+library(boot)
+calc_stat <- function(d, i) {
+  x <- d[i,]
+  mod <- glm(math_std~ST04Q01+ST06Q01+ST15Q01+ST19Q01+ST26Q01+
+               ST26Q04+ST26Q06+ST27Q02+ST28Q01, data=x,
+             weights=SENWGT_STU)
+  stat <- as.numeric(coefficients(mod)[14])
+  return(stat)
+}
+stat <- boot(aus_nomiss, statistic=calc_stat, R=1000,
+     weights=aus_nomiss$SENWGT_STU)
+stat
+```
+
+The 95% confidence interval is (`r sort(stat$t)[25]` , `r sort(stat$t)[975]`). 
+
+b. How does the bootstrap interval compare with the t-interval? `The bootstrap interval is considerably wider than the classical t-interval.`
+
+## Question 3 (2 pts)
+
+Now make a 95% bootstrap confidence interval for predicted value for a new student who is FEMALE, started school at 4, mother and father both work full-time, has a desk, computer and internet, two TVs and 26-100 books in the home. The weight for a student like this is 0.1041. Be sure to convert the values back into the actual math score range.
+
+```{r echo=TRUE}
+calc_pred <- function(d, i, newd) {
+  x <- d[i,]
+  mod <- glm(math_std~ST04Q01+ST06Q01+ST15Q01+ST19Q01+ST26Q01+
+               ST26Q04+ST26Q06+ST27Q02+ST28Q01, data=x,
+             weights=SENWGT_STU)
+  pred <- predict(mod, newd)
+  return(pred)
+}
+new_data <- data.frame(ST04Q01=1, ST06Q01=0, ST15Q01=1, ST19Q01=1, 
+        ST26Q01=1, ST26Q04=1, ST26Q06=1, ST27Q02=3, ST28Q01=3,
+        math_std=0, SENWGT_STU=0.1041)
+new_data$ST04Q01 <- factor(new_data$ST04Q01, levels=c(1,2))
+new_data$ST15Q01 <- factor(new_data$ST15Q01, levels=c(1,2,3,4))
+new_data$ST19Q01 <- factor(new_data$ST19Q01, levels=c(1,2,3,4))
+new_data$ST26Q01 <- factor(new_data$ST26Q01, levels=c(1,2))
+new_data$ST26Q04 <- factor(new_data$ST26Q04, levels=c(1,2))
+new_data$ST26Q06 <- factor(new_data$ST26Q06, levels=c(1,2))
+pred <- boot(aus_nomiss, statistic=calc_pred, R=1000,
+     weights=aus_nomiss$SENWGT_STU, newd=new_data)
+pred
+sort(pred$t)[25]
+sort(pred$t)[975]
+```
+
+The 95% confidence interval for the predicted value is (`r sort(pred$t)[25]*sd(aus_nomiss$math)+mean(aus_nomiss$math)` , `r sort(pred$t)[975]*sd(aus_nomiss$math)+mean(aus_nomiss$math)` ). 
+
+## Question 4  (2 pts)
+
+Compute a bootstrap 95% prediction interval for the same student as in the previous question. Be sure to convert the values back into the actual math score range.
+
+```{r echo=TRUE}
+calc_res <- function(d, i) {
+  x <- d[i,]
+  mod <- glm(math_std~ST04Q01+ST06Q01+ST15Q01+ST19Q01+ST26Q01+
+               ST26Q04+ST26Q06+ST27Q02+ST28Q01, data=x,
+             weights=SENWGT_STU)
+  res <- residuals(mod)
+  return(c(l=min(res), u=max(res)))
+}
+res <- boot(aus_nomiss, statistic=calc_res, R=1000,
+     weights=aus_nomiss$SENWGT_STU)
+l <- sort(res$t[,1])[25]
+u <- sort(res$t[,2])[975]
+new_data <- data.frame(ST04Q01=1, ST06Q01=0, ST15Q01=1, ST19Q01=1, 
+        ST26Q01=1, ST26Q04=1, ST26Q06=1, ST27Q02=3, ST28Q01=3,
+        math_std=0, SENWGT_STU=0.1041)
+new_data$ST04Q01 <- factor(new_data$ST04Q01, levels=c(1,2))
+new_data$ST15Q01 <- factor(new_data$ST15Q01, levels=c(1,2,3,4))
+new_data$ST19Q01 <- factor(new_data$ST19Q01, levels=c(1,2,3,4))
+new_data$ST26Q01 <- factor(new_data$ST26Q01, levels=c(1,2))
+new_data$ST26Q04 <- factor(new_data$ST26Q04, levels=c(1,2))
+new_data$ST26Q06 <- factor(new_data$ST26Q06, levels=c(1,2))
+pred <- predict(aus_glm, new_data)
+```
+
+The 95% prediction interval is (`r (pred+l)*sd(aus_nomiss$math)+mean(aus_nomiss$math)` , `r (pred+u)*sd(aus_nomiss$math)+mean(aus_nomiss$math)`)
+
+
+
+
