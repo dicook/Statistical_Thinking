@@ -13,8 +13,8 @@ knitr::opts_chunk$set(
   echo = FALSE, 
   collapse = TRUE,
   comment = "#",
-  fig.height = 4,
-  fig.width = 8,
+  fig.height = 3,
+  fig.width = 3,
   fig.align = "center",
   cache = FALSE
 )
@@ -34,8 +34,8 @@ In this lab we will pull data together from multiple sources to answer the quest
 
 ## Data
 
-- Melbourne Open data portal contains pedestrian counts by hour for numerous sites around the city.
-- The US Department of Commerce hosts a global data base on weather from ground stations collated by National Climatic Data Center.  
+- [Melbourne Open data portal](https://data.melbourne.vic.gov.au/Transport-Movement/Pedestrian-Sensor-Locations/ygaw-6rzq) contains pedestrian counts by hour for numerous sites around the city.
+- The US Department of Commerce hosts a [global data base on weather from ground stations](http://www1.ncdc.noaa.gov/pub/data/ghcn/daily/) collated by National Climatic Data Center.  
 
 ## Getting started
 
@@ -61,7 +61,7 @@ ggplot(oz, aes(x=long, y=lat)) + geom_path(aes(group=group)) +
 
 We are next going to get the sensor locations, and plot these on a google map of Melbourne. You need to go to the [Melbourne Open Data Portal site](https://data.melbourne.vic.gov.au/Transport-Movement/Pedestrian-Sensor-Locations/ygaw-6rzq) and export the locations as a csv file.
 
-```{r}
+```{r echo=TRUE}
 # Get pedestrian sensor locations
 ped_loc <- read_csv("../data/Pedestrian_Sensor_Locations.csv")
 
@@ -74,7 +74,7 @@ ggmap(melb) + geom_point(data=ped_loc,
 
 Our next step is to extract the nearest weather station near downtown. 
 
-```{r}
+```{r echo=TRUE}
 # Choose a weather station close to pedestrian sensors
 melb_stns <- stations %>% filter(lon > min(ped_loc$Longitude), 
                                  lon < max(ped_loc$Longitude), 
@@ -88,9 +88,44 @@ ggmap(melb) + geom_point(data=ped_loc,
              colour="#542788", size=6, shape=18)
 ```
 
-## 
+## Combining pedestrian sensor data and weather data
 
-```{r}
+Only a selection of sensors are used, ones that have complete records for 2013 and 2014. And only weather records for these years are used, partly because that weather station values for 2015 are mostly missing. We would need to pull weather data from the next nearest station to examine 2015 data.
+
+We pulled the sensor data directly from the portal using this R code 
+
+```
+library(jsonlite)
+limit <- 1453000 # all the up-to-date records need to be retrieved
+web_add <- "https://data.melbourne.vic.gov.au/resource/mxb8-wn4w.json?"
+ped_url <- paste0(web_add, "$limit=", limit)
+pedestrian <- fromJSON(ped_url) # without api token
+pedestrian <- tbl_df(pedestrian)
+colnames(pedestrian) <- c("date_time", "day", "id", "mdate", "month", "count", "sensor_id", "sensor_name", "time", "year")
+pedestrian <- pedestrian %>%
+  mutate(date = as.Date(paste(pedestrian$mdate,
+                              pedestrian$month,
+                              pedestrian$year, sep="-"),
+                        "%d-%b-%Y", tz = "AEST"),
+         count = as.integer(count), sensor_id = factor(sensor_id))
+```
+
+and then wrote the data to file for use in this class. 
+
+The weather data was extracted from the yearly gzipped, csv files, using code like this:
+
+```
+t2013 <- read_csv("2013.csv.gz", col_names=FALSE)
+t2013 <- t2013 %>% filter(X1 == melb_stns$ID)
+```
+
+Some additional pre-processing of the weather data is needed
+- month, day and year variables are extracted from the date column
+- a new date variable is created that is recognised as a date by R
+- temperature is converted into Celsius, precipitation is converted into mm
+- Missing precipitation values were substituted with 0.
+
+```{r fig.width=8}
 # Read temp data
 melb_ghcn <- read_csv("../data/melb_ghcn.csv")
 melb_ghcn <- melb_ghcn %>% 
@@ -104,9 +139,6 @@ melb_ghcn <- melb_ghcn %>%
          year=as.numeric(year), value = value/10)
 melb_ghcn_wide <- melb_ghcn %>% spread(variable, value)
 melb_ghcn_wide$PRCP[is.na(melb_ghcn_wide$PRCP)] <- 0
-date_mis <- melb_ghcn_wide$date[is.na(melb_ghcn_wide$TMAX)]
-melb_ghcn_wide$TMAX[is.na(melb_ghcn_wide$TMAX)] <-
-  melb_ghcn_wide$TMAX[melb_ghcn_wide$date == date_mis-days(1)]
 melb_ghcn_wide <- melb_ghcn_wide %>%
   mutate(high_prcp = ifelse(PRCP>5, "rain", "none"), 
          high_tmp = ifelse(TMAX>33, "hot", "not"), 
@@ -118,76 +150,86 @@ ped_sub <- read_csv("../data/pedestrian_counts_sub.csv")
 ped_sub <- ped_sub %>% 
   filter(year < 2015) %>%
   dplyr::arrange(sensor_id, date, time) 
+unique(ped_sub$sensor_name)
 
 # Combine data
 ped_weather <- left_join(ped_sub, melb_ghcn_wide, by="date")
-
-# Fit model
-ped_weather$time <- factor(ped_weather$time)
-ped_weather$high_prcp <- factor(ped_weather$high_prcp, levels=c("none", "rain"))
-ped_weather$high_tmp <- factor(ped_weather$high_tmp, levels=c("not", "hot"))
-ped_weather$low_tmp <- factor(ped_weather$low_tmp, levels=c("not", "cold"))
-
-ped_weather_fs <- ped_weather %>% filter(sensor_name == "Flagstaff Station")
-ped_weath_glm <- glm(count~day*time*month.x+year.x+TMAX+TMIN+PRCP,
-                     data=ped_weather_fs, family=poisson(link="log"))
-summary(ped_weath_glm)
-ped_weath_aug <- augment(ped_weath_glm)
-ped_weath_aug <- ped_weath_aug %>% mutate(.fitted_exp = exp(.fitted))
-ped_weath_aug <- ped_weath_aug %>% mutate(time = as.numeric(time), 
-  day = factor(day, levels=c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")), 
-  month.x = factor(month.x, levels=c("January", "February", "March", "April", 
-                                     "May", "June", "July", "August", "September",
-                                     "October", "November", "December")))
-
-ggplot(ped_weath_aug, aes(x=time, y=.fitted_exp)) + geom_line() +
-  facet_grid(month.x~day)
-
-ggplot(filter(ped_weather, sensor_name=="Bourke Street Mall (South)"), 
-       aes(x=time, y=count)) + geom_point() +
-  facet_grid(month~day)
-
-ped_weather_bsm <- ped_weather %>% filter(sensor_name == "Bourke Street Mall (South)")
-ped_weath_bsm_glm <- glm(count~day*time*month+high_tmp+low_tmp+high_prcp,
-                     data=ped_weather_bsm, family=poisson(link="log"))
-summary(ped_weath_bsm_glm)
-ped_weath_bsm_aug <- augment(ped_weath_bsm_glm)
-ped_weath_bsm_aug <- ped_weath_bsm_aug %>% mutate(.fitted_exp = exp(.fitted))
-ped_weath_bsm_aug <- ped_weath_bsm_aug %>% mutate(time = as.numeric(time), 
-  day = factor(day, levels=c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"), labels=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")), 
-  month = factor(month, levels=c("January", "February", "March", "April", 
+ped_weather <- ped_weather %>% 
+  mutate(time = factor(ped_weather$time), 
+         high_prcp = factor(ped_weather$high_prcp, levels=c("none", "rain")), 
+         high_tmp <- factor(ped_weather$high_tmp, levels=c("not", "hot")),
+         low_tmp <- factor(ped_weather$low_tmp, levels=c("not", "cold")),
+         day = factor(day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", 
+                                    "Friday", "Saturday", "Sunday"), 
+                      labels=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")), 
+         month = factor(month, levels=c("January", "February", "March", "April", 
                                      "May", "June", "July", "August", "September",
                                      "October", "November", "December"), 
                  labels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
                           "Oct", "Nov", "Dec")))
+```
 
-ggplot(ped_weath_bsm_aug, aes(x=time, y=.fitted_exp)) + 
-  geom_point(aes(colour=interaction(high_prcp, high_tmp))) +
-  facet_grid(month~day)
+Your group will be assigned one sensor to work with. Subset your data to have only the records for this one sensor, in order to do the questions for the lab. (My example code uses )
+
+## Question 1
+
+a. Why was precipitation, max and min temp divided by 10?
+b. Plot the minimum vs maximum temperature and describe the relationship. Why might it not be a good idea to use both of these in a model?
+c. Replacing missing values with 0 is generally a REALLY BAD idea. Why is it reasonable for precipitation?
+d. Three new variables were created, `high_prcp`, `high_tmp`, `low_tmp`. Explain why you think Dr Cook did this? And why these variables rather than the original will be used in the forthcoming model.
+e. Make a plot of 3pm each day in January, and pedestrian `count` by `high_tmp`. You choose what you think is the best plot to make. What do you learn from the plot?
+f. Make a time series plot of pedestrian counts, faceted by month and day. What do you learn about the pedestrian traffic at your sensor location?
+
+```{r}
+ped_weather_bsm <- ped_weather %>% filter(sensor_name == "Bourke Street Mall (South)")
+```
+
+## Question 2
+
+We are going to fit a Poisson model with 
+
+- Response: `count`
+- Explanatory: `day`, `time`, `month`, `high_tmp`, `low_tmp`, `high_prcp`
+
+Three-way interactions between `day`, `time`, `month` are included. 
+
+HEADS UP: The model will take a few minutes to fit, and to compute the predicted values. Start it running and then go get a coffee or tea. 
+
+```{r fig.height=6, fig.width=6, fig.align='center', cache=TRUE, results='hide'}
+# Fit model
+ped_weath_bsm_glm <- glm(count~day*time*month+high_tmp+low_tmp+high_prcp,
+                     data=ped_weather_bsm, family=poisson(link="log"))
+#summary(ped_weath_bsm_glm)
+ped_weath_bsm_aug <- augment(ped_weath_bsm_glm, ped_weather_bsm)
+ped_weath_bsm_aug <- ped_weath_bsm_aug %>% mutate(.fitted_exp = exp(.fitted))
+ped_weath_bsm_aug <- ped_weath_bsm_aug %>% mutate(time = as.numeric(time))
+
 coef_bsm <- summary(ped_weath_bsm_glm)$coefficients
 grep("prcp", rownames(coef_bsm))
 grep("tmp", rownames(coef_bsm))
 coef_bsm[42:44,]
-
-
-# Find large residuals and explore reasons for these
-
 ```
 
-## Reading
-
-
-## Question 1
-
-
-## Question 2
-
+a. Why use a Poisson model?
+b. What does the three way interaction model allow for in the pattern of counts over day, time and month?
+c. How many estimates need to be made in this model? Do you have enough data to do all of this estimation?
+d. Examine the estimates, and significance for the three weather variables. How does high temperature affect the pedestrian traffic? Or does it have any effect?
+e. Make a plot of the fitted values by time, faceted on month and day. Colour points by `high_temp`. What do you learn about the effect of high temperature on estimated pedestrian traffic?
+f. Compute the difference between pedestrian count, for a Wednesday, 3pm, in January, for a `hot` vs `not` day. (Take precipitation to be `none` and `low_temp` to be `not`.)
 
 ## Question 3
 
+a. Plot the observed vs fitted values. How good is your model?
+b. Plot the residuals against fitted values. What days, times and months have the largest residuals? (These would be times that the model doesn't predict well.)
+c. Explore reasons for these misfits, using the internet, or what you know about Melbourne.
 
-## Question 4
-
+```
+library(plotly)
+p <- ggplot(ped_weath_bsm_aug, aes(x=.fitted_exp, y=.resid, 
+  label=paste(month, day, mday, year.x, "-", time))) + 
+  geom_point()
+ggplotly(p)
+```
 
 ## TURN IN 
 
@@ -196,11 +238,9 @@ coef_bsm[42:44,]
 - Make sure your group members are listed as authors, one person per group will turn in the report
 - DUE: Wednesday after the lab, by 7am, loaded into moodle
 
-
-
 ## Resources
 
-- https://data.melbourne.vic.gov.au/Transport-Movement/Pedestrian-Sensor-Locations/ygaw-6rzq
+- [Pedestrian count data](https://data.melbourne.vic.gov.au/Transport-Movement/Pedestrian-Sensor-Locations/ygaw-6rzq)
 - Menne, M.J., I. Durre, B. Korzeniewski, S. McNeal, K. Thomas, X. Yin, S. Anthony, R. Ray, R.S. Vose, B.E.Gleason, and T.G. Houston, 2012: Global Historical Climatology Network - Daily (GHCN-Daily), Version 3. [indicate subset used following decimal, 
 e.g. Version 3.12]. NOAA National Climatic Data Center. http://doi.org/10.7289/V5D21VHZ [9/9/2016].
 
