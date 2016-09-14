@@ -1,0 +1,189 @@
+---
+title: 'Statistical Methods for Insurance: Compiling data for problem solving'
+author: Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monash
+  University
+date: "W8.C2"
+output:
+  ioslides_presentation:
+    transition: default
+    widescreen: yes
+  beamer_presentation: default
+css: default.css
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE,
+  echo=FALSE,
+  fig.align='center', 
+  fig.height = 4,
+  fig.width = 4,
+  collapse = TRUE,
+  comment = "#>"
+)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readr)
+library(gridExtra)
+```
+
+## Overview of this class
+
+- String operations, working with `text`
+- Reading different `data formats`
+- Handling missing data
+
+## Working with text
+
+```{r echo=TRUE}
+tb <- read_csv("../data/tb.csv")
+tb[7:10,1:10]
+```
+
+## Convert to long form
+
+```{r echo=TRUE}
+tb_long <- tb %>% gather(variable, count, m_04:f_u)
+head(tb_long)
+```
+
+## String split
+
+```{r echo=TRUE}
+tb_long <- tb_long %>% separate(variable, c("gender", "age"), "_")
+head(tb_long)
+```
+
+## Take a look
+
+```{r echo=TRUE, fig.align='center', fig.width=8, fig.height=4}
+tb_long %>% filter(iso2 == "CO", age!="u", year>1990) %>%
+  ggplot(aes(x=year, y=count, colour=gender)) + geom_point() + facet_wrap(~age, ncol=3)
+```
+
+## Reading different file formats: shapefiles
+
+The Australian Electorate Commission publishes the boundaries of the electorates on their website at [http://www.aec.gov.au/Electorates/gis/gis_datadownload.htm](http://www.aec.gov.au/Electorates/gis/gis_datadownload.htm).
+
+Once the files (preferably the national files) are downloaded, unzip the file (it will build a folder with a set of files). We want to read the shapes contained in the `shp` file into R.
+
+##
+
+```{r echo=TRUE, message=FALSE}
+library(maptools)
+
+# shapeFile contains the path to the shp file:
+shapeFile <- "../data/vic-esri-24122010/vic 24122010.shp"
+sF <- readShapeSpatial(shapeFile)
+class(sF)
+```
+
+##
+
+`sF` is a spatial data frame containing all of the polygons. 
+We use the `rmapshaper` package available from ateucher's github page to thin the polygons while preserving the geography:
+
+```{r echo=TRUE, message=FALSE}
+library(rmapshaper)
+```
+
+```{r echo=TRUE, message=FALSE}
+sFsmall <- ms_simplify(sF, keep=0.05) # use instead of thinnedSpatialPoly
+```
+
+##
+
+`keep` indicates the percentage of points we want to keep in the polygons. 5% makes the electorate boundary still quite recognizable, but reduce the overall size of the map considerably, making it faster to plot.
+
+##
+
+We can use base graphics to plot this map:
+
+```{r echo=TRUE, cache=TRUE, message=FALSE, fig.width=6, fig.height=4}
+plot(sFsmall)
+```
+
+## Extracting the electorate information 
+
+A spatial polygons data frame consists of both a data set with information on each of the entities (in this case, electorates), and a set of polygons for each electorate (sometimes multiple polygons are needed, e.g. if the electorate has islands). We want to extract both of these parts.
+
+##
+
+```{r echo=TRUE, message=FALSE}
+nat_data <- sF@data
+head(nat_data)
+```
+
+##
+
+The row names of the data file are identifiers corresponding to the polygons - we want to make them a separate variable:
+
+```{r echo=TRUE, message=FALSE}
+nat_data$id <- row.names(nat_data)
+```
+
+## Extracting the polygon information 
+
+The `fortify` function in the `ggplot2` package extracts the polygons into a data frame. 
+```{r echo=TRUE}
+nat_map <- ggplot2::fortify(sFsmall)
+head(nat_map)
+```
+
+##
+
+We need to make sure that `group` and `piece` are kept as factor variables - if they are allowed to be converted to numeric values, it messes things up, because as factor levels `9` and `9.0` are distinct, whereas they are not when interpreted as numbers ...
+
+```{r echo=TRUE}
+nat_map$group <- paste("g",nat_map$group,sep=".")
+nat_map$piece <- paste("p",nat_map$piece,sep=".")
+head(nat_map)
+```
+
+## Plot it
+
+```{r echo=TRUE, fig.width=4, fig.height=3}
+ggplot(nat_map, aes(x=long, y=lat, group=group)) + 
+  geom_polygon(fill="white", colour="black") 
+```
+
+## Handling missing values
+
+- Need to know how the missings are coded, hopefully clearly missing, treated as NA in R, not 0, or -9, or -9999, or . Recode as need be.
+
+- Study the distribution of missing vs not missing, which will help determine how to handle them.
+
+## What ways can these affect analysis?
+
+- If missings happen when conditions are special, eg sensor tends to stop when temperature drops below 3 degrees Celsius, estimation of model parameters may not reflect the population parameters
+
+- Some techniques, particularly multivariate methods like many used in data mining require complete records over many variables. Just a few missing numbers can mean a lot of cases that cannot be used. 
+
+## Making it Easy - MissingDataGUI
+
+- Methods for summarising missings in a data set
+
+- Ways to plot to examine dependence between missing vs not missing
+
+- Imputation methods to substitute missings
+
+```
+library(MissingDataGUI)
+data(tao)
+MissingDataGUI(tao)
+```
+
+## Resources
+
+- [eechidna: Exploring Election and Census Highly Informative Data Nationally
+        for Australia](https://cran.r-project.org/web/packages/eechidna/index.html)
+- [AEC electorate polygons](http://www.aec.gov.au/Electorates/gis/gis_datadownload.htm)
+- [Paper on the MissingDataGUI](https://www.jstatsoft.org/article/view/v068i06/v68i06.pdf)
+
+## Share and share alike
+
+This work is licensed under the Creative Commons Attribution-Noncommercial 3.0 United States License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/ 3.0/us/ or send a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
