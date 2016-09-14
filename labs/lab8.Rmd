@@ -34,7 +34,7 @@ In this lab we will pull data together from multiple sources to answer the quest
 
 ## Data
 
-- [Melbourne Open data portal](https://data.melbourne.vic.gov.au/Transport-Movement/Pedestrian-Sensor-Locations/ygaw-6rzq) contains pedestrian counts by hour for numerous sites around the city.
+- [Melbourne Open data portal](https://data.melbourne.vic.gov.au/Transport-Movement/Pedestrian-Sensor-Locations/ygaw-6rzq) has lcoations of sensors and pedestrian counts by hour for numerous sites around the city.
 - The US Department of Commerce hosts a [global data base on weather from ground stations](http://www1.ncdc.noaa.gov/pub/data/ghcn/daily/) collated by National Climatic Data Center.  
 
 ## Getting started
