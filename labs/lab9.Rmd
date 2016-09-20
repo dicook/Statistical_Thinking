@@ -1,0 +1,126 @@
+---
+title: "ETC 2420/5242 Lab 9 2016"
+author: "Di Cook"
+date: "Week 9"
+output: pdf_document
+---
+
+```{r echo = FALSE, message = FALSE, warning = FALSE, warning = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  error = FALSE, 
+  echo = FALSE, 
+  collapse = TRUE,
+  comment = "#",
+  fig.height = 3,
+  fig.width = 3,
+  fig.align = "center",
+  cache = FALSE
+)
+library(knitr)
+library(readr)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(ggmap)
+library(lubridate)
+library(broom)
+```
+
+## Purpose
+
+In this lab we will model risk and loss for running a coffee shop in downtown Melbourne using the pedestrian traffic data and weather data.
+
+## Models
+
+```{r fig.width=8}
+ped_weather <- read_csv("../data/melb_ped_weather.csv")
+ped_weather_sub <- ped_weather %>% filter(sensor_name %in% c("Melbourne Central", "Flinders Street Station Underpass"))
+ggplot(ped_weather_sub, aes(x=as.numeric(time), y=count, colour=sensor_name)) + 
+  geom_smooth() +
+  facet_grid(month~day) + 
+  theme_bw() + theme(legend.position="bottom")
+
+ped_weath_sub_glm <- glm(count~day*time*month*sensor_name+high_tmp+low_tmp+high_prcp,
+                     data=ped_weather_sub, family=poisson(link="log"))
+save(ped_weath_sub_glm, file="../data/ped_weather_sub_glm.rda")
+```
+
+
+## Question 1
+
+a. Why was precipitation, max and min temp divided by 10? 
+b. Plot the minimum vs maximum temperature and describe the relationship. Why might it not be a good idea to use both of these in a model?
+c. Replacing missing values with 0 is generally a REALLY BAD idea. Why is it reasonable for precipitation?
+d. Three new variables were created, `high_prcp`, `high_tmp`, `low_tmp`. Explain why you think Dr Cook did this? And why these variables rather than the original will be used in the forthcoming model.
+e. Make a plot of 3pm each day in January, and pedestrian `count` by `high_tmp`. You choose what you think is the best plot to make. What do you learn from the plot?
+f. Make a time series plot of pedestrian counts, faceted by month and day. What do you learn about the pedestrian traffic at your sensor location?
+
+```{r}
+ped_weather_bsm <- ped_weather %>% filter(sensor_name == "Bourke Street Mall (South)")
+```
+
+## Question 2
+
+We are going to fit a Poisson model with 
+
+- Response: `count`
+- Explanatory: `day`, `time`, `month`, `high_tmp`, `low_tmp`, `high_prcp`
+
+Three-way interactions between `day`, `time`, `month` are included. 
+
+HEADS UP: The model will take a few minutes to fit, and to compute the predicted values. Start it running and then go get a coffee or tea. 
+
+```{r fig.height=6, fig.width=6, fig.align='center', cache=TRUE, results='hide'}
+# Fit model
+ped_weath_bsm_glm <- glm(count~day*time*month+high_tmp+low_tmp+high_prcp,
+                     data=ped_weather_bsm, family=poisson(link="log"))
+#summary(ped_weath_bsm_glm)
+ped_weath_bsm_aug <- augment(ped_weath_bsm_glm, ped_weather_bsm)
+ped_weath_bsm_aug <- ped_weath_bsm_aug %>% mutate(.fitted_exp = exp(.fitted))
+ped_weath_bsm_aug <- ped_weath_bsm_aug %>% mutate(time = as.numeric(time))
+
+coef_bsm <- summary(ped_weath_bsm_glm)$coefficients
+grep("prcp", rownames(coef_bsm))
+grep("tmp", rownames(coef_bsm))
+coef_bsm[42:44,]
+```
+
+a. Why use a Poisson model?
+b. What does the three way interaction model allow for in the pattern of counts over day, time and month?
+c. How many estimates need to be made in this model? Do you have enough data to do all of this estimation?
+d. Examine the estimates, and significance for the three weather variables. How does high temperature affect the pedestrian traffic? Or does it have any effect?
+e. Make a plot of the fitted values by time, faceted on month and day. Colour points by `high_temp`. What do you learn about the effect of high temperature on estimated pedestrian traffic?
+f. Compute the difference between pedestrian count, for a Wednesday, 3pm, in January, for a `hot` vs `not` day. (Take precipitation to be `none` and `low_temp` to be `not`.)
+
+## Question 3
+
+a. Plot the observed vs fitted values. How good is your model?
+b. Plot the residuals against fitted values. What days, times and months have the largest residuals? (These would be times that the model doesn't predict well.)
+c. Explore reasons for these misfits, using the internet, or what you know about Melbourne.
+
+```
+library(plotly)
+p <- ggplot(ped_weath_bsm_aug, aes(x=.fitted_exp, y=.resid, 
+  label=paste(month, day, mday, year.x, "-", time))) + 
+  geom_point()
+ggplotly(p)
+```
+
+## TURN IN 
+
+- Your `.Rmd` file
+- Your Word (or pdf) file that results from knitting the Rmd.
+- Make sure your group members are listed as authors, one person per group will turn in the report
+- DUE: Wednesday after the lab, by 7am, loaded into moodle
+
+## Resources
+
+- [Pedestrian count data](https://data.melbourne.vic.gov.au/Transport-Movement/Pedestrian-Sensor-Locations/ygaw-6rzq)
+- Menne, M.J., I. Durre, B. Korzeniewski, S. McNeal, K. Thomas, X. Yin, S. Anthony, R. Ray, R.S. Vose, B.E.Gleason, and T.G. Houston, 2012: Global Historical Climatology Network - Daily (GHCN-Daily), Version 3. [indicate subset used following decimal, 
+e.g. Version 3.12]. NOAA National Climatic Data Center. http://doi.org/10.7289/V5D21VHZ [9/9/2016].
+
+
+
+
