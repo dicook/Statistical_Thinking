@@ -1,0 +1,37 @@
+---
+title: "ETC 2420/5242 Quiz 1"
+date: ""
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Name: SOLUTION
+
+Circle your choice.
+
+1. Is "gender of a baby" typically an example of a random event? `True`
+
+2. Long runs of the same outcome are commonly seen in sequences of random events. `True`
+
+3. For this pair of hypotheses, which is the null hypothesis?
+
+ $$H_o: \mu_1 = \mu_2$$ 
+ 
+4. If the $p$-value is small, e.g. 0.0013, you would typically fail to reject the null hypothesis. `False`
+ 
+5. In the following plot, which of these terms describes the distribution of values:
+
+$$symmetric$$
+$$multimodal ~~~ uniform$$
+
+```{r fig.align='center', fig.width=4, fig.height=2, echo=FALSE, message=FALSE}
+library(ggplot2)
+df <- data.frame(x=runif(1000), y=rnorm(1000))
+ggplot(df, aes(x=x, y=..density..)) + geom_histogram(binwidth=0.1, breaks=seq(0,1,0.1)) +
+  scale_x_continuous("", limits=c(0,1)) 
+```
+
+

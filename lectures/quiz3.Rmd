@@ -1,0 +1,43 @@
+---
+title: "ETC 2420/5242 Quiz 3"
+date: ""
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Name: _______________ (Please write your name as it is given in the Monash system, and no need to write your student number.)
+Grader: _______________
+
+Circle your choice.
+
+1. Sketch the line that corresponds to the following equation. Label and mark your axes appropriately (and no need for a title):
+
+$$y=2x+5$$
+
+\vspace{1cm}
+
+2. For the following fitted model
+
+```{r eval=FALSE, echo=FALSE}
+library(readr)
+olympics2008 <- read_csv("../data/olympics2008.csv")
+olympics2012 <- read_csv("../data/olympics2012.csv")
+ol <- merge(olympics2012, olympics2008[,c("Country","Total")],
+                     by="Country", all.x=TRUE)
+colnames(ol)[7] <- "M2012"
+colnames(ol)[12] <- "M2008"
+
+ol_lm <- lm(M2012~M2008, data=ol)
+ol_lm
+```
+
+$$M_{2012} = 0.74 + 0.96M_{2008}$$
+
+a. What is the value of the intercept for the model?
+b. Interpret the slope.
+\vspace{1cm}
+c. The medal count for Jamaica in 2008 was 12. What would you expect the medal count to be in 2012?
+d. The medal count for Indonesia in 2008 was 2 and in 2012 was 5. The predicted medal count for 2012 was 2.66. Compute the residual.

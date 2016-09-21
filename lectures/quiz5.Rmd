@@ -1,0 +1,74 @@
+---
+title: "ETC 2420/5242 Quiz "
+date: "Quiz 5"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE,
+  echo=FALSE,
+  fig.align='center', 
+  fig.height = 4,
+  fig.width = 4,
+  collapse = TRUE,
+  comment = "#>"
+)
+options(digits=4)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readr)
+library(gridExtra)
+```
+
+Name: _______________ (Please write your name as it is given in the Monash system, and no need to write your student number.)
+Grader: _______________
+
+1. Match the dplyr verb to the action
+
+```{r}
+x <- data.frame(verb=c("Arrange", "Summarise", "Filter", "Select", "Mutate", "Ungroup"), action=c("Produce subsets", "Reorder the rows", "Create new variables", "Removing existing grouping", "Choose columns","Make summaries of subsets"))
+kable(x)
+```
+
+2. In the plot below we are looking at the relationship between humidity and air temperature as measured by Pacific Ocen buoys monitoring El Nino. There are missing values coded as 10% below the minimum on both variables. 
+
+a. Circle the cases that are missing on humidity but not on air temperature.
+b. Are the missings on humidity independent of air temperature value?
+
+```{r fig.width=3, fig.height=3}
+library(MissingDataGUI)
+data(tao)
+tao_nomiss <- tao 
+tao_nomiss$humidity[is.na(tao_nomiss$humidity)] <-
+  min(tao_nomiss$humidity, na.rm=T) - 0.1*diff(range(tao$humidity, na.rm=T))
+tao_nomiss$air.temp[is.na(tao_nomiss$air.temp)] <-
+  min(tao_nomiss$air.temp, na.rm=T) - 0.1*diff(range(tao$air.temp, na.rm=T))
+ggplot(tao_nomiss, aes(x=humidity, y=air.temp)) + geom_point() + theme(aspect.ratio=1)
+```
+
+3. Put these words into the right synonym group
+
+`records, attributes, fields, example, instance, features, individuals, subjects, experimental units`
+
+Cases: ______________________________________________________________
+Variables: __________________________________________________________
+
+4. For the following data, write down the variables that have been measured.
+
+____________________
+
+```{r}
+pew <- read.delim(
+  file = "http://stat405.had.co.nz/data/pew.txt",
+  header = TRUE,
+  stringsAsFactors = FALSE,
+  check.names = F
+)
+kable(pew[1:5, 1:5])
+```
+

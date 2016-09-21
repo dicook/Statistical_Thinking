@@ -1,0 +1,51 @@
+---
+title: "ETC 2420/5242 Quiz "
+date: ""
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE,
+  echo=FALSE,
+  fig.align='center', 
+  fig.height = 4,
+  fig.width = 4,
+  collapse = TRUE,
+  comment = "#>"
+)
+options(digits=4)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readr)
+library(gridExtra)
+```
+
+Name: _______________ (Please write your name as it is given in the Monash system, and no need to write your student number.)
+Grader: _______________
+
+1. Which of these two approaches would enforce that the error for each country has the same variance? ($x_1$ has two levels australia, new zealand, $x_2$ is a quantitative variable) A or B ??
+
+A. 
+
+$$y_i = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_1*x_2 +\varepsilon$$
+
+B. Fit separate models for austrlia and new zealand 
+
+$$y^1_i = \beta_0 + \beta_1 x_2 + \varepsilon ~~ and ~~y^2_i = \beta_0 + \beta_1 x_2 + \varepsilon $$
+
+2. Prediction intervals for new values are typically wider than confidence intervals for the predicted value? TRUE or FALSE
+
+3. Permutation samples for testing the statistical significance of a slope parameter are consistent with a sample from a population where $\beta_1=0$. TRUE or FALSE
+
+4. Write down the fitted model for this model summary.
+
+```{r}
+library(HLMdiag)
+radon_lm <- glm(log.radon ~ basement*uranium, data = radon)
+summary(radon_lm)
+```
