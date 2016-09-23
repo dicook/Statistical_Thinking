@@ -1,0 +1,46 @@
+---
+title: "ETC 2420/5242 Quiz 2"
+date: ""
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Name: _______________ (Please write your name as it is given in the Monash system, and no need to write your student number.)
+
+Circle your choice.
+
+1. For the normal model density plotted below
+
+```{r echo=FALSE, warning=FALSE, error=FALSE, message=FALSE, fig.align='center', fig.width=5, fig.height=3}
+library(ggplot2)
+library(dplyr)
+df <- data.frame(x=seq(-14, 18, 0.2), y=dnorm(seq(-14, 18, 0.2), 2, 4))
+ar <- df %>% filter(x<=1) 
+ar <- rbind(c(-14, 0), ar, c(1,0))
+ggplot(data=df, aes(x=x, y=y)) + geom_line() + 
+  geom_polygon(data=ar, aes(x=x, y=y), fill="grey80") + 
+  geom_vline(xintercept=1, colour="black") + 
+  geom_text(aes(x=1, y=-0.003, label="X"), colour="black", nudge_x = -0.8) +
+  geom_text(aes(x=-5, y=0.05, label="Y"), colour="black") +
+  geom_segment(aes(x=-1, xend=-4.8, y=0.025, yend=0.048), colour="black") +
+  geom_hline(yintercept=0, colour="black") + 
+  xlab("") + ylab("") + theme_bw()
+```
+
+a. Is the grey area greater than 0.5? YES or NO
+b. Which letter represents a quantile? X or Y
+
+2. Which of the following would be the density function for a Poisson distribution? (circle it)
+
+$$f(x~|~\lambda, k) = \frac{k}{\lambda}\left(\frac{x}{\lambda}\right)^{k-1} e^{(-x/\lambda)^k}, ~~~ x\geq 0 ~~~ or ~~~ P(X=x~|~\lambda) = \frac{\lambda^x e^{-\lambda}}{x!} ~~ x \in \{0, 1, 2, ...\}$$
+
+3. For the following density function, write down the likelihood function for a sample of $n=2, x_1=4, x_2=1$.
+
+$$f(x~|~\lambda) = e^{-\lambda x} ~~ x\geq 0$$
+
+\vspace{1in}
+
+4. For a random variable, $X$, the $P(X>5)=0.3$. What's the probability of observing two sample values (drawn independently from the distribution) greater than 5, in a sample of size 2?
