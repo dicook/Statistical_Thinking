@@ -100,6 +100,42 @@ for(case in <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv
     ## fill all the necessary code in
   }
 }</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1986</span>)
+theta &lt;-<span class="st"> </span><span class="dv">2</span>
+sigma_0 &lt;-<span class="st"> </span><span class="dv">3</span>
+
+alln &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">10000</span>)
+for(case in <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)){
+  if (case ==<span class="st"> </span><span class="dv">1</span>) {
+    prior_mu &lt;-<span class="st"> </span><span class="dv">2</span>
+    prior_tau &lt;-<span class="st"> </span><span class="dv">2</span>
+  } else if (case ==<span class="st"> </span><span class="dv">2</span>) {
+    prior_mu &lt;-<span class="st"> </span><span class="dv">5</span>
+    prior_tau &lt;-<span class="st"> </span><span class="dv">1</span>
+  }
+  
+  for (n in alln) {
+    x &lt;-<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">mean =</span> theta, <span class="dt">sd=</span> sigma_0)
+    x_bar &lt;-<span class="st"> </span><span class="kw">mean</span>(x)
+    
+    a &lt;-<span class="st"> </span>(n *<span class="st"> </span>x_bar)/sigma_0^<span class="dv">2</span> +<span class="st"> </span>prior_mu/prior_tau^<span class="dv">2</span>
+    b &lt;-<span class="st"> </span>n/sigma_0^<span class="dv">2</span> +<span class="st"> </span><span class="dv">1</span>+prior_tau^<span class="dv">2</span>
+      
+    post_mu &lt;-<span class="st"> </span>a/b
+    <span class="kw">print</span>(post_mu)
+    post_sigma &lt;-<span class="st"> </span><span class="dv">1</span>/(n/sigma_0^<span class="dv">2</span> +<span class="st"> </span><span class="dv">1</span>/prior_tau^<span class="dv">2</span>)
+      
+    xx &lt;-<span class="st"> </span><span class="kw">seq</span>(-<span class="dv">5</span>, <span class="dv">5</span>, <span class="dt">by =</span> <span class="fl">0.001</span>)
+    xx_prior &lt;-<span class="st"> </span>xx *<span class="st"> </span>prior_tau +<span class="st"> </span>prior_mu
+    xx_post &lt;-<span class="st">  </span>xx *<span class="st"> </span>post_sigma +<span class="st"> </span>post_mu
+    
+    Y &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="kw">dnorm</span>(xx_prior, <span class="dt">mean =</span> prior_mu, <span class="dt">sd=</span> prior_tau), 
+               <span class="kw">dnorm</span>(xx_post, <span class="dt">mean =</span> post_mu, <span class="dt">sd =</span> post_sigma))
+    X &lt;-<span class="st"> </span><span class="kw">cbind</span>(xx_prior, xx_post)
+    <span class="kw">matplot</span>(X, Y, <span class="dt">type =</span> <span class="st">&#39;l&#39;</span>, <span class="dt">lty =</span> <span class="dv">1</span>, <span class="dt">main =</span> <span class="kw">paste</span>(<span class="st">&quot;n = &quot;</span>, n))
+    <span class="kw">abline</span>(<span class="dt">v =</span> x_bar, <span class="dt">lty =</span> <span class="dv">1</span>)
+  }
+}</code></pre></div>
 </div>
 
   <!-- dynamically load mathjax for compatibility with self-contained -->
