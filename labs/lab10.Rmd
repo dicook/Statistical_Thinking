@@ -41,7 +41,7 @@ Explain the different steps to compute the conditional probability *$P(\text{spa
 
 ## Question 2
 
-Let $X_1, \dots, X_n \sim N(\theta, 3)$.
+Let $X_1, \dots, X_n \sim N(\theta, 9)$.
 
 a. If $\theta \sim N(\mu, \tau^2)$, what is $\pi(\theta|x_1, \dots, x_n)$?
 b. What is the posterior mean $E[\theta|x_1, \dots, x_n]$?
