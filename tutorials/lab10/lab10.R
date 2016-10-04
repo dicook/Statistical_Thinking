@@ -44,7 +44,7 @@ for(case in c(1, 2)){
     x_bar <- mean(x)
     
     a <- (n * x_bar)/sigma_0^2 + prior_mu/prior_tau^2
-    b <- n/sigma_0^2 + 1+prior_tau^2
+    b <- n/sigma_0^2 + 1/prior_tau^2
       
     post_mu <- a/b
     print(post_mu)
