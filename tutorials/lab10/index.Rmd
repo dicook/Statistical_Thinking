@@ -1,0 +1,49 @@
+---
+title: "ETC2420/5242 <br> Bayesian inference"
+author: Earo Wang <br> <earo.wang@gmail.com>
+date: Lab 10
+output:
+  slidy_presentation:
+    css: ../myslidy.css
+    self_contained: false
+    footer: "LICENSE: CC BY-NC 3.0 US"
+---
+
+```{r initial, echo = FALSE, cache = FALSE, results = 'hide'}
+opts_chunk$set(warning = FALSE, message = FALSE, 
+			   fig.path = 'figure/', cache.path = 'cache/', 
+			   fig.align = 'center', dev = 'png', fig.width = 10, fig.height = 6, 
+			   fig.show = 'hold', cache = TRUE, external  =  TRUE,
+         dev = 'Cairo_png')
+read_chunk("lab10.R")
+```
+
+# Conditional probabilities
+
+<!-- break -->
+
+## Bayes' theorem
+
+$$
+\Pr(A | B) = \frac{\Pr(B | A) \Pr(A)}{\Pr(B)}
+$$
+
+## Law of total probability
+
+$$
+\Pr(B) = \sum_{i = 1}^{2} \Pr(B | A_i)\Pr(A_i)
+$$
+
+# Bayesian inference
+
+```{r warmup, echo = FALSE}
+```
+
+## Question 2
+
+* Read p.21-24 on [the slides of week 9](http://dicook.github.io/Statistical_Thinking/lectures/10-bayesian-reasoning.pdf) 
+* R code template
+
+```{r q2-temp, eval = FALSE}
+```
+
