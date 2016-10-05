@@ -47,6 +47,40 @@ $$
 ```{r q2-temp, eval = FALSE}
 ```
 
-```{r q2, eval = FALSE}
+```{r q2, echo = FALSE, eval = FALSE}
 ```
 
+## Question 3
+
+You need to specify
+
+* Prior density: $\theta \sim \beta(\alpha, \beta)$
+  $$
+  \pi(\theta) \propto \theta^{\alpha - 1}\left(1 - \theta\right)^{\beta - 1}
+  $$
+* Likelihood: $X \sim B(n, p)$
+  $$
+  L(\theta) = \binom{n}{0}\theta^{0}(1 - \theta)^{10} + \cdots +
+  \binom{n}{p}\theta^{p}(1 - \theta)^{1 - p}
+  $$
+* Posterior density:
+  $$
+  \pi(\theta|X) \propto \pi(\theta) \times L(\theta)
+  $$
+
+* R code
+
+```{r q3, eval = FALSE}
+```
+
+## Question 4
+
+Start with
+
+$$
+\begin{align}
+\alpha + \beta &= \frac{E(\theta)(1 - E(\theta))}{Var(\theta)} - 1 \\
+E(\theta) &= \frac{\alpha}{\alpha + \beta} \\
+1 - E(\theta) &= \frac{\beta}{\alpha + \beta}
+\end{align}
+$$
