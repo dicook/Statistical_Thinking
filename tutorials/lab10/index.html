@@ -107,8 +107,8 @@ for(case in <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv
   \pi(\theta) \propto \theta^{\alpha - 1}\left(1 - \theta\right)^{\beta - 1}
   \]</span></li>
 <li>Likelihood: <span class="math inline">\(X \sim B(n, p)\)</span> <span class="math display">\[
-  L(\theta) = \binom{n}{0}\theta^{0}(1 - \theta)^{10} + \cdots +
-  \binom{n}{p}\theta^{p}(1 - \theta)^{1 - p}
+  L(\theta) = \binom{n}{0}\theta^{0}(1 - \theta)^{n} + \cdots +
+  \binom{n}{p}\theta^{p}(1 - \theta)^{n - p}
   \]</span></li>
 <li><p>Posterior density: <span class="math display">\[
   \pi(\theta|\mathbf{x}) \propto \pi(\theta) \times f(\mathbf{x}|\theta)

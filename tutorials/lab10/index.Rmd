@@ -60,8 +60,8 @@ You need to specify
   $$
 * Likelihood: $X \sim B(n, p)$
   $$
-  L(\theta) = \binom{n}{0}\theta^{0}(1 - \theta)^{10} + \cdots +
-  \binom{n}{p}\theta^{p}(1 - \theta)^{1 - p}
+  L(\theta) = \binom{n}{0}\theta^{0}(1 - \theta)^{n} + \cdots +
+  \binom{n}{p}\theta^{p}(1 - \theta)^{n - p}
   $$
 * Posterior density:
   $$
