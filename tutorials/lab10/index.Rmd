@@ -65,7 +65,7 @@ You need to specify
   $$
 * Posterior density:
   $$
-  \pi(\theta|X) \propto \pi(\theta) \times L(\theta)
+  \pi(\theta|\mathbf{x}) \propto \pi(\theta) \times f(\mathbf{x}|\theta)
   $$
 
 * R code
