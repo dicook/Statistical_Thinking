@@ -1,0 +1,90 @@
+---
+title: "ETC2420/5242 <br> Monte Carlo sampling methods"
+author: Earo Wang <br> <earo.wang@gmail.com>
+date: Lab 11
+output:
+  slidy_presentation:
+    css: ../myslidy.css
+    self_contained: false
+    footer: "LICENSE: CC BY-NC 3.0 US"
+---
+
+```{r initial, echo = FALSE, cache = FALSE, results = 'hide'}
+opts_chunk$set(warning = FALSE, message = FALSE, 
+			   fig.path = 'figure/', cache.path = 'cache/', 
+			   fig.align = 'center', fig.width = 10, fig.height = 6, 
+			   fig.show = 'hold', cache = FALSE, external  =  TRUE,
+         dev = 'CairoPNG')
+read_chunk("lab11.R")
+```
+
+# Monte Carlo sampling
+
+<!-- break -->
+
+## Approximating $\pi$
+
+Simulate this experiment by generating many points on the unit square $[-1, 1] \times [-1, 1]$, 
+then counting how many landed in the circle. How good is your approximation if 
+you throw 100 darts? 1,000 darts? 10,000 darts? 100,000 darts?
+
+```{r q1-temp, eval = FALSE}
+```
+
+```{r q1, echo = FALSE}
+```
+
+```{r q1-plot}
+```
+
+## Rejection sampling
+
+Suppose it is hard to sample from $f(x)$. Rejection sampling uses random samples 
+from another density $g(x)$ we know how to sample from. First find a constant 
+$c$ such that $f(x)\leq c g(x)$ for all $x \in \mathcal{X}$, then follow these steps:
+
+1. Generate a random sample x with the density $g(x)$.
+
+2. Generate a uniformly distributed random sample $u$ on the interval $\mathcal{X}$. If $u \leq \frac{f(x)}{c g(x)}$, then output $x$; otherwise reject $x$ and return to step 1.
+
+We will use rejection sampling to generate random samples from the density 
+function $f(x) = \frac{x (1 - x) e^{x}}{3 - e}$ with $x \in [0, 1]$ using a 
+uniform proposal, i.e. $g(x) = 1$ for $x \in [0, 1]$.
+
+```{r q2-temp, eval = FALSE}
+```
+
+```{r q2, echo = FALSE, fig.height = 9}
+```
+
+## Metropolis-Hastings (M-H) algorithm
+
+Let $q(y|x)$ be an arbitrarly, friendly distribution (i.e. we know how to sample 
+from $q(y|x)$), also called the *proposal distribution*. The M-H algorithm 
+creates a sequence of observations $X_0, X_1, \dots$, as follows.
+
+Choose $X_0$ arbitrarily. Suppose we have generated $X_0, X_1, \dots, X_i$. To 
+generate $X_{i+1}$, do the following:
+
+a. Generate a *proposal* or *candidate* value $Y \sim q(y | X_i)$.
+b. Evaluate $r(X_i, Y)$ where
+
+$$ r(x, y) = min \left\{1, \frac{f(y) q(x|y)}{f(x) q(y|x)}  \right\}$$.
+
+c. Set 
+
+$$X_i = \begin{cases} Y & \text{with probability}~ r  \\ X_i & \text{with probaiblity}~ 1 - r \end{cases}.$$
+
+Remark 1: A common choice for $q(y|x)$ is $\mathcal{N}(x, b^2)$ for some $b > 
+0$. In that case, because $q(y | x) = q(x | y)$, $r = min \left\{\frac{f(y)}{f(x)}, 1\right\}$.
+
+Remark 2: A simple way to execute (c) is to generate $U \sim \text{Uniform}(0, 
+1)$. If $U < r$, set $X_{i + 1} = Y$ otherwise $X_{i+1} = X_i$.
+
+We want to generate samples from the Cauchy distribution that has density
+
+$$ f(x)  = \frac{1}{\pi} \frac{1}{1 + x^2} $$
+
+
+```{r q3, echo = FALSE}
+```
