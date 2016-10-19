@@ -1,0 +1,50 @@
+---
+title: "Project Summary"
+author: "Di Cook"
+date: "October 19, 2016"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE, 
+  warning = FALSE,
+  message = FALSE)
+```
+
+## Public vs private error
+
+The error on the private data was for the most part lower than the public!
+
+```{r}
+library(readr)
+kaggle <- read_csv("AllSubmissionsDetails.csv")
+library(ggplot2)
+summary(kaggle$PrivateScore)
+summary(kaggle$PublicScore)
+```
+
+##
+
+```{r}
+ggplot(kaggle, aes(x=PublicScore, y=PrivateScore)) +
+  geom_point() + coord_equal() + 
+  xlim(c(25000, 40000)) + ylim(c(25000, 40000)) +
+  geom_abline(slope=1)
+```
+
+##
+
+Public (triangle) and private (dots) scores by date submitted, with regression line overlaid. Most groups improved over time.
+
+```{r}
+library(plotly)
+p <- ggplot(kaggle, aes(x=DateSubmittedUtc, y=PrivateScore, colour=TeamName, label=TeamName)) +
+  ylim(c(25000, 40000)) +
+  geom_point() +
+  geom_smooth(method="lm", se=F) + 
+  geom_point(aes(y=PublicScore), shape=2) +
+  geom_smooth(aes(y=PublicScore), method="lm", se=F, linetype=2) + 
+  theme(legend.position = "none")
+ggplotly(p)
+```
