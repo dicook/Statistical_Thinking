@@ -4,11 +4,12 @@ author: Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monas
   University
 date: "W8.C1"
 output:
-  ioslides_presentation:
-    transition: default
-    widescreen: yes
-  beamer_presentation: default
-css: default.css
+  xaringan::moon_reader:
+    css: ["default", "myremark.css"]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
 ---
 
 ```{r setup, include = FALSE}
@@ -60,6 +61,7 @@ kable(head(grad[1:4,c(2,3,4,6)]))
 - Cases:  graduate programs
 - Variables: subject, Inst, AvNumPubs, ...
 ```
+
 
 ## Example 2
 
