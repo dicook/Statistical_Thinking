@@ -18,7 +18,7 @@ title: Home
 
 ## Lecture notes
 
-- Week 1: Introduction and motivation
+- Week 1: [Introduction and motivation](lectures/week1.class1.html) ([Rmd](lectures/week1.class1.Rmd))
 - Week 2: Games
 - Week 3: Hypothesis testing
 - Week 4: Distribution theory

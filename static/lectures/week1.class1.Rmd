@@ -1,14 +1,16 @@
 ---
-title: 'Statistical Methods for Insurance: Randomisation'
-author: Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monash
-  University
+title: 'Statistical Thinking using Randomisation and Simulation'
+subtitle: "Introduction and motivation"
+author: Di Cook (dicook@monash.edu, @visnut)
 date: "W1.C1"
 output:
-  ioslides_presentation:
-    transition: default
-    widescreen: yes
-  beamer_presentation: default
-css: default.css
+  xaringan::moon_reader:
+    css: ["default", "myremark.css"]
+    self_contained: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
 ---
 
 ```{r setup, include = FALSE}
@@ -26,49 +28,57 @@ library(dplyr)
 library(tidyr)
 ```
 
-## Overview of the class
+
+# Overview of the class
 
 - Topics
 - Assessment
 - Resources
 - Instructors, tutors
 
-## Topics
+---
+# Topics
 
 - Topic 1: Simulation of games for decision strategies (2 weeks))
 - Topic 2: Statistical distributions for decision theory (1.5 weeks)
 - Topic 3: Linear models for credibility theory (1.5 weeks) 
 - Topic 4: Compiling data to problem solve (2 weeks)
 - Topic 5: Bayesian statistical thinking (1.5 weeks)
-- Topic 6: Temporal data and time series models
+- Topic 6: Temporal data and time series models (1.5 weeks)
 - Topic 7: Modeling risk and loss, with data and using randomization to assess uncertainty (2 weeks)
 
-## Assessment
+---
+# Assessment
 
-- Final exam: 70%
-- Tutorials/labs: 25%,  Weekly reports due Monday noon after the lab
-- Class exercises: 5%
-- ETC5242 students: Labs 15%, Project report and presentation 10%
+- Final exam: 60%
+- Tutorials/labs: 30%,  Weekly reports due Monday noon after the lab
+- Quizzes: 10%
+- ETC5242 students: Labs 15%, Project report and presentation 15%
 
-## Resources
+---
+# Resources
 
-- Web site: [http://dicook.github.io/Statistical_Thinking/](http://dicook.github.io/Statistical_Thinking/)
+- Web site: [https://st.netlify.com](https://st.netlify.com)
 - Moodle
 - [Statistics online textbook](https://www.openintro.org/stat/textbook.php?stat_book=isrs
 )
 - [Accuarial online curriculum/exam material](https://www.actuaries.org.uk/studying/plan-my-study-route/fellowshipassociateship/core-technical-subjects/ct6-statistical-methods)
 - Software: [R](https://cran.r-project.org), [RStudio Desktop](https://www.rstudio.com/products/rstudio/download2/)
 
-## Instructors
+---
+# Instructors
 
 - Instructors: 
-    - Professor Di Cook 
-    - Dr Souhaib Ben Taieb
+    - Professor Di Cook, Menzies 762A
 - Tutors: 
-    - Earo Wang (working with Di on PhD) 
+    - Stuart Lee (working with Di on PhD)
+    - Dilini Talagala (working with Rob Hyndman on PhD)
+    - Thiyanga Talagala (working with Rob Hyndman on PhD)
     - Nathaniel Tomasetti (worked with Di for Honors, working with Dr Catherine Forbes on PhD)
+    - Earo Wang (working with Di on PhD) 
 
-## What is randomness?
+---
+# What is randomness?
 
 - Coin flip
 - Die roll
@@ -79,29 +89,29 @@ library(tidyr)
 - Lightning strike
 - Pipe burst
 
-## Your turn
+---
+class: inverse middle 
+# Your turn
 
-We are going to play a game of "Stump the Professor". 
+We are going to play a game of "Stump the Professor". Flip a coin. If it shows up tails do A first, if it shows up heads to B first. 
 
-1. Flip a coin. If it shows up tails do A first, if it shows up heads to B first. 
-
-  `A. Write down a sequence of heads and tails that you might expect to come from TEN flips of a coin`
+  `A. Write down a sequence of heads and tails that you might expect to come from TWENTY flips of a coin`
   
-  `B. Now flip a coin TEN times, and write down the outcomes`
+  `B. Now flip a coin TWENTY times, and write down the outcomes`
+- Enter these in the [online sheet](https://docs.google.com/forms/d/155fP-mdd0HevqNYEVUngEBVWHXmxYi-B5zPzKjikEb0/edit) (Remember whether you entered the coin flip sequence first or the made up sequence.)
+- Now I am going to look at what you entered, and guess if sequence was made up, or actual outcomes from coin flips. 
+- You record how many times I get it right. 
 
-2. Enter these in the online sheet at http://bit.ly/ETC2420-1 (Remember whether you entered the coin flip sequence first or the made up sequence.)
-3. Now I am going to look at what you entered, and guess if sequence was made up, or actual outcomes from coin flips. 
-
-4. You record how many times I get it right. 
-
-## Example: a look at the Australian electoral distribution
+---
+# Example: a look at the Australian electoral distribution
 
 - Results of 2013 election from Australian Electoral Commission web site
 - 2011 Census data from the Australian Bureau of Statistics
 - Combined demographics of electorate with political representation
 - Interactive application, in R package `eechidna`
 
-## How to use randomization to understand probability
+---
+# How to use randomization to understand probability
 
 ```{r echo=FALSE, fig.width=10, fig.height=4}
 library(eechidna)
@@ -118,18 +128,22 @@ ggplot(data=aec_abs, aes(x=Population)) + geom_dotplot(binwidth=2900) +
   scale_x_continuous(breaks=seq(75000, 225000, 25000), labels=seq(75, 225, 25))
 ```
 
-## Your turn
+---
+class: inverse middle 
+# Your turn
 
 - What is the difference (roughly) in population between the biggest and smallest electorates?
 - What is the relative worth of a voter in the electorate with the largest population, compared to a voter in the electorate with the smallest population?
 
-## Politics
+---
+# Politics
 
 - Ideally all electorates have exactly the same number of people.
 - Geography can interfere with this, e.g an electorate cannot be part in Tasmania and part in Victoria.
 - The Australian Electoral Commission will adjust geographic boundaries before each election to adjust for population changes as measured in the most recent Census.
 
-## Compute averages
+---
+# Compute averages
 
 ```{r echo=FALSE}
 aec_abs_means <- aec_abs %>% filter(PartyGp != "Other") %>%
@@ -138,7 +152,8 @@ aec_abs_means <- aec_abs %>% filter(PartyGp != "Other") %>%
 aec_abs_means
 ```
 
-## Statistical thinking
+---
+# Statistical thinking
 
 - The means are different
 - How big is this difference?
@@ -146,15 +161,17 @@ aec_abs_means
 
 We could use a two-sample t-test to answer these, but here is how to do the equivalent by randomization.
 
-## Procedure
+---
+# Procedure
 
-1. Compute the statistic for the data (e.g. absolute value of mean difference)
-2. Shuffle the group labels (e.g. put the MP party names into a hat, mix them around, draw them and assign to new electorate)
-3. Compute the statistic for this shuffled data
-4. Repeat steps 2, 3 many times
-5. Examine how often the value of the data statistic, or a larger value occurs
+- Compute the statistic for the data (e.g. absolute value of mean difference)
+- Shuffle the group labels (e.g. put the MP party names into a hat, mix them around, draw them and assign to new electorate)
+- Compute the statistic for this shuffled data
+- Repeat steps 2, 3 many times
+- Examine how often the value of the data statistic, or a larger value occurs
 
-## Let's do it
+---
+# Let's do it
 
 ```{r echo=FALSE, fig.height=4, fig.width=8, fig.align='center'}
 library(purrr)
@@ -175,15 +192,18 @@ ggplot(data=aec_abs_shuffle, aes(x=d)) + geom_dotplot(binwidth=100) +
 
 Let's also count the number of times that we see a bigger difference by chance. It is `r length(aec_abs_shuffle$d[aec_abs_shuffle$d > aec_abs_meandif])`. 
 
-## What does this mean?
+---
+# What does this mean?
 
 If we oberve a difference this large `r length(aec_abs_shuffle$d[aec_abs_shuffle$d > aec_abs_meandif])` out of `r length(aec_abs_shuffle$d)` random shuffles, is it likely to see this electorate distribution by chance?
 
-## Caveats
+---
+# Caveats
 
 Let's wait until the next Census results are in (after August this year) and the latest election results, to compare populations of electorates again. 
 
-## Next steps
+---
+# Next steps
 
 - Next few classes we will 
     - review statistical hypothesis testing
@@ -192,6 +212,8 @@ Let's wait until the next Census results are in (after August this year) and the
     - compute probabilities of events, and 
 - Lab this week will be getting started with using R - the top data science software available today.
 
-## Share and share alike
+---
+class: inverse middle 
+# Share and share alike
 
-This work is licensed under the Creative Commons Attribution-Noncommercial 3.0 United States License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/ 3.0/us/ or send a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.

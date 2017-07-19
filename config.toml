@@ -1,4 +1,4 @@
-baseurl = "/"
+baseurl = "https://st.netlify.com"
 languageCode = "en-us"
 title = "ETC2420/5242: Statistical Thinking"
 theme = "hugo-xmin"
