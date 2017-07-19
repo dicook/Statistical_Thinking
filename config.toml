@@ -1,0 +1,30 @@
+baseurl = "/"
+languageCode = "en-us"
+title = "ETC2420/5242: Statistical Thinking"
+theme = "hugo-xmin"
+googleAnalytics = ""
+disqusShortname = ""
+ignoreFiles = ["\\.Rmd$", "_cache$"]
+preserveTaxonomyNames = true
+footnotereturnlinkcontents = "↩"
+
+[permalinks]
+    post = "/post/:year/:month/:day/:slug/"
+    note = "/note/:year/:month/:day/:slug/"
+
+[[menu.main]]
+    name = "Home"
+    url = "/"
+    weight = 1
+[[menu.main]]
+    name = "Moodle"
+    url = "http://moodle.vle.monash.edu/course/view.php?id=38489"
+    weight = 2
+[[menu.main]]
+    name = "Textbook"
+    url = "https://www.openintro.org/stat/textbook.php?stat_book=isrs"
+    weight = 3
+
+[params]
+    description = "A website built through Hugo and blogdown."
+    footer = "&copy; [Di Cook](https://dicook.org) 2017 | [Github](https://github.com/dicook) | [Twitter](https://twitter.com/dicook)"
