@@ -33,7 +33,7 @@ title: Home
 
 ## Tutorials
 
-- Week 1: Setting up your computing environment
+- Week 1: [Setting up your computing environment](labs/lab1.html) [(Rmd)](labs/lab1.Rmd)
 - Week 2: Making a Monte Hall game
 
 ## Computing information
