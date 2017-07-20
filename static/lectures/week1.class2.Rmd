@@ -1,14 +1,16 @@
 ---
-title: 'Statistical Methods for Insurance: Randomisation'
-author: Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monash
-  University
+title: 'Statistical Thinking using Randomisation and Simulation'
+subtitle: "Introduction and motivation"
+author: Di Cook (dicook@monash.edu, @visnut)
 date: "W1.C2"
 output:
-  beamer_presentation: default
-  ioslides_presentation:
-    transition: default
-    widescreen: yes
-css: default.css
+  xaringan::moon_reader:
+    css: ["default", "myremark.css"]
+    self_contained: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
 ---
 
 ```{r setup, include = FALSE}
@@ -26,29 +28,33 @@ library(dplyr)
 library(tidyr)
 ```
 
-## Review of hypothesis testing
+# Review of hypothesis testing
 
 - Terminology: null and alternative hypothesis, test statistic, significance value, p-value, critical value, decision, power, one-sided or two-sided test
 - Common basic tests: one sample t-test, two sample t-test, paired sample t-test, chisquared test (for association), analysis of variance
 
-## Hypotheses
+---
+# Hypotheses
 
 - The two hypotheses need to cover all poosibilities.
 - Alternative hypothesis is usually the interesting outcome, sometimes its easier to write this first. It is usually stated as an inequality.
 - Null hypothesis is the usually stated as a parameter is `=` to some specified value. It represents a historical value, or a conservative state of business as usual where we would only rule against it if there is overwhelming evidence.
 
-## Using permutation to examine association
+---
+# Using permutation to examine association
 
 Example from DBCR: 
 
 *The participants in this study were 48 male bank supervisors attending a management institute at the University of North Carolina in 1972. They were asked to assume the role of the personnel director of a bank and were given a personnel file to judge whether the person should be promoted to a branch manager position. The files given to the participants were identical, except that half of them indicated the candidate was male and the other half indicated the candidate was female. These files were randomly assigned to the subjects.*
 
-## Your turn
+---
+# Your turn
 
 Is this an observational study or an experiment? How does
 the type of study impact what can be inferred from the results?
 
-##
+---
+#
 
 ```{r echo=FALSE}
 bank <- data.frame(gender=c(rep("male", 24), rep("female", 24)), 
@@ -59,40 +65,43 @@ bank <- data.frame(gender=c(rep("male", 24), rep("female", 24)),
 ```{r echo=FALSE, eval=FALSE}
 bank %>% group_by(gender, decision) %>%
   tally() %>% 
-  spread(decision, n) %>%
-  kable(format.args=list(width=80))
+  spread(decision, n)
 ```
 
 ```{r echo=FALSE}
-kable(addmargins(table(bank$gender, bank$decision)))
-kable(prop.table(table(bank$gender, bank$decision), 1))
+addmargins(table(bank$gender, bank$decision))
+prop.table(table(bank$gender, bank$decision), 1)
 ```
 
-## How likely is this?
+---
+# How likely is this?
  
-1. Break any association between gender and decision
-2. Re-tabulate
-3. Compute proportion of women promoted
+- Break any association between gender and decision
+- Re-tabulate
+- Compute proportion of women promoted
 
-##
+---
+#
 
 Original: 
 
 ```{r echo=FALSE}
-kable(head(bank, 10))
+head(bank, 10)
 ```
 
-##
+---
+#
 
 Permuted decision:
 
 ```{r echo=FALSE}
 set.seed(4664)
 bank.p <- bank %>% mutate(decision=sample(decision))
-kable(head(bank.p, 10))
+head(bank.p, 10)
 ```
 
-## Share and share alike
+---
+class: inverse middle 
+# Share and share alike
 
-This work is licensed under the Creative Commons Attribution-Noncommercial 3.0 United States License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/ 3.0/us/ or send a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
-
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
