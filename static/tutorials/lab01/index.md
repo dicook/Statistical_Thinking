@@ -1,69 +1,10 @@
 ---
 title: "ETC2420/5242 <br> Introduction to R, RStudio & RMarkdown"
-author: Earo Wang <br> <earo.wang@gmail.com>
 date: Lab 01
+author: "https://st.netlify.com/tutorials/lab01"
 ---
 
 
-
-# View this slides in your browser
-
-<center>
-<http://bit.ly/etc2420-lab01> 
-</center>
-
-## Manual control
-* **Left/Right arrow**: page up/down; or click to page down
-* **C**: toggle table of content
-* **A**: display current or all slides
-* **S**: make fonts smaller
-* **B**: make fonts bigger
-
-# What is markdown?
-
-> An **easy-to-read** and **easy-to-write** plain text format.
-
-* Check out the [markdown homepage](https://daringfireball.net/projects/markdown/)
-  for its philosophy
-* Examples of basic syntax
-    + Emphasis
-        - `**bold**` ===> **bold**
-        - `*italics*` ===> *italics*
-    * Lists
-
-```
-* Examples of basic syntax
-    + Emphasis
-        - **bold**
-        - *italics*
-    + Lists
-```
-
-* [Markdown cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
-* This slides is written in **R** + **Markdown** = **[RMarkdown](http://rmarkdown.rstudio.com/)**!!
-
-# Write report in RMarkdown
-
-1. Start RStudio
-2. Create a new project (`ETC2420`) for this unit
-    + File -> New Project -> Existing Directory -> Empty Project
-3. Open a new RMarkdown document and save it as `MYLab1.Rmd` 
-    * File -> New File -> R Markdown -> OK -> Knit HTML
-4. Look through this sample Rmd document
-    + Meta information starting and ending with `---`
-    + Embed R code like 
-        - One line of R code
-<pre>```{r cars} 
-summary(cars)
-```</pre>
-        - Multiple lines of R code
-<pre>```{r economics} 
-library(dplyr) 
-data(economics, package = "ggplot2")
-glimpse(economics)
-```</pre>
-    * Write outside the R chunk but in markdown way
-5. Knit the file to a pdf/word document
 
 # Have fun with R
 ## US economic time series from ggplot2 
@@ -146,7 +87,7 @@ Can you think of two questions you could answer using these variables?
 
 ```r
 library(readr)
-ped <- read_csv("http://dicook.github.io/Statistical_Thinking/data/Pedestrian_Counts.csv")
+ped <- read_csv("https://st.netlify.com/data/Pedestrian_Counts.csv")
 glimpse(ped)
 ```
 
@@ -161,11 +102,6 @@ glimpse(ped)
 
 Can you think of two questions you could answer using these variables?
 
-p.s. I came across with this drawing about the city of Melbourne (1854) in the
-2016 rare book exhibition.
-
-<center><img src="figure/melb_city.jpeg" alt="Melb City" style="width: 716px; height: 490px"/></center>
-
 # Have fun with R
 ## R packages
 
@@ -177,9 +113,6 @@ library(dplyr) # load the package
 
 * For example, `dplyr` is an R package written by [Hadley Wickham](http://hadley.nz/).
 It is a fast, consistent tool for working with data frame.
-* I've also developed the [hts](https://cran.r-project.org/web/packages/hts/index.html)
-package on analysing and forecasting hierarchical and grouped time series, with Rob Hyndman,
-Alan Lee and Shanika Wickramasuriya. (Yes, this is an advertisement.)
 * There are more than 8000 packages available on R CRAN now.
 
 # Have fun with R
@@ -221,13 +154,59 @@ mean(x) # calculate the average of x
 mean(x, na.rm = TRUE) # na.rm is an argument in the mean() function
 ```
 
+# What is markdown?
+
+> An **easy-to-read** and **easy-to-write** plain text format.
+
+* Check out the [markdown homepage](https://daringfireball.net/projects/markdown/)
+  for its philosophy
+* Examples of basic syntax
+    + Emphasis
+        - `**bold**` ===> **bold**
+        - `*italics*` ===> *italics*
+    * Lists
+
+```
+* Examples of basic syntax
+    + Emphasis
+        - **bold**
+        - *italics*
+    + Lists
+```
+
+* [Markdown cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+* This slides is written in **R** + **Markdown** = **[RMarkdown](http://rmarkdown.rstudio.com/)**!!
+
+# Write report in RMarkdown
+
+1. Start RStudio
+2. Create a new project (`ETC2420`) for this unit
+    + File -> New Project -> Existing Directory -> Empty Project
+3. Open a new RMarkdown document and save it as `MYLab1.Rmd` 
+    * File -> New File -> R Markdown -> OK -> Knit HTML
+4. Look through this sample Rmd document
+    + Meta information starting and ending with `---`
+    + Embed R code like 
+        - One line of R code
+<pre>```{r cars} 
+summary(cars)
+```</pre>
+        - Multiple lines of R code
+<pre>```{r economics} 
+library(dplyr) 
+data(economics, package = "ggplot2")
+glimpse(economics)
+```</pre>
+    * Write outside the R chunk but in markdown way
+5. Knit the file to a pdf/word document
+
 # Your turn
 ## Get things done in R and RMarkdown
 
 1. Read in the OECD PISA data
 
 ```r
-download.file("http://dicook.github.io/Statistical_Thinking/data/student_sub.rds",
+download.file("https://st.netlify.com/data/student_sub.rds",
               destfile = "../data/student_sub.rds") # the path can be changed
 student2012.sub <- readRDS("../data/student_sub.rds")
 ```
@@ -235,12 +214,5 @@ student2012.sub <- readRDS("../data/student_sub.rds")
 3. Extract the values for Australia (`AUS`) and Shanghai (`QCN`)
 4. Compute the average and standard deviation of the reading scores (`PV1READ`), for each country
 5. Write a few sentences explaining what you learn about reading scores in these two countries
-
-## Turn in 
-
-* Your `.Rmd` file
-* Your pdf (or word) file that results from knitting the Rmd
-* Make sure your group members are listed as authors, one person per group will turn in the report
-* **DUE**: Monday after the lab, by noon, loaded into moodle
 
 <meta name="copyright" content="LICENSE: CC BY-NC 3.0 US" />
