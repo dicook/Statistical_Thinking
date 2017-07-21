@@ -1,7 +1,7 @@
 ---
 title: "ETC2420/5242 <br> Introduction to R, RStudio & RMarkdown"
 date: Lab 01
-author: "https://st.netlify.com/tutorials/lab01"
+author: "http://st.netlify.com/tutorials/lab01"
 ---
 
 
