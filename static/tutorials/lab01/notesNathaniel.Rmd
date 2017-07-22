@@ -1,0 +1,198 @@
+---
+title: "Introduction to R"
+author: "Nathaniel Tomasetti"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+
+---
+
+# What is R?
+
+R is the language of data analysis.
+
+-It works with **objects** and **functions**.
+
+-Its basic functions are similar to what you can do in Excel.
+
+-But it has almost every statistical and data analytics tool available.
+
+-It easily allows people to create their own functions and share them with the world.
+
+-It is free, available on any operating system and growing in popularity in business.
+
+-It can be hard to learn at first, but it gets easier the more you use it.
+
+---
+
+class:middle, inverse, center
+# Objects in R
+
+---
+
+Objects allow things to be created and stored.
+
+--
+
+They can be variables,
+```{r}
+x = 5
+x + 1
+```
+--
+
+or they can be vectors, matrices, and entire datasets.
+```{r}
+y = c(1, 4, 2, 6, 5, 0)
+y
+z = matrix(y, nrow = 2, ncol = 3)
+z
+```
+--
+
+An object can be almost everything!
+
+
+---
+
+class:middle, inverse, center
+#Functions in R
+
+---
+
+Functions are a set of instructions to turn an input into an output.
+
+```{r}
+myMean = function(x){
+  N = length(x)
+  mean = sum(x) / N
+  return(mean)
+}
+x = c(4, 1, 6, -3, 7, 1)
+myMean(x)
+```
+
+--
+
+It's easy to give them multiple inputs.
+
+```{r}
+addAndDouble = function(x, y){
+  2 * (x + y)
+}
+addAndDouble(5, 2)
+```
+
+---
+
+R comes with many built in functions
+```{r}
+x = c(4, 1, 6, -3, 7, 1)
+mean(x)
+```
+--
+```{r}
+max(x)
+```
+--
+```{r}
+sd(x)
+```
+--
+```{r}
+cor(x, c(0, -5, 1, 3, 11, 2))
+```
+--
+```{r}
+sort(x)
+```
+
+---
+
+R can do all of the regression you would do in eViews, Excel, Stata, SAS etc.
+
+```{r}
+x = rnorm(1000)
+y = 2 + 3*x + rnorm(1000, sd = 0.1)
+linReg = lm(y ~ x)
+summary(linReg)
+```
+
+---
+class: middle, inverse, center
+
+#Packages and Datasets
+
+---
+
+There are thousands of packages people have written with extra functions and data.
+
+The dataset economics is part of the ggplot2 package and the function glimpse is part of the dplyr package. Install these once per computer.
+
+```{r, eval=FALSE}
+install.packages("ggplot2")
+install.packages("dplyr")
+```
+
+--
+
+Then use library(ggplot2) and library(dplyr) to load their contents into R.
+
+```{r, eval=FALSE}
+library(ggplot2)
+library(dplyr)
+data(economics, package="ggplot2")
+
+```
+
+--
+
+Now we have access to everything in dplyr and ggplot2 until you close R!
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+data(economics, package="ggplot2")
+```
+
+Now we can look at this economics data
+
+```{r}
+glimpse(economics)
+```
+
+Alternatively, you can use any of these to get an idea about what the dataset looks like
+
+```{r, eval=FALSE}
+head(economics)
+tail(economics)
+summary(economics)
+str(economics)
+hist(economics$pce)
+plot(economics$date, economics$pop)
+```
+
+---
+
+If you're ever stuck on how to use a function, you can get help with ?
+
+```{r, eval=FALSE}
+?mean
+?ggplot
+```
+
+
+There's also tonnes of online resources available,
+
+
+- https://stackoverflow.com/ is a great resource for programming help
+
+- https://cran.r-project.org/ has documentation on almost every function
+
+- https://www.datacamp.com/ has nice interactive courses on learning R.
+
