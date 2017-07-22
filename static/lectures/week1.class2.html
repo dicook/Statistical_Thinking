@@ -29,7 +29,7 @@ class: center, middle, inverse, title-slide
 ---
 # Hypotheses
 
-- The two hypotheses need to cover all poosibilities.
+- The two hypotheses need to cover all possibilities.
 - Alternative hypothesis is usually the interesting outcome, sometimes its easier to write this first. It is usually stated as an inequality.
 - Null hypothesis is the usually stated as a parameter is `=` to some specified value. It represents a historical value, or a conservative state of business as usual where we would only rule against it if there is overwhelming evidence.
 
@@ -41,13 +41,44 @@ Example from DBCR:
 *The participants in this study were 48 male bank supervisors attending a management institute at the University of North Carolina in 1972. They were asked to assume the role of the personnel director of a bank and were given a personnel file to judge whether the person should be promoted to a branch manager position. The files given to the participants were identical, except that half of them indicated the candidate was male and the other half indicated the candidate was female. These files were randomly assigned to the subjects.*
 
 ---
+class: inverse 
 # Your turn
 
-Is this an observational study or an experiment? How does
-the type of study impact what can be inferred from the results?
+- Researchers perform an observational study when they collect data in a way that does not directly interfere with how the data arise.
+--
+
+- When researchers want to investigate the possibility of a causal connection, they conduct an experiment. Researchers will collect a sample of individuals and split them into groups. The individuals in each group are assigned a treatment. When individuals are randomly assigned to a group, the experiment is called a randomized experiment.
+--
+
+- __Is the bank data from an observational study or an experiment?__
+--
+
+- __How does the type of study impact what can be inferred from the results?__
+
 
 ---
-#
+class: inverse 
+# Your turn
+
+- What is the null hypothesis?
+--
+
+- `\(H_o:\)` promotion chances are not related to gender
+--
+
+- What is the alternative hypothesis?
+--
+
+- `\(H_a:\)` females are promoted at a lower rate
+--
+
+- Write these in statistical notation
+--
+
+- `\(H_o: p_M = p_F\)`, `\(H_a: p_M &gt; p_F\)`
+
+---
+# Look at the data
 
 
 
@@ -67,51 +98,68 @@ the type of study impact what can be inferred from the results?
 ```
 
 ---
-# How likely is this?
- 
-- Break any association between gender and decision
-- Re-tabulate
+# How likely is this if there really is no gender bias in promotion?
+
+We can do this using permutation. 
+
+- __Generate samples that are consistent with `\(H_o\)`.__ Break any association between gender and decision. 
+- __Re-tabulate__
 - Compute proportion of women promoted
+- Repeat these steps many, many times
 
 ---
-#
+# Data table looks like this
 
 Original: 
 
 
 ```
-#&gt;    gender decision
-#&gt; 1    male promoted
-#&gt; 2    male promoted
-#&gt; 3    male promoted
-#&gt; 4    male promoted
-#&gt; 5    male promoted
-#&gt; 6    male promoted
-#&gt; 7    male promoted
-#&gt; 8    male promoted
-#&gt; 9    male promoted
-#&gt; 10   male promoted
+#&gt;    gender     decision
+#&gt; 1  female not promoted
+#&gt; 2  female not promoted
+#&gt; 3  female     promoted
+#&gt; 4  female     promoted
+#&gt; 5  female     promoted
+#&gt; 6    male not promoted
+#&gt; 7    male     promoted
+#&gt; 8    male     promoted
+#&gt; 9    male     promoted
+#&gt; 10   male     promoted
 ```
 
 ---
-#
+# Scramble one colume
 
 Permuted decision:
 
 
 ```
 #&gt;    gender     decision
-#&gt; 1    male     promoted
-#&gt; 2    male not promoted
-#&gt; 3    male     promoted
-#&gt; 4    male     promoted
-#&gt; 5    male     promoted
+#&gt; 1  female     promoted
+#&gt; 2  female     promoted
+#&gt; 3  female     promoted
+#&gt; 4  female     promoted
+#&gt; 5  female     promoted
 #&gt; 6    male not promoted
-#&gt; 7    male not promoted
-#&gt; 8    male not promoted
-#&gt; 9    male     promoted
-#&gt; 10   male     promoted
+#&gt; 7    male     promoted
+#&gt; 8    male     promoted
+#&gt; 9    male not promoted
+#&gt; 10   male not promoted
 ```
+
+---
+# Let's do it
+
+
+```r
+prop &lt;- bank %&gt;% group_by(gender, decision) %&gt;%
+  tally() %&gt;% 
+  ungroup() %&gt;%
+  group_by(gender) %&gt;%
+  mutate(p = n/sum(n))
+```
+
+Propotion of women promoted is 0.42.
 
 ---
 class: inverse middle 
