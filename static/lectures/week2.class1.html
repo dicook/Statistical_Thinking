@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Statistical Thinking using Randomisation and Simulation</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Di Cook (dicook@monash.edu, @visnut)" />
+    <link href="week1.class2_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <link rel="stylesheet" href="myremark.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistical Thinking using Randomisation and Simulation
+## Introduction and motivation
+### Di Cook (<a href="mailto:dicook@monash.edu">dicook@monash.edu</a>, <span class="citation">@visnut</span>)
+### W1.C2
+
+---
+
+
+
+
+# Review of hypothesis testing
+
+- Terminology: null and alternative hypothesis, test statistic, significance value, p-value, critical value, decision, power, one-sided or two-sided test
+- Common basic tests: one sample t-test, two sample t-test, paired sample t-test, chisquared test (for association), analysis of variance
+
+---
+# Hypotheses
+
+- The two hypotheses need to cover all possibilities.
+- Alternative hypothesis is usually the interesting outcome, sometimes its easier to write this first. It is usually stated as an inequality.
+- Null hypothesis is the usually stated as a parameter is `=` to some specified value. It represents a historical value, or a conservative state of business as usual where we would only rule against it if there is overwhelming evidence.
+
+---
+# Using permutation to examine association
+
+Example from DBCR: 
+
+*The participants in this study were 48 male bank supervisors attending a management institute at the University of North Carolina in 1972. They were asked to assume the role of the personnel director of a bank and were given a personnel file to judge whether the person should be promoted to a branch manager position. The files given to the participants were identical, except that half of them indicated the candidate was male and the other half indicated the candidate was female. These files were randomly assigned to the subjects.*
+
+---
+class: inverse 
+# Your turn
+
+- Researchers perform an observational study when they collect data in a way that does not directly interfere with how the data arise.
+--
+
+- When researchers want to investigate the possibility of a causal connection, they conduct an experiment. Researchers will collect a sample of individuals and split them into groups. The individuals in each group are assigned a treatment. When individuals are randomly assigned to a group, the experiment is called a randomized experiment.
+--
+
+- __Is the bank data from an observational study or an experiment?__
+--
+
+- __How does the type of study impact what can be inferred from the results?__
+
+
+---
+class: inverse 
+# Your turn
+
+- What is the null hypothesis?
+--
+
+- `\(H_o:\)` promotion chances are not related to gender
+--
+
+- What is the alternative hypothesis?
+--
+
+- `\(H_a:\)` females are promoted at a lower rate
+--
+
+- Write these in statistical notation
+--
+
+- `\(H_o: p_M = p_F\)`, `\(H_a: p_M &gt; p_F\)`
+
+---
+# Look at the data
+
+
+
+
+
+
+```
+#&gt;         
+#&gt;          not promoted promoted Sum
+#&gt;   female           10       14  24
+#&gt;   male              3       21  24
+#&gt;   Sum              13       35  48
+#&gt;         
+#&gt;          not promoted promoted
+#&gt;   female         0.42     0.58
+#&gt;   male           0.12     0.88
+```
+
+---
+# How likely is this if there really is no gender bias in promotion?
+
+We can do this using permutation. 
+
+- __Generate samples that are consistent with `\(H_o\)`.__ Break any association between gender and decision. 
+- __Re-tabulate__
+- Compute proportion of women promoted
+- Repeat these steps many, many times
+
+---
+# Data table looks like this
+
+Original: 
+
+
+```
+#&gt;    gender     decision
+#&gt; 1  female not promoted
+#&gt; 2  female not promoted
+#&gt; 3  female     promoted
+#&gt; 4  female     promoted
+#&gt; 5  female     promoted
+#&gt; 6    male not promoted
+#&gt; 7    male     promoted
+#&gt; 8    male     promoted
+#&gt; 9    male     promoted
+#&gt; 10   male     promoted
+```
+
+---
+# Scramble one column
+
+Permuted decision:
+
+
+```
+#&gt;    gender     decision
+#&gt; 1  female     promoted
+#&gt; 2  female     promoted
+#&gt; 3  female     promoted
+#&gt; 4  female     promoted
+#&gt; 5  female     promoted
+#&gt; 6    male not promoted
+#&gt; 7    male     promoted
+#&gt; 8    male     promoted
+#&gt; 9    male not promoted
+#&gt; 10   male not promoted
+```
+
+---
+# Let's do it
+
+
+```r
+prop &lt;- bank %&gt;% group_by(gender, decision) %&gt;%
+  tally() %&gt;% 
+  ungroup() %&gt;%
+  group_by(gender) %&gt;%
+  mutate(p = n/sum(n))
+```
+
+The difference between men and women promoted is 0.29.
+
+---
+# Permute 100 times and re-calculate
+
+&lt;img src="week1.class2_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+There are 3 null values larger than or equl to the difference in the data set, 0.29. This gives a `\(p\)`-value equal to 0.03 which is small. It is unlikely to see a difference between promotion rates as large as this purely by chance. 
+
+---
+class: inverse middle 
+# Share and share alike
+
+&lt;a rel="license" href="http://creativecommons.org/licenses/by/4.0/"&gt;&lt;img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /&gt;&lt;/a&gt;&lt;br /&gt;This work is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by/4.0/"&gt;Creative Commons Attribution 4.0 International License&lt;/a&gt;.
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

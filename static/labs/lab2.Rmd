@@ -1,5 +1,5 @@
 ---
-title: "ETC 2420/5242 Lab 2 2016"
+title: "ETC 2420/5242 Lab 2 2017"
 author: "Di Cook"
 date: "Week 2"
 output: pdf_document
@@ -84,10 +84,8 @@ ppc_sample <- function(){
 ## TURN IN 
 
 - Your `.Rmd` file
-- Your Word (or pdf) file that results from knitting the Rmd.
+- Your `.html` file that results from knitting the Rmd.
 - Make sure your group members are listed as authors, one person per group will turn in the report
-- DUE: Wednesday after the lab, by 7am, loaded into moodle
-
 
 ```{r echo=FALSE, eval=FALSE}
 #####################################################

@@ -43,6 +43,10 @@ ul li li:before {
   font-family: "FontAwesome";
   margin-right: 10px;
 }
+ol li:before {
+  margin-right: 10px;
+  color: #D95F02;
+}
 .red { color: #D00000; }
 .orange { color: #FFBA08; }
 .blue { color: #3F88C5; }
