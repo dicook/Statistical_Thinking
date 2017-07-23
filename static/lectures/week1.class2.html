@@ -130,6 +130,8 @@ Check that the probabilities sum to 1. (Why?) Now what should be your strategy?
 
 (Probabilities reported in article in [http://www.telegraph.co.uk](http://www.telegraph.co.uk/men/thinking-man/11051704/How-to-always-win-at-rock-paper-scissors.html))
 
+Also, look at this [twitter poll](https://twitter.com/nj_tierney/status/888345405871636480).
+
 ---
 class: inverse middle 
 # Your turn
@@ -208,8 +210,72 @@ Strategy      | Decision  | Rock (0.354) | Paper  (0.350) | Scissors (0.296)
 
 
 ---
-# Non-zero sum games, e.e. the prisoner's dilemma
+# Playing until someone loses all their money
 
+Suppose you choose strategy `\(a_2\)`, for all your turns. 
+
+
+```
+#&gt; $nturns
+#&gt; [1] 1
+#&gt; 
+#&gt; $winnings
+#&gt; [1] 2
+```
+
+---
+# Simulate 100 times
+
+&lt;img src="week1.class2_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+The expected earnings with strategy `\(a_2\)` is 1.16 (estimated using mean of simulated winnings).
+
+---
+# Dependency between consecutive games
+
+People have a tendency to stay with their previous choice of moves, if they won, otherwise to switch to the what would have been the winning move assuming that the opponent won't change. Using this knowledge, could give you an advantage. We can simulate this too. Let's compare two new strategies for consecutive moves:
+
+- `\(a_1\)`: Counter those moves of opponent as above
+- `\(a_2\)`: Purely random choice of move each time
+
+
+
+---
+
+Results with strategy 1:
+
+
+```
+#&gt;   [1] -1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+#&gt;  [24]  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+#&gt;  [47]  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+#&gt;  [70]  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+#&gt;  [93]  1  1  1  1  1  1  1  1
+```
+
+Results with strategy 2:
+
+
+```
+#&gt;   [1] -1 -1  1  0  0  0 -1  1  1  0  0 -1 -1  1 -1  1  1  0  0 -1  1  1 -1
+#&gt;  [24]  0 -1  0  0 -1  0  1  0  1  0 -1  1  0 -1 -1  0 -1  1  0  1 -1 -1  1
+#&gt;  [47]  0 -1  1  0  1 -1  1  1 -1  1  0  1 -1  0  0  1 -1  1  0  0  1 -1 -1
+#&gt;  [70]  1  1  1 -1  1  1  1 -1  1 -1  1 -1 -1 -1  0  1  1  0  1 -1  1  0  0
+#&gt;  [93] -1  1  0 -1 -1  0  0  0
+```
+
+Expected winnings, strategy 1 are 0.98, and for stratgey 2 are 0.03.
+
+---
+# Non-zero sum games
+
+Examples:
+
+- The prisoner's dilemma
+- Chicken
+- Deadlock and stag hunt
+
+[Source](https://cs.stanford.edu/people/eroberts/courses/soco/projects/1998-99/game-theory/nonzero.html)
 
 ---
 # Taxonomy of games
@@ -226,10 +292,10 @@ Strategy      | Decision  | Rock (0.354) | Paper  (0.350) | Scissors (0.296)
 ---
 # Decision theory model
 
-- There is a well defined set of possible actions, a, that constitutes an action space `\(A\)`.
+- There is a well defined set of possible actions, `\(a\)`, that constitutes an action space `\(A\)`.
 - The state of the world, or state of nature, is represented by a parameter `\(\theta\)`. The set of possible states of nature, the state space (or parameter space) `\(\theta\)`, is known.
-- There is a loss function `\(l(a, \theta)\)` defined on the space of consequences `\(A \times \theta\)` which assigns a value to the loss incurred if action a is taken when the prevailing state of nature is `\(\theta\)`.
--  Data ($x$) from a random experiment with sample space `\(\Omega\)` is available that provides information on the possible state of nature that prevails.
+- There is a loss function `\(l(a, \theta)\)` defined on the space of consequences `\(A \times \theta\)` which assigns a value to the loss incurred if action `\(a\)` is taken when the prevailing state of nature is `\(\theta\)`.
+-  Data ( `\(x\)` ) from a random experiment with sample space `\(\Omega\)` is available that provides information on the possible state of nature that prevails.
 
 Examples of decision problems: hypothesis testing, parameter estimation, games, etc.
 
@@ -237,27 +303,10 @@ Examples of decision problems: hypothesis testing, parameter estimation, games, 
 #  The Decision Theory Model as a 2-person game
 
 - Analogy with a zero sum two person game?
-- The decision maker (the scientist or statistician, say) and nature replace the two players,
+- The decision maker (the scientist or statistician, say) and nature replace the two players.
 - The payoff is replaced by the corresponding loss (the loss function is assumed to be given).
-- The data may be thought of as a form of “spying”. The aim is to select the best action with respect to the loss function having regard to the extent and basis of any information that is available concerning the prevailing state of nature.
+- The data may be thought of as a form of "spying". The aim is to select the best action with respect to the loss function having regard to the extent and basis of any information that is available concerning the prevailing state of nature.
 - Statistical inference can be thought of as a game between the statistician, who needs to make a decision about the population, and nature, meaning the relevant features of the population of interest.
-
----
-# Losses vs regrets
-
-- An alternative basis for assessing actions is regret (rather than loss).
-The regret function is defined as
-
-`$$r(a, \theta) = l(a, \theta) − min_{a \element A} l(a, \theta) a \in A$$`.
-
-- `\(min l(a, \theta)\)` is the smallest loss for that `\(\theta\)`, so if we `\(a \element A\)`
-knew `\(\theta\)` (and took the correct action!) this would be
-the loss we'd face
-- So `\(r(a, \theta)\)` represents the loss that could have been avoided had the state of nature been known with certainty.
-- Using regrets to assess the merits of different consequences rather than losses can lead to a different "optimal" strategy.
-
----
-# 
 
 ---
 class: inverse middle 
