@@ -21,7 +21,7 @@ title: Home
 
 ## Lecture notes
 
-- Week 1: Introduction and motivation[ Slides 1](lectures/week1.class1.html) ([Rmd](lectures/week1.class1.Rmd)); [Slides 2]() ([Rmd]()); __Reading:__ 
+- Week 1: Introduction and motivation[ Slides 1](lectures/week1.class1.html) ([Rmd](lectures/week1.class1.Rmd)); [Slides 2](lectures/week1.class2.html) ([Rmd](lectures/week1.class2.Rmd)); __Reading:__ [Yihui's fun package](https://yihui.name/en/2011/08/the-fun-package-use-r-for-fun/), [Actuarial CT6 UNIT 1 — DECISION THEORY](https://www.actuaries.org.uk/studying/plan-my-study-route/fellowshipassociateship/core-technical-subjects/ct6-statistical-methods)
 - Week 2: Games
 - Week 3: Hypothesis testing
 - Week 4: Distribution theory
