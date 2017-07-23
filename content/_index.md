@@ -13,7 +13,7 @@ title: Home
 
 ## Schedule
 
-- Lectures: (R4) M 9-10 R4, F 12-1
+- Lectures: (R4) M 9-10, F 12-1
 - Labs: 
   - Wed (E157) 1-2:30 (Nat), 2:30-4:00 (Nat), 4:00-5:30 (Dilini)
   - Thu (E157) 8:00-9:30 (Earo), 9:30-11:00 (Thiyanga), 11:00-12:30 (Stuart), 12:30-2:00 (Stuart)
@@ -21,7 +21,7 @@ title: Home
 
 ## Lecture notes
 
-- Week 1: Introduction and motivation[ Slides 1](lectures/week1.class1.html) ([Rmd](lectures/week1.class1.Rmd)); [Slides 2](lectures/week1.class2.html) ([Rmd](lectures/week1.class2.Rmd)); __Reading:__
+- Week 1: Introduction and motivation[ Slides 1](lectures/week1.class1.html) ([Rmd](lectures/week1.class1.Rmd)); [Slides 2](lectures/week1.class2.html) ([Rmd](lectures/week1.class2.Rmd)); __Reading:__ 
 - Week 2: Games
 - Week 3: Hypothesis testing
 - Week 4: Distribution theory
