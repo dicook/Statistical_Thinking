@@ -65,7 +65,7 @@ What is rock, paper, scissors?
 ---
 # Zero-sum two person games
 
-- The payoff is the amount of money each player receive after choosing their respective strategies 
+- The payoff is the amount of money each player receives after choosing their respective strategies 
 - Whatever one player loses, the other player wins.
 - Each player must choose his own strategy without knowing what his opponent is going to do.
 - An objective is to determine optimal winning strategies.
@@ -84,15 +84,35 @@ Whatever you choose you have a 1/3 of winning, losing or tieing.
 ---
 # Let's simulate the game
 
-1. Fix your decision to be `\(a_1\)`
-2. Randomly generate the opponents response
-3. Count the number of times you win, lose, tie
+- Fix your decision to be `\(a_1\)`, without loss of generality
+- Randomly generate the opponents response
+- Count the number of times you win, lose, tie
+
+Run 1:
 
 
 ```
 #&gt; d
 #&gt;    Paper     Rock Scissors 
-#&gt;       29       36       35
+#&gt;     3236     3419     3345
+```
+
+Run 2:
+
+
+```
+#&gt; d
+#&gt;    Paper     Rock Scissors 
+#&gt;     3370     3324     3306
+```
+
+Run 3:
+
+
+```
+#&gt; d
+#&gt;    Paper     Rock Scissors 
+#&gt;     3364     3357     3279
 ```
 
 There is no optimal strategy.
@@ -106,7 +126,7 @@ Strategy      | Decision  | Rock (0.354) | Paper  (0.350) | Scissors (0.296)
 `\(a_2\)` | Paper | 1 | 0 | -1
 `\(a_3\)` | Scissors | -1 | 1 | 0
 
-Now what should be your strategy?
+Check that the probabilities sum to 1. (Why?) Now what should be your strategy?
 
 (Probabilities reported in article in [http://www.telegraph.co.uk](http://www.telegraph.co.uk/men/thinking-man/11051704/How-to-always-win-at-rock-paper-scissors.html))
 
@@ -116,9 +136,9 @@ class: inverse middle
 
 If your strategy is 
 
-1. `\(a_1\)`, 
-2. `\(a_2\)`,
-3. `\(a_3\)`,
+- `\(a_1\)`, 
+- `\(a_2\)`, or
+- `\(a_3\)`,
 
 your chance of winning should be?
 
@@ -127,26 +147,69 @@ your chance of winning should be?
 ---
 # Let's simulate it
 
-Your strategy is `\(a_1\)`, `Rock`
+- Generate `\(n\)` samples from a `uniform(0,1)` distribution
+- Bin the number into `0-0.354, 0.354-0.654, 0.654-1` to match the probabilities of opponent choices
+- Count the proportion of `\(n\)` times you would win under each strategy `\(a_1, a_2, a_3\)`.
+
+For each of the following runs, my `\(n=10000\)`.
+
+Your strategy is `\(a_1\)`, `Rock`:
 
 
 ```
 #&gt; [1] 0.35
 ```
 
-Your strategy is `\(a_2\)`, `Paper`
+Your strategy is `\(a_2\)`, `Paper`:
 
 
 ```
 #&gt; [1] 0.36
 ```
 
-Your strategy is `\(a_3\)`, `Scissors`
+Your strategy is `\(a_3\)`, `Scissors`:
 
 
 ```
 #&gt; [1] 0.3
 ```
+
+---
+# Pay off matrix, includes opp payoff
+
+Strategy      | Decision  | Rock (0.354) | Paper  (0.350) | Scissors (0.296) 
+----- | ----- | ----- | ----- | -----
+`\(a_1\)` | Rock | 0, 0 |  -1, 1 | 1, -1
+`\(a_2\)` | Paper | 1, -1 | 0, 0 | -1, 1
+`\(a_3\)` | Scissors | -1, 1 | 1, -1 | 0, 0
+
+$$\mbox{payoff}|a_1 = 0\times 0.354 - 1\times0.350 + 1\times 0.296 = -0.054 $$
+$$\mbox{payoff}|a_2 =  1\times 0.354 + 0\times0.350 - 1\times 0.296 = 0.058 $$
+
+`$$\mbox{payoff}|a_3 =  -1\times 0.354 + 1\times0.350 + 0\times 0.296 = -0.004$$`
+
+There's a clear winner!
+
+---
+class: inverse middle 
+# Your turn
+
+Under a different payoff?
+
+Strategy      | Decision  | Rock (0.354) | Paper  (0.350) | Scissors (0.296) 
+----- | ----- | ----- | ----- | -----
+`\(a_1\)` | Rock | 0, 0 |  -1, 1 | 1, -1
+`\(a_2\)` | Paper | 2, -1 | -1, 0 | -1, 1
+`\(a_3\)` | Scissors | -1, 1 | 1, -1 | 0, 0
+
+- Is it still a zero sum game?
+- What is the expected payoff under each strategy?
+
+
+
+---
+# Non-zero sum games, e.e. the prisoner's dilemma
+
 
 ---
 # Taxonomy of games
@@ -159,10 +222,6 @@ Your strategy is `\(a_3\)`, `Scissors`
 - Two-person versus n-person games 
 - Non-iterated versus iterated games
 
----
-#
-
-More on the example, pay off
 
 ---
 # Decision theory model

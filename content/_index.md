@@ -14,7 +14,10 @@ title: Home
 ## Schedule
 
 - Lectures: (R4) M 9-10 R4, F 12-1
-- Labs: (E157) W 1-2:30, 2:30-4:00, 4:00-5:30; Th 8:00-9:30, 9:30-11:00, 11:00-12:30, 12:30-2:00
+- Labs: 
+  - Wed (E157) 1-2:30 (Nat), 2:30-4:00 (Nat), 4:00-5:30 (Dilini)
+  - Thu (E157) 8:00-9:30 (Earo), 9:30-11:00 (Thiyanga), 11:00-12:30 (Stuart), 12:30-2:00 (Stuart)
+  - Fri (E163) 8:00-9:30 (Thiyanga), (E160) 9:30-11:00 (Dilini), (E157) 4:00-5:30 (Earo)
 
 ## Lecture notes
 
