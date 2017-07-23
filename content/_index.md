@@ -9,7 +9,7 @@ title: Home
 ## Semester 2 2017
 
 - Lecturer: Professor Di Cook 
-- Tutors: Stuart Lee, Priyanga Talagala, Thiyanga Talagala, Nathaniel Tomasetti, Earo Wang
+- Tutors: Stuart Lee, Priyanga (Dilini) Talagala, Thiyanga Talagala, Nathaniel Tomasetti, Earo Wang
 
 ## Schedule
 
