@@ -46,7 +46,7 @@ Objects allow things to be created and stored.
 They can be variables,
 
 ```r
-x = 5
+x &lt;- 5
 x + 1
 ```
 
@@ -58,7 +58,7 @@ x + 1
 or they can be vectors, matrices, and entire datasets.
 
 ```r
-y = c(1, 4, 2, 6, 5, 0)
+y &lt;- c(1, 4, 2, 6, 5, 0)
 y
 ```
 
@@ -67,7 +67,7 @@ y
 ```
 
 ```r
-z = matrix(y, nrow = 2, ncol = 3)
+z &lt;- matrix(y, nrow = 2, ncol = 3)
 z
 ```
 
@@ -92,12 +92,12 @@ Functions are a set of instructions to turn an input into an output.
 
 
 ```r
-myMean = function(x){
+myMean &lt;- function(x){
   N = length(x)
   mean = sum(x) / N
   return(mean)
 }
-x = c(4, 1, 6, -3, 7, 1)
+x &lt;- c(4, 1, 6, -3, 7, 1)
 myMean(x)
 ```
 
@@ -111,7 +111,7 @@ It's easy to give them multiple inputs.
 
 
 ```r
-addAndDouble = function(x, y){
+addAndDouble &lt;- function(x, y){
   2 * (x + y)
 }
 addAndDouble(5, 2)
@@ -126,7 +126,7 @@ addAndDouble(5, 2)
 R comes with many built in functions
 
 ```r
-x = c(4, 1, 6, -3, 7, 1)
+x &lt;- c(4, 1, 6, -3, 7, 1)
 mean(x)
 ```
 
@@ -176,9 +176,9 @@ R can do all of the regression you would do in eViews, Excel, Stata, SAS etc.
 
 
 ```r
-x = rnorm(1000)
-y = 2 + 3*x + rnorm(1000, sd = 0.1)
-linReg = lm(y ~ x)
+x &lt;- rnorm(1000)
+y &lt;- 2 + 3*x + rnorm(1000, sd = 0.1)
+linReg &lt;- lm(y ~ x)
 summary(linReg)
 ```
 
@@ -189,18 +189,18 @@ summary(linReg)
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
-## -0.31960 -0.06363  0.00212  0.06655  0.27386 
+## -0.30992 -0.06719 -0.00289  0.06783  0.37062 
 ## 
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) 2.004028   0.003079   651.0   &lt;2e-16 ***
-## x           3.000748   0.003060   980.5   &lt;2e-16 ***
+## (Intercept) 2.005493   0.003271   613.2   &lt;2e-16 ***
+## x           3.000896   0.003284   913.7   &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 0.09731 on 998 degrees of freedom
-## Multiple R-squared:  0.999,	Adjusted R-squared:  0.999 
-## F-statistic: 9.614e+05 on 1 and 998 DF,  p-value: &lt; 2.2e-16
+## Residual standard error: 0.1033 on 998 degrees of freedom
+## Multiple R-squared:  0.9988,	Adjusted R-squared:  0.9988 
+## F-statistic: 8.349e+05 on 1 and 998 DF,  p-value: &lt; 2.2e-16
 ```
 
 ---
