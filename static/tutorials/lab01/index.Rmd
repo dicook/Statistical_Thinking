@@ -68,8 +68,8 @@ Functions are a set of instructions to turn an input into an output.
 
 ```{r}
 myMean <- function(x){
-  N = length(x)
-  mean = sum(x) / N
+  N <- length(x)
+  mean <- sum(x) / N
   return(mean)
 }
 x <- c(4, 1, 6, -3, 7, 1)
