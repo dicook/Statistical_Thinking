@@ -17,13 +17,17 @@ footnotereturnlinkcontents = "↩"
     url = "/"
     weight = 1
 [[menu.main]]
-    name = "Moodle"
-    url = "http://moodle.vle.monash.edu/course/view.php?id=38489"
-    weight = 2
-[[menu.main]]
     name = "Textbook"
     url = "https://www.openintro.org/stat/textbook.php?stat_book=isrs"
+    weight = 2
+[[menu.main]]
+    name = "Moodle (lecture videos)"
+    url = "http://moodle.vle.monash.edu/course/view.php?id=38489"
     weight = 3
+[[menu.main]]
+    name = "ED (assignments & quizzes)"
+    url = "https://edstem.com.au/"
+    weight = 4
 
 [params]
     description = "A website built through Hugo and blogdown."
