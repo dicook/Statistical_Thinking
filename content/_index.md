@@ -19,6 +19,13 @@ title: Home
   - Wed (E157) 1-2:30 (Nat), 2:30-4:00 (Nat), 4:00-5:30 (Dilini)
   - Thu (E157) 8:00-9:30 (Earo), 9:30-11:00 (Thiyanga), 11:00-12:30 (Stuart), 12:30-2:00 (Stuart)
   - Fri (E163) 8:00-9:30 (Thiyanga), (E160) 9:30-11:00 (Dilini)
+- Consultation times:
+  - Dilini M 2-3 (W1105)
+  - Thiyanga Tu 9-10 (W1105)
+  - Earo Th 9:30-10:30 (W1105)
+  - Nat F 11-12 (W1105)
+  - Stuart F 3-4 (W1105)
+  - Di W 2-4 (E762A)
 
 ## Lecture notes
 
