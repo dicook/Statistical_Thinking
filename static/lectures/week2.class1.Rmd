@@ -2,7 +2,7 @@
 title: 'Statistical Thinking using Randomisation and Simulation'
 subtitle: "Game simulation and decision theory"
 author: Di Cook (dicook@monash.edu, @visnut)
-date: "W1.C2"
+date: "W2.C1"
 output:
   xaringan::moon_reader:
     css: ["default", "myremark.css"]
