@@ -130,9 +130,10 @@ $a_1$ | Rock | 0 |  -1 | 1
 $a_2$ | Paper | 1 | 0 | -1
 $a_3$ | Scissors | -1 | 1 | 0
 
-Check that the probabilities sum to 1. (Why?) Now what should be your strategy?
-
+But people have some patterns when they play, generally. It is reported that people tend to play rock and paper more than scissors.
 (Probabilities reported in article in [http://www.telegraph.co.uk](http://www.telegraph.co.uk/men/thinking-man/11051704/How-to-always-win-at-rock-paper-scissors.html))
+
+Check that the probabilities sum to 1. (Why?) Now what should be your strategy?
 
 Also, look at this [twitter poll](https://twitter.com/nj_tierney/status/888345405871636480).
 
@@ -396,36 +397,6 @@ Examples:
 
 [Source](https://cs.stanford.edu/people/eroberts/courses/soco/projects/1998-99/game-theory/nonzero.html)
 
----
-# Taxonomy of games
-
-- Zero-sum versus nonzero-sum games
-- Non-cooperative versus cooperative games
-- Simultaneous-move versus sequential-move games
-- Games with perfect information versus games with imperfect information
-- Non-symmetric versus symmetric games 
-- Two-person versus n-person games 
-- Non-iterated versus iterated games
-
-
----
-# Decision theory model
-
-- There is a well defined set of possible actions, $a$, that constitutes an action space $A$.
-- The state of the world, or state of nature, is represented by a parameter $\theta$. The set of possible states of nature, the state space (or parameter space) $\theta$, is known.
-- There is a loss function $l(a, \theta)$ defined on the space of consequences $A \times \theta$ which assigns a value to the loss incurred if action $a$ is taken when the prevailing state of nature is $\theta$.
--  Data ( $x$ ) from a random experiment with sample space $\Omega$ is available that provides information on the possible state of nature that prevails.
-
-Examples of decision problems: hypothesis testing, parameter estimation, games, etc.
-
----
-#  The Decision Theory Model as a 2-person game
-
-- Analogy with a zero sum two person game?
-- The decision maker (the scientist or statistician, say) and nature replace the two players.
-- The payoff is replaced by the corresponding loss (the loss function is assumed to be given).
-- The data may be thought of as a form of "spying". The aim is to select the best action with respect to the loss function having regard to the extent and basis of any information that is available concerning the prevailing state of nature.
-- Statistical inference can be thought of as a game between the statistician, who needs to make a decision about the population, and nature, meaning the relevant features of the population of interest.
 
 ---
 class: inverse middle 

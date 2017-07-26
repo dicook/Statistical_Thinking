@@ -203,16 +203,6 @@ If we oberve a difference this large `r length(aec_abs_shuffle$d[aec_abs_shuffle
 Let's wait until the next Census results are in (after August this year) and the latest election results, to compare populations of electorates again. 
 
 ---
-# Next steps
-
-- Next few classes we will 
-    - review statistical hypothesis testing
-    - go through a few more examples of using permutation to make statistical significance tests
-    - discuss random number generators, and simulating events
-    - compute probabilities of events, and 
-- Lab this week will be getting started with using R - the top data science software available today.
-
----
 class: inverse middle 
 # Share and share alike
 
