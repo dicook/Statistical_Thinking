@@ -19,10 +19,18 @@ title: Home
   - Wed (E157) 1-2:30 (Nat), 2:30-4:00 (Nat), 4:00-5:30 (Dilini)
   - Thu (E157) 8:00-9:30 (Earo), 9:30-11:00 (Thiyanga), 11:00-12:30 (Stuart), 12:30-2:00 (Stuart)
   - Fri (E163) 8:00-9:30 (Thiyanga), (E160) 9:30-11:00 (Dilini)
+- Consultation times:
+  - Dilini M 2-3 (W1105)
+  - Thiyanga Tu 9-10 (W1105)
+  - Earo Th 9:30-10:30 (W1105)
+  - Nat M 10-11 (W1105)
+  - Stuart F 3-4 (W1105)
+  - Di W 2-4 (E762A)
 
 ## Lecture notes
 
-- Week 1: Introduction and motivation [Slides 1](lectures/week1.class1.html) ([Rmd](lectures/week1.class1.Rmd)); [Slides 2](lectures/week1.class2.html) ([Rmd](lectures/week1.class2.Rmd)); __Reading:__ [Yihui's fun package](https://yihui.name/en/2011/08/the-fun-package-use-r-for-fun/), [Actuarial CT6 UNIT 1 — DECISION THEORY](https://www.actuaries.org.uk/studying/plan-my-study-route/fellowshipassociateship/core-technical-subjects/ct6-statistical-methods)
+
+- Week 1: Introduction and motivation[ Slides 1](lectures/week1.class1.html) ([Rmd](lectures/week1.class1.Rmd)); [Slides 2](lectures/week1.class2.html) ([Rmd](lectures/week1.class2.Rmd)); __Reading:__ [Yihui's fun package](https://yihui.name/en/2011/08/the-fun-package-use-r-for-fun/), Textbook: Chapter 1. 1.1-1.5
 - Week 2: Games [Slides 1](lectures/week2.class1.html) ([Rmd](lectures/week2.class1.Rmd)); [Slides 2](lectures/week2.class2.html) ([Rmd](lectures/week2.class2.Rmd));
 - Week 3: Hypothesis testing
 - Week 4: Distribution theory

@@ -40,16 +40,16 @@ Objects allow things to be created and stored.
 
 They can be variables,
 ```{r}
-x = 5
+x <- 5
 x + 1
 ```
 --
 
 or they can be vectors, matrices, and entire datasets.
 ```{r}
-y = c(1, 4, 2, 6, 5, 0)
+y <- c(1, 4, 2, 6, 5, 0)
 y
-z = matrix(y, nrow = 2, ncol = 3)
+z <- matrix(y, nrow = 2, ncol = 3)
 z
 ```
 --
@@ -67,12 +67,12 @@ class:middle, inverse, center
 Functions are a set of instructions to turn an input into an output.
 
 ```{r}
-myMean = function(x){
-  N = length(x)
-  mean = sum(x) / N
+myMean <- function(x){
+  N <- length(x)
+  mean <- sum(x) / N
   return(mean)
 }
-x = c(4, 1, 6, -3, 7, 1)
+x <- c(4, 1, 6, -3, 7, 1)
 myMean(x)
 ```
 
@@ -81,7 +81,7 @@ myMean(x)
 It's easy to give them multiple inputs.
 
 ```{r}
-addAndDouble = function(x, y){
+addAndDouble <- function(x, y){
   2 * (x + y)
 }
 addAndDouble(5, 2)
@@ -91,7 +91,7 @@ addAndDouble(5, 2)
 
 R comes with many built in functions
 ```{r}
-x = c(4, 1, 6, -3, 7, 1)
+x <- c(4, 1, 6, -3, 7, 1)
 mean(x)
 ```
 --
@@ -116,9 +116,9 @@ sort(x)
 R can do all of the regression you would do in eViews, Excel, Stata, SAS etc.
 
 ```{r}
-x = rnorm(1000)
-y = 2 + 3*x + rnorm(1000, sd = 0.1)
-linReg = lm(y ~ x)
+x <- rnorm(1000)
+y <- 2 + 3*x + rnorm(1000, sd = 0.1)
+linReg <- lm(y ~ x)
 summary(linReg)
 ```
 
