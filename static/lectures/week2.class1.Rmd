@@ -84,7 +84,7 @@ __B:3__|-2|-6|12
 
 For player B:
 
-- minimising maximum loss is achieved by strategy 2
+- minimising maximum loss is achieved by strategy 2 (they would actually be guaranteed to win 2)
 - even if player A knew that player B would use strategy 2, strategy I is still A's optimal choice. This is called a __saddle point__ or __equilibrium__.
 
 ---
