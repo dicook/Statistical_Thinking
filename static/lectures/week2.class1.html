@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Statistical Thinking using Randomisation and Simulation</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Di Cook (dicook@monash.edu, @visnut)" />
+    <link href="week2.class1_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <link rel="stylesheet" href="myremark.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistical Thinking using Randomisation and Simulation
+## Game simulation and decision theory
+### Di Cook (<a href="mailto:dicook@monash.edu">dicook@monash.edu</a>, <span class="citation">@visnut</span>)
+### W2.C1
+
+---
+
+
+
+
+# Taxonomy of games
+
+- Zero-sum versus nonzero-sum games
+- Non-cooperative versus cooperative games
+- Simultaneous-move versus sequential-move games
+- Games with perfect information versus games with imperfect information
+- Non-symmetric versus symmetric games 
+- Two-person versus n-person games 
+- Non-iterated versus iterated games
+
+---
+# Dominance
+
+Consider the following payoff matrix (losses to A, gains
+to B):
+
+|A:I|A:II|
+---|---:|---:|
+__B:1__|7|-4|
+__B:2__|8|10|
+
+For player B, strategy 2 is better than strategy 1 regardless of what player A does.
+
+---
+# Minimax
+
+Consider the following payoff matrix (losses to A, gains
+to B):
+
+|A:I|A:II|A:III
+---|---:|---:|---:
+__B:1__|-1|6|-2
+__B:2__|2|4|6
+__B:3__|-2|-6|12
+
+For player A:
+
+- using strategy I worst loss is 2, with strategy II worst loss is 6, and with strategy III loss is 12
+- player A minimises maximum loss by choosing strategy I
+
+---
+# Minimax
+
+Consider the following payoff matrix (losses to A, gains
+to B):
+
+|A:I|A:II|A:III
+---|---:|---:|---:
+__B:1__|-1|6|-2
+__B:2__|2|4|6
+__B:3__|-2|-6|12
+
+For player B:
+
+- minimising maximum loss is achieved by strategy 2
+- even if player A knew that player B would use strategy 2, strategy I is still A's optimal choice. This is called a __saddle point__ or __equilibrium__.
+
+---
+# Minimax
+
+No equilibrium? Consider the following payoff matrix (losses to A, gains
+to B):
+
+|A:I|A:II
+---|---:|---:
+__B:1__|8|-5
+__B:2__|2|6
+
+- Player A's minimax strategy is II and Player B's is Strategy 2.
+- But if Player A knew that Player B was going to choose Strategy 2, Player A could switch to Strategy I and reduce the value of the game from 6 to 2.
+- And if Player B knew that Player A would act this way Player B could in turn switch to Strategy 1 and increase the value of the game from 6 to 8.
+
+---
+# Randomized strategies
+
+- Knowledge of the other player’s choice of strategy is advantageous in this case
+- Consistently choosing the same strategy cannot be optimal
+- This suggests that each player should mix up (randomize) their behaviour patterns
+ie, introduce a stochastic element into their choice of strategy.
+
+---
+
+Suppose that player A chooses strategy I with probability `\(p\)`, and hence strategy II with probability `\(1-p\)`.
+
+|A:I|A:II
+---|---:|---:
+__B:1__|8|-5
+__B:2__|2|6
+
+- if player B chooses strategy 1, the loss for player A is `\(L_1(p) = 8p - 5(1 - p)\)`.
+- and if player B chooses strategy 2, the loss for player A is `\(L_2(p) = 2p + 6(1 - p)\)`
+
+---
+# Plot the loss
+
+&lt;img src="week2.class1_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+
+Best `\(p\)` to use is where the two lines intersect, approximately 0.65. This minimises expected loss. Player A could use a random number generator to sample strategy I and II with proportion 0.65, that is slightly more often use strategy I.
+
+---
+# Decision theory model
+
+- There is a well defined set of possible actions, `\(a\)`, that constitutes an action space `\(A\)`.
+- The state of the world, or state of nature, is represented by a parameter `\(\theta\)`. The set of possible states of nature, the state space (or parameter space) `\(\theta\)`, is known.
+- There is a loss function `\(l(a, \theta)\)` defined on the space of consequences `\(A \times \theta\)` which assigns a value to the loss incurred if action `\(a\)` is taken when the prevailing state of nature is `\(\theta\)`.
+-  Data ( `\(x\)` ) from a random experiment with sample space `\(\Omega\)` is available that provides information on the possible state of nature that prevails.
+
+Examples of decision problems: hypothesis testing, parameter estimation, games, etc.
+
+---
+#  Model as a 2-person game
+
+- Analogy with a zero sum two person game?
+- The decision maker (the scientist or statistician, say) and nature replace the two players.
+- The payoff is replaced by the corresponding loss (the loss function is assumed to be given).
+- The data may be thought of as a form of "spying". The aim is to select the best action with respect to the loss function having regard to the extent and basis of any information that is available concerning the prevailing state of nature.
+- Statistical inference can be thought of as a game between the statistician, who needs to make a decision about the population, and nature, meaning the relevant features of the population of interest.
+
+
+---
+class: inverse middle 
+# Share and share alike
+
+&lt;a rel="license" href="http://creativecommons.org/licenses/by/4.0/"&gt;&lt;img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /&gt;&lt;/a&gt;&lt;br /&gt;This work is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by/4.0/"&gt;Creative Commons Attribution 4.0 International License&lt;/a&gt;.
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
