@@ -1,6 +1,6 @@
 ---
 title: 'Statistical Thinking using Randomisation and Simulation'
-subtitle: "Introduction and motivation"
+subtitle: "Hypothesis testing"
 author: Di Cook (dicook@monash.edu, @visnut)
 date: "W2.C2"
 output:
@@ -48,14 +48,17 @@ Example from DBCR:
 *The participants in this study were 48 male bank supervisors attending a management institute at the University of North Carolina in 1972. They were asked to assume the role of the personnel director of a bank and were given a personnel file to judge whether the person should be promoted to a branch manager position. The files given to the participants were identical, except that half of them indicated the candidate was male and the other half indicated the candidate was female. These files were randomly assigned to the subjects.*
 
 ---
-class: inverse 
-# Your turn
+# Experiments vs observtional study
 
 - Researchers perform an observational study when they collect data in a way that does not directly interfere with how the data arise.
 --
 
 - When researchers want to investigate the possibility of a causal connection, they conduct an experiment. Researchers will collect a sample of individuals and split them into groups. The individuals in each group are assigned a treatment. When individuals are randomly assigned to a group, the experiment is called a randomized experiment.
 --
+
+---
+class: inverse 
+# Your turn
 
 - __Is the bank data from an observational study or an experiment?__
 --
@@ -225,9 +228,9 @@ Sample statistics are used to compute the test statistic with the sample
 #  Significance level and decision errors
 
 - $\alpha$: Probability of Type I Error
-- The defendant is innocent ($H_0$ true) but wrongly convicted
+- The defendant is innocent ($ H_0 $ true) but wrongly convicted
 - $\beta$: Probability of Type II Error
-- The court failed to reject $H_0$ (i.e. failed to convict the person) when he was in fact guilty (Ha true).
+- The court failed to reject $H_0$ (i.e. failed to convict the person) when he was in fact guilty ($ H_a$ true).
 - $1 − \beta$: Power of the test
 
 The signifcance level selected for a test should reflect the real-world consequences associated with making a Type 1 or Type 2 Error.
@@ -235,13 +238,18 @@ The signifcance level selected for a test should reflect the real-world conseque
 ---
 #  Test statistic
 
-- A test statistic is a numerical summary of the data that measures compatibility between the null hypothesis and the data.
-- The null distribution is the probability distribution of the test statistic when the null hypothesis is true
+- A test statistic is a numerical summary of the data.
+- The sampling distribution of the test statistic is the probability distribution of the test statistic when the null hypothesis is true.
+- E.g. the t-test for $H_0: \mu = \mu_0$ has a test statistic of
+
+$$t = \frac{\bar{X}-\mu_0}{s/\sqrt{n}}$$
+
+and it follows a t-distribution with d.f. $n-1$.
 
 ---
 #  The p-value
 
-The $p$-value is the probability of observing data at least as favorable to the alternative hypothesis as our current data set, if the null hypothesis were true. We typically use a test statistic (a summary statistic of the data) to compute the p-value.
+The $p$-value is the probability of observing the test statistic value or one more extreme, if the null hypothesis were true. 
 
 ---
 #  The p-value and decision
