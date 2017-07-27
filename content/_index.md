@@ -31,7 +31,7 @@ title: Home
 
 
 - Week 1: Introduction and motivation[ Slides 1](lectures/week1.class1.html) ([Rmd](lectures/week1.class1.Rmd)); [Slides 2](lectures/week1.class2.html) ([Rmd](lectures/week1.class2.Rmd)); __Reading:__ [Yihui's fun package](https://yihui.name/en/2011/08/the-fun-package-use-r-for-fun/), Textbook: Chapter 1. 1.1-1.5
-- Week 2: Games [Slides 1](lectures/week2.class1.html) ([Rmd](lectures/week2.class1.Rmd)); [Slides 2](lectures/week2.class2.html) ([Rmd](lectures/week2.class2.Rmd)); Videos: [1](https://vimeo.com/227187709), [2](https://vimeo.com/227190457), [3]()
+- Week 2: Games [Slides 1](lectures/week2.class1.html) ([Rmd](lectures/week2.class1.Rmd)); [Slides 2](lectures/week2.class2.html) ([Rmd](lectures/week2.class2.Rmd)); Videos: [1](https://vimeo.com/227187709), [2](https://vimeo.com/227190457), [3](https://vimeo.com/227192379)
 - Week 3: Hypothesis testing
 - Week 4: Distribution theory
 - Week 5: Linear models
