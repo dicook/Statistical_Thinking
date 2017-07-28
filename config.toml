@@ -22,7 +22,7 @@ footnotereturnlinkcontents = "↩"
     weight = 2
 [[menu.main]]
     name = "Moodle (lecture videos)"
-    url = "http://moodle.vle.monash.edu/course/view.php?id=38489"
+    url = "http://moodle.vle.monash.edu/course/view.php?id=38490"
     weight = 3
 [[menu.main]]
     name = "ED (assignments & quizzes)"
