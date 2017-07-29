@@ -3,7 +3,7 @@
   <head>
     <title>Introduction to R</title>
     <meta charset="utf-8">
-    <meta name="author" content="Nathaniel Tomasetti" />
+    <meta name="author" content="Earo Wang   earo.wang@gmail.com" />
     <link href="libs/remark-css-0.0.1/example.css" rel="stylesheet" />
   </head>
   <body>
@@ -11,10 +11,16 @@
 class: center, middle, inverse, title-slide
 
 # Introduction to R
-### Nathaniel Tomasetti
+### Earo Wang <br> <a href="mailto:earo.wang@gmail.com">earo.wang@gmail.com</a>
 
 ---
 
+
+class: middle
+# Consulation
+Thursday 9:30 to 10:30 at W1105
+
+---
 
 # What is R?
 
@@ -189,18 +195,18 @@ summary(linReg)
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
-## -0.41861 -0.06469 -0.00083  0.06504  0.33159 
+## -0.35405 -0.06416 -0.00191  0.06639  0.28754 
 ## 
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) 1.994652   0.003183   626.6   &lt;2e-16 ***
-## x           2.998890   0.003168   946.6   &lt;2e-16 ***
+## (Intercept) 2.002005   0.003126   640.5   &lt;2e-16 ***
+## x           3.002633   0.003196   939.5   &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 0.1006 on 998 degrees of freedom
+## Residual standard error: 0.09884 on 998 degrees of freedom
 ## Multiple R-squared:  0.9989,	Adjusted R-squared:  0.9989 
-## F-statistic: 8.961e+05 on 1 and 998 DF,  p-value: &lt; 2.2e-16
+## F-statistic: 8.826e+05 on 1 and 998 DF,  p-value: &lt; 2.2e-16
 ```
 
 ---
@@ -264,10 +270,39 @@ head(economics)
 tail(economics)
 summary(economics)
 str(economics)
-hist(economics$pce)
-plot(economics$date, economics$pop)
+```
+---
+
+class:middle, inverse, center
+# Basic plotting with **ggplot2**
+
+---
+
+## Histogram
+
+
+```r
+# histogram
+ggplot(data = economics) +
+  geom_histogram(aes(pce))
 ```
 
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+![](index_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+---
+
+## Scatterplot
+
+
+```r
+ggplot(data= economics) +
+  geom_point(aes(x = psavert, y = pce))
+```
+
+![](index_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
 ---
 
 If you're ever stuck on how to use a function, you can get help with ?

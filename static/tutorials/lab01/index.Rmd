@@ -1,6 +1,6 @@
 ---
 title: "Introduction to R"
-author: "Nathaniel Tomasetti"
+author: "Earo Wang <br> <earo.wang@gmail.com>"
 output:
   xaringan::moon_reader:
     lib_dir: libs
@@ -8,6 +8,11 @@ output:
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
+---
+
+class: middle
+# Consulation
+Thursday 9:30 to 10:30 at W1105
 
 ---
 
@@ -173,10 +178,29 @@ head(economics)
 tail(economics)
 summary(economics)
 str(economics)
-hist(economics$pce)
-plot(economics$date, economics$pop)
 ```
+---
 
+class:middle, inverse, center
+# Basic plotting with **ggplot2**
+
+---
+
+## Histogram
+
+```{r, fig.height = 4}
+# histogram
+ggplot(data = economics) +
+  geom_histogram(aes(pce))
+```
+---
+
+## Scatterplot
+
+```{r, fig.height = 5, fig.width = 5, fig.asp = 1}
+ggplot(data= economics) +
+  geom_point(aes(x = psavert, y = pce))
+```
 ---
 
 If you're ever stuck on how to use a function, you can get help with ?
