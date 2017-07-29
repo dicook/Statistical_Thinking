@@ -46,7 +46,7 @@ title: Home
 ## Tutorials
 
 - Week 1: [Setting up your computing environment](labs/lab1.pdf) [(Rmd)](labs/lab1.Rmd); [Tutorial slides](tutorials/lab01/index.html) [(Rmd)](tutorials/lab01/index.Rmd)
-- Week 2: [Making a Monty Hall game](labs/lab2.pdf) [(Rmd)](labs/lab2.Rmd);
+- Week 2: [Making a Monty Hall game](labs/lab2.pdf) [(Rmd)](labs/lab2.Rmd); [Tutorial slides](tutorials/lab02/index.html) [(Rmd)](tutorials/lab02/index.Rmd)
 
 ## Computing information
 
