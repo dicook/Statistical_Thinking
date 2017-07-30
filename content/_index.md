@@ -22,7 +22,7 @@ title: Home
 - Consultation times:
   - Dilini M 2-3 (W1105)
   - Thiyanga Tu 9-10 (W1105)
-  - Earo Th 9:30-10:30 (W1105)
+  - Earo Th 9:30-10:30 (W1106)
   - Nat M 10-11 (W1105)
   - Stuart Th 3-4:30 (W1105)
   - Di W 2-4 (E762A)
