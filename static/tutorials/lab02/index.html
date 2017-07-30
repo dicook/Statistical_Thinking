@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>R programming basics</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Stuart Lee" />
+    <link href="index_files/remark-css/example.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# R programming basics
+### Stuart Lee
+
+---
+
+
+
+
+
+## Goat, Goat, Car
+
+In this lab we are going to create a simulation of the Monty Hall game.
+In order to complete our task we'll need to learn some more programming techinques!
+
+&lt;img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Monty_open_door.svg/1280px-Monty_open_door.svg.png" width="500px" style="display: block; margin: auto;" /&gt;
+
+If you've never heard of this game you can play it here:
+http://www.shodor.org/interactivate/activities/SimpleMontyHall/
+
+
+Image credit: [[Wikimedia Commons](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Monty_open_door.svg/1280px-Monty_open_door.svg.png)]
+
+---
+class: center, middle
+
+# Activity Time!
+
+Let's go through execerise 1 of the tutorial. Remember to record your 
+answers in your "mylab2.Rmd" file!
+
+---
+
+## Everything in R is an object
+
+Let's go through some R programming basics.
+
+&gt; “To understand computations in R, two slogans are helpful:
+&gt;
+  * Everything that exists is an object.
+  * Everything that happens is a function call."
+  
+&gt; John Chambers
+
+Remember that objects are assigned a value using the "&lt;-" operator
+
+```r
+x &lt;- 10 * 2
+# here the object x has value 20
+x
+```
+
+```
+## [1] 20
+```
+
+```r
+# 100 samples from a uniform distribution stored in object `mydata`
+mydata &lt;- runif(100)
+head(mydata)
+```
+
+```
+## [1] 0.1665197 0.4603836 0.6230080 0.1828311 0.1984167 0.3047562
+```
+
+---
+
+## What are functions?
+
+Remember that functions take an input(s) and return an output.
+
+*Example*: a simple function - what do you think it does?
+
+```r
+f &lt;- function(x)  x + 1 
+# what is the value of f(10)?
+```
+
+*Example*: a function can have multiple inputs (called arguments)
+
+
+```r
+hello &lt;- function(name, age) {
+  paste("Hello my name is",  name,  "and I am", age, "years old.")
+}
+
+hello("Harry Potter, boy wizard,", 11)
+```
+
+```
+## [1] "Hello my name is Harry Potter, boy wizard, and I am 11 years old."
+```
+
+*Example*: or no inputs at all!
+
+```r
+random_number &lt;- function() runif(1)
+random_number()
+```
+
+```
+## [1] 0.6538379
+```
+
+---
+# Why do we write functions?
+
+- We use functions because they allow us to reduce the amount of repetition in our 
+code (and hopefully reduce the chance of errors!).
+
+- If you find yourself writing the same bit of code over and over with only
+minor modifications, it's probably time to write a function!
+
+---
+# What do functions consist of?
+
+Functions in R consist of the following:
+
+- arguments: these are the names of the inputs to the function
+- body: the code inside the function (this is what does the work)
+
+*Example*: what are the arguments of the functions on the previous slide?
+
+---
+# Calling functions
+
+- To call a function (perform a computation) 
+simply type it's name and enclose it's arguments in brackets. 
+
+- Arguments in a function are first matched by their name then their
+position in the function definition.
+---
+
+# Examples
+
+```r
+mydata &lt;- c(10, 11, 1, 5)
+mean(mydata) 
+```
+
+```
+## [1] 6.75
+```
+
+```r
+rnorm(5, mean = 5) # is the same as rnorm(n = 5, mean = 5)
+```
+
+```
+## [1] 5.334759 4.076358 5.712347 3.059758 4.687227
+```
+
+```r
+sample(mydata, 1) # is the same as sample(x = mydata, size = 1)
+```
+
+```
+## [1] 11
+```
+
+---
+
+# Writing functions
+
+We have already seen a few examples of functions but how can write our own?
+Functions are defined as follows 
+
+```r
+function_name &lt;- function(args) {
+  do_stuff 
+}
+```
+This has several components:
+
+- the function name (here creatively titled `function_name`)
+- a call to `function` (this lets R know we are writing a function)
+- the arguments of the function
+- a left brace `{`, to enclose the code contained in the function
+- the code inside the function that does all the heavy lifting
+- a right brace `}` to let R know we have finished defining our function.
+
+---
+# Naming objects and functions
+
+- Naming things is hard! 
+
+- Remember names in R are case sensitive and cannot
+start with a number or a special character (such as '*' or '_').
+
+- Try to be consistent in your naming.
+
+---
+class: center, middle
+# Activity time!
+
+Exercise from [R4DS](http://r4ds.had.co.nz/functions.html)
+
+&gt; Practice turning the following code snippets into functions. Think about what each function does. What would you call it? How many arguments does it need? Can you rewrite it to be more expressive or less duplicative?
+
+
+```r
+x / sum(x, na.rm = TRUE)
+
+sd(x, na.rm = TRUE) / mean(x, na.rm = TRUE)
+```
+
+---
+
+# Control statements - if
+
+An `if` statement let's you control when a bit of your code is 
+executed based on a logical condition.
+
+
+```r
+if (condition) {
+  # code that is run when condition is TRUE
+} else {
+  # code that is run when condition is FALSE
+}
+```
+
+Note that the condition must evaluate to either TRUE or FALSE.
+
+---
+
+# Control statements - multiple condtions 
+
+You can put multiple conditions together using `else if`
+
+
+```r
+if (condition) {
+  # stuff that happens when condtion is TRUE
+} else if (something_else) {
+  # stuff that happens when something_else is TRUE
+} else {
+  # some other stuff
+}
+```
+
+---
+
+# Example - weather
+
+
+```r
+melb_temp &lt;- function(temp) {
+  if (temp &lt; 11) {
+    "cold"
+  } else if (temp &gt;= 15 &amp; temp &lt; 25) {
+    "okay"
+  } else {
+    "hot"
+  }
+}
+```
+
+What does the function `melb_temp` do?
+---
+
+## Vectors 
+
+- Vectors in R are either **atomic** or **lists**. 
+- Atomic vectors contain elements that are all the same type while lists can contain anything. 
+
+For example here are some atomic vectors,
+
+```r
+c("A", "B", "C") # character
+```
+
+```
+## [1] "A" "B" "C"
+```
+
+```r
+runif(3) # a numeric (double) vector
+```
+
+```
+## [1] 0.3375680 0.2416459 0.1016979
+```
+
+```r
+c(1L, 2L, 3L) # a numeric (integer vector)
+```
+
+```
+## [1] 1 2 3
+```
+
+```r
+c(TRUE, TRUE, FALSE) # a logical vector
+```
+
+```
+## [1]  TRUE  TRUE FALSE
+```
+---
+
+# Vectors have a length and type
+
+The number of elements in a vector can be found using `length`
+
+```r
+length(c(1,2,3))
+```
+
+```
+## [1] 3
+```
+The type of a vector can be found using `typeof` 
+
+```r
+typeof(c(1,2,3))
+```
+
+```
+## [1] "double"
+```
+
+```r
+# the is. family can be used to test the type of a vector
+is.numeric(c(1,2,3))
+```
+
+```
+## [1] TRUE
+```
+
+---
+
+# Creating vectors
+We can combine objects into a vector using `c`
+
+```r
+x &lt;- 1
+y &lt;-"A"
+c(x,y)
+```
+
+```
+## [1] "1" "A"
+```
+
+We can create a sequence of numbers from a to b using `a:b`
+
+```r
+1:10
+```
+
+```
+##  [1]  1  2  3  4  5  6  7  8  9 10
+```
+
+```r
+# alternatively
+seq_len(10)
+```
+
+```
+##  [1]  1  2  3  4  5  6  7  8  9 10
+```
+
+---
+# Subsetting vectors 
+
+We can subset vectors using `[` and a position. We can also replace the 
+elements of a vector using `&lt;-`.
+
+```r
+x &lt;- 1:10
+x[1]
+```
+
+```
+## [1] 1
+```
+
+```r
+x[1] &lt;- 3
+x[[1]] # alternative syntax for getting first element
+```
+
+```
+## [1] 3
+```
+
+```r
+x[[1]] &lt;- 1
+```
+
+---
+# Subsetting vectors
+
+We can also subset using another vector of positions!
+
+```r
+x[c(1,2,4)] # we can subset using another vector
+```
+
+```
+## [1] 1 2 4
+```
+
+```r
+x[-1] # all but the first element
+```
+
+```
+## [1]  2  3  4  5  6  7  8  9 10
+```
+
+```r
+x[length(x)] # the last element
+```
+
+```
+## [1] 10
+```
+
+---
+# Subsetting vectors
+
+We can also subset using a logical statement.
+
+
+```r
+x &lt;- c(10, 3, NA, 5, 8, 1, NA)
+x &gt; 5 
+```
+
+```
+## [1]  TRUE FALSE    NA FALSE  TRUE FALSE    NA
+```
+
+```r
+is.na(x)
+```
+
+```
+## [1] FALSE FALSE  TRUE FALSE FALSE FALSE  TRUE
+```
+
+```r
+x[x&gt;5]
+```
+
+```
+## [1] 10 NA  8 NA
+```
+
+```r
+x[!is.na(x)]
+```
+
+```
+## [1] 10  3  5  8  1
+```
+
+---
+class: middle
+# Activity time!
+
+Using the `x` defined below, write code to do the following:
+- create a new vector `y` from `x` with missing values removed
+- subset `x` to only have elements greater than 10 and with no missing values
+- replace the missing values in `x` to have value -1
+
+```r
+x &lt;- c(10, 3, NA, 5, 8, 1, NA, 14, 15, NA)
+```
+
+---
+
+# Iteration 
+
+- As with functions, iteration can help us reduce the amount of repetition in
+our code.
+
+- Iteration can be used to perform the same operation over and over which
+is necessary when performing simulations
+
+
+---
+
+# for loops
+
+A `for` loop can be used to iterate over the elements of a vector and
+perform some computation. There are three components to creating a for loop:
+- an object of suffucient size to store the output of the loop. 
+- a sequence to iterate over
+- a body that contains 
+
+Example: sampling from normal distribution with different means
+
+```r
+mu &lt;- c(10, 20, 50, 100, 1000)
+# output where we will store our results, here we create
+# an empty numeric vector of length of mu vector
+output &lt;- numeric(length(mu))
+for (i in seq_along(mu) ) { # sequence to iterate over, here the columns
+  # body of the loop, what are we doing?
+  output[[i]] &lt;- rnorm(1, mean = mu[[i]])
+}
+output
+```
+
+```
+## [1]   8.488695  18.100499  51.054867 100.049552 999.860320
+```
+---
+
+# Comments on the for loop pattern
+
+* output: we create an empty vector that has the same type as the
+  result of our computation in the body, in the above example a "numeric" vector.
+* sequence: `i in seq_along(means)`, this is what we we're looping over.
+Each run of the loop will create an object `i` and assign it to a different value in `seq_along(means)`
+* body: here we assigning the `i` th element of output to have a random sample
+from normal distribution with mean equal to the `i`th element of the `mu` vector. 
+
+---
+
+# Learning more
+
+A lot of the material I've used here is inspired by the book 
+R for data science by Garett Grolemund and Hadley Wickham 
+
+You can read the book for free online at:
+http://r4ds.had.co.nz/
+
+---
+class: center, middle
+# Activity time!
+
+You know have all the necessary material to complete the exercises in
+lab 2. Happy coding!
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
