@@ -1,5 +1,5 @@
 ---
-title: "ETC 2420/5242 Lab 3 2016"
+title: "ETC 2420/5242 Lab 2 2017"
 author: "Di Cook"
 date: "SOLUTION"
 output: pdf_document
