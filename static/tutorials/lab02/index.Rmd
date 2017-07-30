@@ -18,7 +18,7 @@ options(htmltools.dir.version = FALSE)
 ## Goat, Goat, Car
 
 In this lab we are going to create a simulation of the Monty Hall game.
-In order to complete our task we'll need to learn some more programming techinques!
+In order to complete our task we'll need to learn some more programming techniques!
 
 ```{r, out.width = "500px", echo=FALSE, fig.align='center'}
 knitr::include_graphics("https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Monty_open_door.svg/1280px-Monty_open_door.svg.png")
@@ -35,7 +35,7 @@ class: center, middle
 
 # Activity Time!
 
-Let's go through execerise 1 of the tutorial. Remember to record your 
+Let's go through exerciser 1 of the tutorial. Remember to record your 
 answers in your "mylab2.Rmd" file!
 
 ---
@@ -51,7 +51,7 @@ Let's go through some R programming basics.
   
 > John Chambers
 
-Remember that objects are assigned a value using the "<-" operator
+Remember that objects are assigned a value using the "<-" operator.
 ```{r objects}
 x <- 10 * 2
 # here the object x has value 20
@@ -105,8 +105,8 @@ minor modifications, it's probably time to write a function!
 
 Functions in R consist of the following:
 
-- arguments: these are the names of the inputs to the function
-- body: the code inside the function (this is what does the work)
+- arguments: these are the names of the inputs to the function,
+- body: the code inside the function (this is what does the work).
 
 *Example*: what are the arguments of the functions on the previous slide?
 
@@ -325,7 +325,7 @@ x <- c(10, 3, NA, 5, 8, 1, NA, 14, 15, NA)
 our code.
 
 - Iteration can be used to perform the same operation over and over which
-is necessary when performing simulations
+is necessary when performing simulations.
 
 
 ---
@@ -334,9 +334,9 @@ is necessary when performing simulations
 
 A `for` loop can be used to iterate over the elements of a vector and
 perform some computation. There are three components to creating a for loop:
-- an object of suffucient size to store the output of the loop. 
-- a sequence to iterate over
-- a body that contains 
+- an object of sufficient size to store the output of the loop. 
+- a sequence to iterate over.
+- a body that contains the computation.
 
 Example: sampling from normal distribution with different means
 ```{r}
@@ -357,7 +357,7 @@ output
 * output: we create an empty vector that has the same type as the
   result of our computation in the body, in the above example a "numeric" vector.
 * sequence: `i in seq_along(means)`, this is what we we're looping over.
-Each run of the loop will create an object `i` and assign it to a different value in `seq_along(means)`
+Each run of the loop will create an object `i` and assign it to a different value in `seq_along(means)`.
 * body: here we assigning the `i` th element of output to have a random sample
 from normal distribution with mean equal to the `i`th element of the `mu` vector. 
 
