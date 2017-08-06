@@ -226,7 +226,6 @@ functions in a sequence of operations.
 
 ```{r }
 summarise(group_by(gapminder, continent), max = max(lifeExp))
-
 ```
 
 ---
@@ -325,7 +324,6 @@ yawn_expt <- tibble(group = c(rep("control", 16),
                         yawn = c(rep("no", 12), rep("yes", 4),
                                  rep("no", 24), rep("yes", 10)))
 
-
 ```
 
 
@@ -345,8 +343,6 @@ glimpse(yawn_expt)
 ```{r}
 #Print out the last few rows
 tail(yawn_expt)
-
-
 ```
 ]
 
@@ -395,13 +391,13 @@ prop_dif <- function(data){
 
 Compare the resulted outputs of the following commands:
 ```{r}
-set.seed(1)
+set.seed(100)
 rnorm(5)
 
 
 rnorm(5) 
 
-set.seed(1)
+set.seed(100)
 rnorm(5)
 ```
 ---
