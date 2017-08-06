@@ -272,7 +272,7 @@ b
 
 
 ```r
-library(tibble)
+library(dplyr)
 data(economics, package = "ggplot2")
 glimpse(economics)
 ```
@@ -305,14 +305,234 @@ glimpse(gapminder)
 ## $ gdpPercap &lt;dbl&gt; 779.4453, 820.8530, 853.1007, 836.1971, 739.9811, 78...
 ```
 ---
-## Creating a data frame in R
 
-- A data frame can be created using *data.frame()*, which takes named vectors as input.
+
+class: inverse, center, middle
+
+# Managing data frames with the &lt;br/&gt; dplyr package 
+
+&lt;img src="https://d21ii91i3y6o6h.cloudfront.net/gallery_images/from_proof/9295/large/1447175226/rstudio-hex-dplyr-dot-psd.png" width="200px" style="display: block; margin: auto;" /&gt;
+
+
+---
+### Managing data frames with the dplyr package 
+
+- [Learn more on 'Managing data frames with the dplyr package' - read 'R Programming for Data Science' by Roger D.  Peng](https://bookdown.org/rdpeng/rprogdatascience/managing-data-frames-with-the-dplyr-package.html)
+
+- Some of the key "verbs" provided by the dplyr package are
+
+    + **select()**: return a subset of the columns of a data frame
+    
+    + **filter()**: extract a subset of rows from a data frame 
+    
+    + **arrange()**: reorder rows of a data frame
+    
+    + **rename()**: rename variables in a data frame
+    
+    + **mutate()**: add new variables/columns or transform existing variables
+    
+    + **group_by**:  takes an existing tbl and converts it into a grouped tbl
+    
+    + **summarise()**: generate summary statistics of different variables in the data frame, possibly within groups
+    
+
+
+
+---
+class: inverse, center, middle
+
+# %&gt;% operator 
+
+&lt;img src="https://d21ii91i3y6o6h.cloudfront.net/gallery_images/from_proof/9302/large/1447173978/rstudio-hex-pipe-dot-psd.png" width="200px" style="display: block; margin: auto;" /&gt;
+
+#### *"Ceci n'est pas une pipe" - (This is not a pipe)*
+---
+## %&gt;% operator
+
+- **%&gt;%**: the "pipe" operator is used to connect multiple
+functions in a sequence of operations.
+
+#### Format: *second_fun( first_fun(x) )*
+- Difficult to read a sequence of operations
+
+
+```r
+summarise(group_by(gapminder, continent), max = max(lifeExp))
+```
+
+```
+## # A tibble: 5 x 2
+##   continent    max
+##      &lt;fctr&gt;  &lt;dbl&gt;
+## 1    Africa 76.442
+## 2  Americas 80.653
+## 3      Asia 82.603
+## 4    Europe 81.757
+## 5   Oceania 81.235
+```
+
+---
+- %&gt;% operator makes code more readable
+
+- Reads more naturally in a left-to-right fashion.
+
+####Format: *x %&gt;% first_fun() %&gt;% second_fun*
+
+
+```r
+gapminder %&gt;%
+  group_by(continent) %&gt;%
+  summarise(max = max(lifeExp))
+```
+
+```
+## # A tibble: 5 x 2
+##   continent    max
+##      &lt;fctr&gt;  &lt;dbl&gt;
+## 1    Africa 76.442
+## 2  Americas 80.653
+## 3      Asia 82.603
+## 4    Europe 81.757
+## 5   Oceania 81.235
+```
+- Once you travel down the pipeline with %&gt;%, the first argument is taken to be the output of the previous function in the pipeline.
+---
+
+class: inverse, center, middle
+
+# Creating data frames with the &lt;br/&gt; tibble package
+
+&lt;img src="http://hexb.in/hexagons/tibble.png" width="200px" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+## Creating a data frame with the tibble package
+
+- Learn more on tibbles read 
+
+    + ['R for Data Science' by Garrett Grolemund and Hadley Wickham](http://r4ds.had.co.nz/tibbles.html)
+
+    + [Rstudio blog](https://blog.rstudio.com/2016/08/29/tibble-1-2-0/)
+
+
+```r
+     vignette("tibble")
+```
+
+- A data frame can be created using tibble().
+
+
+```r
+library(tibble)
+df &lt;- tibble(x = 1:3, y = 3:1)
+
+df
+```
+
+```
+## # A tibble: 3 x 2
+##       x     y
+##   &lt;int&gt; &lt;int&gt;
+## 1     1     3
+## 2     2     2
+## 3     3     1
+```
+---
 
 
 
 ```r
-yawn_expt &lt;- data_frame(group = c(rep("control", 16), 
+#The add_row()/ add_column() functions allows 
+#control over where the new rows/columns are added
+
+df %&gt;% 
+  add_row(x = 4, y = 0, .before = 2)
+```
+
+```
+## # A tibble: 4 x 2
+##       x     y
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1     1     3
+## 2     4     0
+## 3     2     2
+## 4     3     1
+```
+
+```r
+df %&gt;%
+  add_column(z = -1:1, .after = "x")
+```
+
+```
+## # A tibble: 3 x 3
+##       x     z     y
+##   &lt;int&gt; &lt;int&gt; &lt;int&gt;
+## 1     1    -1     3
+## 2     2     0     2
+## 3     3     1     1
+```
+
+
+---
+### Subsetting
+
+.pull-left[
+
+```r
+# Extract by name
+df$x
+```
+
+```
+## [1] 1 2 3
+```
+
+```r
+df[["x"]]
+```
+
+```
+## [1] 1 2 3
+```
+
+```r
+# Extract by position
+df[[1]]
+```
+
+```
+## [1] 1 2 3
+```
+]
+.pull-right[
+
+```r
+# To use in a pipe, use 
+# the special placeholder .:
+
+df %&gt;% .$x
+```
+
+```
+## [1] 1 2 3
+```
+
+```r
+df %&gt;% .[["x"]]
+```
+
+```
+## [1] 1 2 3
+```
+
+
+]
+---
+
+```r
+yawn_expt &lt;- tibble(group = c(rep("control", 16), 
                                   rep("treatment", 34)),
                         yawn = c(rep("no", 12), rep("yes", 4),
                                  rep("no", 24), rep("yes", 10)))
@@ -375,67 +595,6 @@ tail(yawn_expt)
 
 ---
 
-class: inverse, center, middle
-
-# Managing data frames with the &lt;br/&gt; dplyr package 
-
-&lt;img src="https://d21ii91i3y6o6h.cloudfront.net/gallery_images/from_proof/9295/large/1447175226/rstudio-hex-dplyr-dot-psd.png" width="200px" style="display: block; margin: auto;" /&gt;
-
-
----
-### Managing data frames with the dplyr package 
-
-- [Learn more on 'Managing data frames with the dplyr package' - read 'R Programming for Data Science' by Roger D.  Peng](https://bookdown.org/rdpeng/rprogdatascience/managing-data-frames-with-the-dplyr-package.html)
-
-- Some of the key "verbs" provided by the dplyr package are
-
-    + **select()**: return a subset of the columns of a data frame
-    
-    + **filter()**: extract a subset of rows from a data frame 
-    
-    + **arrange()**: reorder rows of a data frame
-    
-    + **rename()**: rename variables in a data frame
-    
-    + **mutate()**: add new variables/columns or transform existing variables
-    
-    + **group_by**:  takes an existing tbl and converts it into a grouped tbl
-    
-    + **summarise()**: generate summary statistics of different variables in the data frame, possibly within groups
-    
-
-
-
----
-class: inverse, center, middle
-
-# %&gt;% operator 
-
-&lt;img src="https://d21ii91i3y6o6h.cloudfront.net/gallery_images/from_proof/9302/large/1447173978/rstudio-hex-pipe-dot-psd.png" width="200px" style="display: block; margin: auto;" /&gt;
-
-#### *"Ceci n'est pas une pipe" - (This is not a pipe)*
----
-## %&gt;% operator
-
-- **%&gt;%**: the "pipe" operator is used to connect multiple dplyr functions in a sequence of operations.
-
-
-
-
-```r
- third(second(first(x))) #Difficult to read a sequence of operations
-```
-
-- %&gt;% operator makes code more readable
-
-
-
-```r
- first(x) %&gt;% second %&gt;% third
-```
-- Once you travel down the pipeline with %&gt;%, the first argument is taken to be the output of the previous function in the pipeline.
----
-
 ## Creating a contingency table from a data frame
 
 
@@ -449,16 +608,15 @@ yawn_expt %&gt;%
    tally() %&gt;%
    ungroup() %&gt;%
    spread(yawn, n) %&gt;% 
-   mutate(total = rowSums(.[-1])) %&gt;%
-   mutate(p = yes/total)
+   mutate(total = rowSums(.[-1])) 
 ```
 
 ```
-## # A tibble: 2 x 5
-##       group    no   yes total         p
-##       &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1   control    12     4    16 0.2500000
-## 2 treatment    24    10    34 0.2941176
+## # A tibble: 2 x 4
+##       group    no   yes total
+##       &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
+## 1   control    12     4    16
+## 2 treatment    24    10    34
 ```
 --
 ####Your turn
@@ -473,6 +631,7 @@ prop_dif &lt;- function(data){
   
   dtbl &lt;- data %&gt;%
     mutate(yawn = sample(yawn)) #Permutate yawn variable
+  
     # Yurn turn to compute the difference
     # between proportions of treaments and crontrol groups
 
@@ -542,11 +701,11 @@ library(ggplot2)
 # 'economics' is the name of the data frame and
 # it has a variable called 'pce'.
 ggplot(data = economics, aes(x = pce)) +
-  geom_histogram(binwidth = 500,  col="blue", fill="lightblue")+
+  geom_histogram(binwidth = 500,  colour = "blue", fill ="lightblue")+
   geom_vline(xintercept = 10000 , colour = "red")
 ```
 
-![](index_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
+![](index_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
 - *binwidth is the width of the histogram bins* 
 
 ---
@@ -568,9 +727,11 @@ pdif &lt;- data.frame(pdif)
 class: inverse, center, middle
 Most of the material I've used here are based on 
 
-- ['Advanced R' by Hadley Wickham](http://adv-r.had.co.nz/)
+['Advanced R' by Hadley Wickham](http://adv-r.had.co.nz/)
 
-- ['R Programming for Data Science' by Roger D.  Peng](https://bookdown.org/rdpeng/rprogdatascience/)
+['R Programming for Data Science' by Roger D.  Peng](https://bookdown.org/rdpeng/rprogdatascience/)
+
+['R for Data Science' by Garrett Grolemund and Hadley Wickham](http://r4ds.had.co.nz/)
 
 # Happy learning with R :)
     </textarea>

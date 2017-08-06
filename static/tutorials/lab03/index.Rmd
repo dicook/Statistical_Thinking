@@ -159,8 +159,8 @@ b
 
 - Few data frames that we are already familiar with: *economics*, *gapminder*
 
-```{r}
-library(tibble)
+```{r warning= FALSE, message=FALSE}
+library(dplyr)
 data(economics, package = "ggplot2")
 glimpse(economics)
 ```
@@ -170,43 +170,7 @@ data(gapminder, package = "gapminder")
 glimpse(gapminder)
 ```
 ---
-## Creating a data frame in R
 
-- A data frame can be created using *data.frame()*, which takes named vectors as input.
-
-
-```{r}
-yawn_expt <- data_frame(group = c(rep("control", 16), 
-                                  rep("treatment", 34)),
-                        yawn = c(rep("no", 12), rep("yes", 4),
-                                 rep("no", 24), rep("yes", 10)))
-
-
-```
-
-
----
-Let's take a look at the data frame we created
-
-.pull-left[
-```{r}
-#Print out the first few rows
-head(yawn_expt)
-
-#Get a glimpse of your data.
-glimpse(yawn_expt)
-```
-]
-.pull-right[
-```{r}
-#Print out the last few rows
-tail(yawn_expt)
-
-
-```
-]
-
----
 
 class: inverse, center, middle
 
@@ -254,21 +218,138 @@ knitr::include_graphics("https://d21ii91i3y6o6h.cloudfront.net/gallery_images/fr
 ---
 ## %>% operator
 
-- **%>%**: the "pipe" operator is used to connect multiple dplyr functions in a sequence of operations.
+- **%>%**: the "pipe" operator is used to connect multiple
+functions in a sequence of operations.
 
+#### Format: *second_fun( first_fun(x) )*
+- Difficult to read a sequence of operations
 
+```{r }
+summarise(group_by(gapminder, continent), max = max(lifeExp))
 
-```{r eval = FALSE}
- third(second(first(x))) #Difficult to read a sequence of operations
 ```
 
+---
 - %>% operator makes code more readable
 
+- Reads more naturally in a left-to-right fashion.
 
-```{r eval = FALSE}
- first(x) %>% second %>% third
+####Format: *x %>% first_fun() %>% second_fun*
+
+```{r }
+gapminder %>%
+  group_by(continent) %>%
+  summarise(max = max(lifeExp))
 ```
 - Once you travel down the pipeline with %>%, the first argument is taken to be the output of the previous function in the pipeline.
+---
+
+class: inverse, center, middle
+
+# Creating data frames with the <br/> tibble package
+
+```{r, out.width = "200px", echo=FALSE, fig.align='center'}
+knitr::include_graphics("http://hexb.in/hexagons/tibble.png")
+```
+
+
+
+---
+## Creating a data frame with the tibble package
+
+- Learn more on tibbles read 
+
+    + ['R for Data Science' by Garrett Grolemund and Hadley Wickham](http://r4ds.had.co.nz/tibbles.html)
+
+    + [Rstudio blog](https://blog.rstudio.com/2016/08/29/tibble-1-2-0/)
+
+```{r eval= FALSE}
+     vignette("tibble")
+```
+
+- A data frame can be created using tibble().
+
+```{r}
+library(tibble)
+df <- tibble(x = 1:3, y = 3:1)
+
+df
+```
+---
+
+
+```{r}
+#The add_row()/ add_column() functions allows 
+#control over where the new rows/columns are added
+
+df %>% 
+  add_row(x = 4, y = 0, .before = 2)
+
+
+df %>%
+  add_column(z = -1:1, .after = "x")
+```
+
+
+---
+### Subsetting
+
+.pull-left[
+```{r}
+# Extract by name
+df$x
+
+df[["x"]]
+
+# Extract by position
+df[[1]]
+```
+]
+.pull-right[
+```{r}
+# To use in a pipe, use 
+# the special placeholder .:
+
+df %>% .$x
+
+df %>% .[["x"]]
+
+```
+
+
+]
+---
+```{r}
+yawn_expt <- tibble(group = c(rep("control", 16), 
+                                  rep("treatment", 34)),
+                        yawn = c(rep("no", 12), rep("yes", 4),
+                                 rep("no", 24), rep("yes", 10)))
+
+
+```
+
+
+---
+Let's take a look at the data frame we created
+
+.pull-left[
+```{r}
+#Print out the first few rows
+head(yawn_expt)
+
+#Get a glimpse of your data.
+glimpse(yawn_expt)
+```
+]
+.pull-right[
+```{r}
+#Print out the last few rows
+tail(yawn_expt)
+
+
+```
+]
+
 ---
 
 ## Creating a contingency table from a data frame
@@ -284,8 +365,7 @@ yawn_expt %>%
    tally() %>%
    ungroup() %>%
    spread(yawn, n) %>% 
-   mutate(total = rowSums(.[-1])) %>%
-   mutate(p = yes/total)
+   mutate(total = rowSums(.[-1])) 
 ```
 --
 ####Your turn
@@ -299,6 +379,7 @@ prop_dif <- function(data){
   
   dtbl <- data %>%
     mutate(yawn = sample(yawn)) #Permutate yawn variable
+  
     # Yurn turn to compute the difference
     # between proportions of treaments and crontrol groups
 
@@ -354,7 +435,7 @@ library(ggplot2)
 # 'economics' is the name of the data frame and
 # it has a variable called 'pce'.
 ggplot(data = economics, aes(x = pce)) +
-  geom_histogram(binwidth = 500,  col="blue", fill="lightblue")+
+  geom_histogram(binwidth = 500,  colour = "blue", fill ="lightblue")+
   geom_vline(xintercept = 10000 , colour = "red")
 
 
@@ -379,9 +460,11 @@ pdif <- data.frame(pdif)
 class: inverse, center, middle
 Most of the material I've used here are based on 
 
-- ['Advanced R' by Hadley Wickham](http://adv-r.had.co.nz/)
+['Advanced R' by Hadley Wickham](http://adv-r.had.co.nz/)
 
-- ['R Programming for Data Science' by Roger D.  Peng](https://bookdown.org/rdpeng/rprogdatascience/)
+['R Programming for Data Science' by Roger D.  Peng](https://bookdown.org/rdpeng/rprogdatascience/)
+
+['R for Data Science' by Garrett Grolemund and Hadley Wickham](http://r4ds.had.co.nz/)
 
 # Happy learning with R :)
 
