@@ -22,7 +22,7 @@ class: center, middle, inverse, title-slide
 ## Goat, Goat, Car
 
 In this lab we are going to create a simulation of the Monty Hall game.
-In order to complete our task we'll need to learn some more programming techinques!
+In order to complete our task we'll need to learn some more programming techniques!
 
 &lt;img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Monty_open_door.svg/1280px-Monty_open_door.svg.png" width="500px" style="display: block; margin: auto;" /&gt;
 
@@ -37,7 +37,7 @@ class: center, middle
 
 # Activity Time!
 
-Let's go through execerise 1 of the tutorial. Remember to record your 
+Let's go through exerciser 1 of the tutorial. Remember to record your 
 answers in your "mylab2.Rmd" file!
 
 ---
@@ -53,7 +53,7 @@ Let's go through some R programming basics.
   
 &gt; John Chambers
 
-Remember that objects are assigned a value using the "&lt;-" operator
+Remember that objects are assigned a value using the "&lt;-" operator.
 
 ```r
 x &lt;- 10 * 2
@@ -72,7 +72,7 @@ head(mydata)
 ```
 
 ```
-## [1] 0.1665197 0.4603836 0.6230080 0.1828311 0.1984167 0.3047562
+## [1] 0.05331197 0.22858859 0.81035981 0.95642146 0.68621613 0.95323134
 ```
 
 ---
@@ -111,7 +111,7 @@ random_number()
 ```
 
 ```
-## [1] 0.6538379
+## [1] 0.8542632
 ```
 
 ---
@@ -128,8 +128,8 @@ minor modifications, it's probably time to write a function!
 
 Functions in R consist of the following:
 
-- arguments: these are the names of the inputs to the function
-- body: the code inside the function (this is what does the work)
+- arguments: these are the names of the inputs to the function,
+- body: the code inside the function (this is what does the work).
 
 *Example*: what are the arguments of the functions on the previous slide?
 
@@ -159,7 +159,7 @@ rnorm(5, mean = 5) # is the same as rnorm(n = 5, mean = 5)
 ```
 
 ```
-## [1] 5.334759 4.076358 5.712347 3.059758 4.687227
+## [1] 3.870806 4.708577 4.452628 4.780493 5.677645
 ```
 
 ```r
@@ -167,7 +167,7 @@ sample(mydata, 1) # is the same as sample(x = mydata, size = 1)
 ```
 
 ```
-## [1] 11
+## [1] 1
 ```
 
 ---
@@ -291,7 +291,7 @@ runif(3) # a numeric (double) vector
 ```
 
 ```
-## [1] 0.3375680 0.2416459 0.1016979
+## [1] 0.6522045 0.1885220 0.3689551
 ```
 
 ```r
@@ -492,7 +492,7 @@ x &lt;- c(10, 3, NA, 5, 8, 1, NA, 14, 15, NA)
 our code.
 
 - Iteration can be used to perform the same operation over and over which
-is necessary when performing simulations
+is necessary when performing simulations.
 
 
 ---
@@ -501,9 +501,9 @@ is necessary when performing simulations
 
 A `for` loop can be used to iterate over the elements of a vector and
 perform some computation. There are three components to creating a for loop:
-- an object of suffucient size to store the output of the loop. 
-- a sequence to iterate over
-- a body that contains 
+- an object of sufficient size to store the output of the loop. 
+- a sequence to iterate over.
+- a body that contains the computation.
 
 Example: sampling from normal distribution with different means
 
@@ -520,7 +520,7 @@ output
 ```
 
 ```
-## [1]   8.488695  18.100499  51.054867 100.049552 999.860320
+## [1]   7.89414  20.43041  49.77911 101.49443 999.47682
 ```
 ---
 
@@ -529,7 +529,7 @@ output
 * output: we create an empty vector that has the same type as the
   result of our computation in the body, in the above example a "numeric" vector.
 * sequence: `i in seq_along(means)`, this is what we we're looping over.
-Each run of the loop will create an object `i` and assign it to a different value in `seq_along(means)`
+Each run of the loop will create an object `i` and assign it to a different value in `seq_along(means)`.
 * body: here we assigning the `i` th element of output to have a random sample
 from normal distribution with mean equal to the `i`th element of the `mu` vector. 
 

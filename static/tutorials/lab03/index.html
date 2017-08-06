@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Testing Hypotheses Using Permutation</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Dilini Talagala" />
+    <link href="index_files/remark-css/example.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Testing Hypotheses Using Permutation
+### Dilini Talagala
+
+---
+
+
+
+
+class: inverse, center, middle
+
+# Data structures
+[Learn more on  data structures in R - read 'Advanced R' by Hadley Wickham](http://adv-r.had.co.nz/Data-structures.html)
+
+&lt;img src="https://images.tandf.co.uk/common/jackets/amazon/978146658/9781466586963.jpg" width="200px" style="display: block; margin: auto;" /&gt;
+---
+### Data structures
+- R's base data structures can be organised by their **dimensionality** (1d, 2d, or nd) and  whether they are **homogeneous** or **heterogeneous** . 
+
+- Most commonly used data types in data analysis:
+
+.pull-left[
+
+**Homogeneous** 
+
+#####*(All contents must be of the same type)*
+
+Atomic vector [1d]
+
+Matrix [2d]
+
+Array [nd]
+
+]
+
+
+.pull-right[
+
+**Heterogeneous** 
+
+#####*(The contents can be of different types)*
+
+List [1d]
+
+Data frame [2d]
+
+]
+
+
+
+---
+
+## 1. Vectors
+
+- Vectors in R are either  
+
+    - **atomic vectors** or
+    
+    - **lists**
+    
+---
+### 1.1 Atomic vectors
+- All elements of an atomic vector must be the same type.
+- Common types of atomic vectors:
+
+```r
+c(0.5, 0.6, 0.7) ## numeric (double)
+```
+
+```
+## [1] 0.5 0.6 0.7
+```
+
+```r
+# With the L suffix, you get an integer rather than a double
+c(1L, 2L, 3L) ## integer
+```
+
+```
+## [1] 1 2 3
+```
+
+```r
+c(TRUE, FALSE, TRUE) ## logical
+```
+
+```
+## [1]  TRUE FALSE  TRUE
+```
+
+```r
+c("a", "b", "c") ## character
+```
+
+```
+## [1] "a" "b" "c"
+```
+
+---
+### 1.2 Lists
+
+- Lists are different from atomic vectors because their elements can be of different types, including lists.
+
+
+```r
+x &lt;- list(a = 1:3,  b = c(TRUE, FALSE, TRUE), 
+          c = c(2.3, 5.9), d = list(y = c(1,2,3), z = c("A", "B")))
+
+x
+```
+
+```
+## $a
+## [1] 1 2 3
+## 
+## $b
+## [1]  TRUE FALSE  TRUE
+## 
+## $c
+## [1] 2.3 5.9
+## 
+## $d
+## $d$y
+## [1] 1 2 3
+## 
+## $d$z
+## [1] "A" "B"
+```
+---
+
+```r
+x$b
+```
+
+```
+## [1]  TRUE FALSE  TRUE
+```
+
+```r
+x$d$z
+```
+
+```
+## [1] "A" "B"
+```
+
+```r
+str(x)
+```
+
+```
+## List of 4
+##  $ a: int [1:3] 1 2 3
+##  $ b: logi [1:3] TRUE FALSE TRUE
+##  $ c: num [1:2] 2.3 5.9
+##  $ d:List of 2
+##   ..$ y: num [1:3] 1 2 3
+##   ..$ z: chr [1:2] "A" "B"
+```
+---
+## 2. Matrices and arrays
+- Adding a dim() attribute to an atomic vector allows it to create
+a multi-dimensional array. 
+
+- A special case of the array is the matrix, which has two dimensions.
+
+- Matrices are common. Arrays are much rarer. 
+
+---
+### 2.1 Matrix 
+
+
+```r
+# Two scalar arguments to specify rows and columns
+a &lt;- matrix(1:6, ncol = 3, nrow = 2)
+a
+```
+
+```
+##      [,1] [,2] [,3]
+## [1,]    1    3    5
+## [2,]    2    4    6
+```
+
+
+.pull-left[
+
+
+```r
+a[2, 3] #a[row, column]
+```
+
+```
+## [1] 6
+```
+
+```r
+a[ , 3]#third column
+```
+
+```
+## [1] 5 6
+```
+
+```r
+a[1, ]#first row
+```
+
+```
+## [1] 1 3 5
+```
+
+]
+.pull-right[
+
+```r
+is.matrix(a)
+```
+
+```
+## [1] TRUE
+```
+
+```r
+is.array(a)
+```
+
+```
+## [1] TRUE
+```
+
+]
+---
+### 2.2 Array
+
+```r
+# One vector argument to describe all dimensions
+b &lt;- array(1:12, c(2, 3, 2))
+b
+```
+
+```
+## , , 1
+## 
+##      [,1] [,2] [,3]
+## [1,]    1    3    5
+## [2,]    2    4    6
+## 
+## , , 2
+## 
+##      [,1] [,2] [,3]
+## [1,]    7    9   11
+## [2,]    8   10   12
+```
+---
+
+## 3. Data frames
+- A data frame is the most common way of storing data in R.
+
+- Few data frames that we are already familiar with: *economics*, *gapminder*
+
+
+```r
+library(tibble)
+data(economics, package = "ggplot2")
+glimpse(economics)
+```
+
+```
+## Observations: 574
+## Variables: 6
+## $ date     &lt;date&gt; 1967-07-01, 1967-08-01, 1967-09-01, 1967-10-01, 1967...
+## $ pce      &lt;dbl&gt; 507.4, 510.5, 516.3, 512.9, 518.1, 525.8, 531.5, 534....
+## $ pop      &lt;int&gt; 198712, 198911, 199113, 199311, 199498, 199657, 19980...
+## $ psavert  &lt;dbl&gt; 12.5, 12.5, 11.7, 12.5, 12.5, 12.1, 11.7, 12.2, 11.6,...
+## $ uempmed  &lt;dbl&gt; 4.5, 4.7, 4.6, 4.9, 4.7, 4.8, 5.1, 4.5, 4.1, 4.6, 4.4...
+## $ unemploy &lt;int&gt; 2944, 2945, 2958, 3143, 3066, 3018, 2878, 3001, 2877,...
+```
+---
+
+```r
+data(gapminder, package = "gapminder")
+glimpse(gapminder)
+```
+
+```
+## Observations: 1,704
+## Variables: 6
+## $ country   &lt;fctr&gt; Afghanistan, Afghanistan, Afghanistan, Afghanistan,...
+## $ continent &lt;fctr&gt; Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asi...
+## $ year      &lt;int&gt; 1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992...
+## $ lifeExp   &lt;dbl&gt; 28.801, 30.332, 31.997, 34.020, 36.088, 38.438, 39.8...
+## $ pop       &lt;int&gt; 8425333, 9240934, 10267083, 11537966, 13079460, 1488...
+## $ gdpPercap &lt;dbl&gt; 779.4453, 820.8530, 853.1007, 836.1971, 739.9811, 78...
+```
+---
+## Creating a data frame in R
+
+- A data frame can be created using *data.frame()*, which takes named vectors as input.
+
+
+
+```r
+yawn_expt &lt;- data_frame(group = c(rep("control", 16), 
+                                  rep("treatment", 34)),
+                        yawn = c(rep("no", 12), rep("yes", 4),
+                                 rep("no", 24), rep("yes", 10)))
+```
+
+
+---
+Let's take a look at the data frame we created
+
+.pull-left[
+
+```r
+#Print out the first few rows
+head(yawn_expt)
+```
+
+```
+## # A tibble: 6 x 2
+##     group  yawn
+##     &lt;chr&gt; &lt;chr&gt;
+## 1 control    no
+## 2 control    no
+## 3 control    no
+## 4 control    no
+## 5 control    no
+## 6 control    no
+```
+
+```r
+#Get a glimpse of your data.
+glimpse(yawn_expt)
+```
+
+```
+## Observations: 50
+## Variables: 2
+## $ group &lt;chr&gt; "control", "control", "control", "control", "control", "...
+## $ yawn  &lt;chr&gt; "no", "no", "no", "no", "no", "no", "no", "no", "no", "n...
+```
+]
+.pull-right[
+
+```r
+#Print out the last few rows
+tail(yawn_expt)
+```
+
+```
+## # A tibble: 6 x 2
+##       group  yawn
+##       &lt;chr&gt; &lt;chr&gt;
+## 1 treatment   yes
+## 2 treatment   yes
+## 3 treatment   yes
+## 4 treatment   yes
+## 5 treatment   yes
+## 6 treatment   yes
+```
+]
+
+---
+
+class: inverse, center, middle
+
+# Managing data frames with the &lt;br/&gt; dplyr package 
+
+&lt;img src="https://d21ii91i3y6o6h.cloudfront.net/gallery_images/from_proof/9295/large/1447175226/rstudio-hex-dplyr-dot-psd.png" width="200px" style="display: block; margin: auto;" /&gt;
+
+
+---
+### Managing data frames with the dplyr package 
+
+- [Learn more on 'Managing data frames with the dplyr package' - read 'R Programming for Data Science' by Roger D.  Peng](https://bookdown.org/rdpeng/rprogdatascience/managing-data-frames-with-the-dplyr-package.html)
+
+- Some of the key "verbs" provided by the dplyr package are
+
+    + **select()**: return a subset of the columns of a data frame
+    
+    + **filter()**: extract a subset of rows from a data frame 
+    
+    + **arrange()**: reorder rows of a data frame
+    
+    + **rename()**: rename variables in a data frame
+    
+    + **mutate()**: add new variables/columns or transform existing variables
+    
+    + **group_by**:  takes an existing tbl and converts it into a grouped tbl
+    
+    + **summarise()**: generate summary statistics of different variables in the data frame, possibly within groups
+    
+
+
+
+---
+class: inverse, center, middle
+
+# %&gt;% operator 
+
+&lt;img src="https://d21ii91i3y6o6h.cloudfront.net/gallery_images/from_proof/9302/large/1447173978/rstudio-hex-pipe-dot-psd.png" width="200px" style="display: block; margin: auto;" /&gt;
+
+#### *"Ceci n'est pas une pipe" - (This is not a pipe)*
+---
+## %&gt;% operator
+
+- **%&gt;%**: the "pipe" operator is used to connect multiple dplyr functions in a sequence of operations.
+
+
+
+
+```r
+ third(second(first(x))) #Difficult to read a sequence of operations
+```
+
+- %&gt;% operator makes code more readable
+
+
+
+```r
+ first(x) %&gt;% second %&gt;% third
+```
+- Once you travel down the pipeline with %&gt;%, the first argument is taken to be the output of the previous function in the pipeline.
+---
+
+## Creating a contingency table from a data frame
+
+
+```r
+library(dplyr)
+library(tidyr)
+library(knitr)
+
+yawn_expt %&gt;%
+   group_by(group, yawn) %&gt;% 
+   tally() %&gt;%
+   ungroup() %&gt;%
+   spread(yawn, n) %&gt;% 
+   mutate(total = rowSums(.[-1])) %&gt;%
+   mutate(p = yes/total)
+```
+
+```
+## # A tibble: 2 x 5
+##       group    no   yes total         p
+##       &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;     &lt;dbl&gt;
+## 1   control    12     4    16 0.2500000
+## 2 treatment    24    10    34 0.2941176
+```
+--
+####Your turn
+
+Compute the proportion of the treatment and control groups who yawned. Add this to the table.
+---
+## Permutation Test
+
+
+```r
+prop_dif &lt;- function(data){
+  
+  dtbl &lt;- data %&gt;%
+    mutate(yawn = sample(yawn)) #Permutate yawn variable
+    # Yurn turn to compute the difference
+    # between proportions of treaments and crontrol groups
+
+    return(pdif)
+}
+```
+
+---
+## Setting the random number seed
+
+- Setting the random number seed with set.seed() ensures reproducibility of the sequence of random numbers.
+
+Compare the resulted outputs of the following commands:
+
+```r
+set.seed(1)
+rnorm(5)
+```
+
+```
+## [1] -0.6264538  0.1836433 -0.8356286  1.5952808  0.3295078
+```
+
+```r
+rnorm(5) 
+```
+
+```
+## [1] -0.8204684  0.4874291  0.7383247  0.5757814 -0.3053884
+```
+
+```r
+set.seed(1)
+rnorm(5)
+```
+
+```
+## [1] -0.6264538  0.1836433 -0.8356286  1.5952808  0.3295078
+```
+---
+### Run the function 10000 times, saving the results
+
+
+```r
+set.seed(444)
+
+# here we create an empty numeric vector of 
+#length 10000 to store our results
+pdif &lt;- numeric(10000)
+
+## Your turn to write the for-loop
+```
+---
+class: inverse, center, middle
+
+# Plotting with ggplot2
+
+
+&lt;img src="https://d21ii91i3y6o6h.cloudfront.net/gallery_images/from_proof/9296/large/1447173871/rstudio-hex-ggplot2-dot-psd.png" width="200px" style="display: block; margin: auto;" /&gt;
+---
+
+### Histogram
+
+
+```r
+library(ggplot2)
+# 'economics' is the name of the data frame and
+# it has a variable called 'pce'.
+ggplot(data = economics, aes(x = pce)) +
+  geom_histogram(binwidth = 500,  col="blue", fill="lightblue")+
+  geom_vline(xintercept = 10000 , colour = "red")
+```
+
+![](index_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
+- *binwidth is the width of the histogram bins* 
+
+---
+
+### Your turn
+
+1. Make a histogram of the results.
+
+2. Draw a vertical line on the plot that represent the difference for the actual data.
+
+
+```r
+pdif &lt;- data.frame(pdif)
+# your turn to use ggplot to produce the histogram
+```
+
+---
+
+class: inverse, center, middle
+Most of the material I've used here are based on 
+
+- ['Advanced R' by Hadley Wickham](http://adv-r.had.co.nz/)
+
+- ['R Programming for Data Science' by Roger D.  Peng](https://bookdown.org/rdpeng/rprogdatascience/)
+
+# Happy learning with R :)
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
