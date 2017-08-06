@@ -32,7 +32,7 @@ title: Home
 
 - Week 1: Introduction and motivation[ Slides 1](lectures/week1.class1.html) ([Rmd](lectures/week1.class1.Rmd)); [Slides 2](lectures/week1.class2.html) ([Rmd](lectures/week1.class2.Rmd)); __Reading:__ [Yihui's fun package](https://yihui.name/en/2011/08/the-fun-package-use-r-for-fun/), Textbook: Chapter 1. 1.1-1.5
 - Week 2: Games [Slides 1](lectures/week2.class1.html) ([Rmd](lectures/week2.class1.Rmd)); [Slides 2](lectures/week2.class2.html) ([Rmd](lectures/week2.class2.Rmd)); Videos: [1](https://vimeo.com/227187709), [2](https://vimeo.com/227190457), [3](https://vimeo.com/227192379), [4](https://vimeo.com/227350960), [5](https://vimeo.com/227350968), [6](https://vimeo.com/227350985), [7](https://vimeo.com/227350988); Textbook Reading: Chapter 2.1-2.4
-- Week 3: Hypothesis testing
+- Week 3: Hypothesis testing [Slides](lectures/week1.class1.html) ([Rmd](lectures/week3.class1.Rmd)); Reading: [Data Scientist’s Crib Sheet](https://blog.cloudera.com/blog/2015/12/common-probability-distributions-the-data-scientists-crib-sheet/), [Gallery of distributions](http://www.itl.nist.gov/div898/handbook/eda/section3/eda366.htm), [Distributions for Actuaries](http://www.casact.org/pubs/monographs/papers/02-Bahnemann.pdf)
 - Week 4: Distribution theory
 - Week 5: Linear models
 - Week 6: Generalised linear models
@@ -47,6 +47,7 @@ title: Home
 
 - Week 1: [Setting up your computing environment](labs/lab1.pdf) [(Rmd)](labs/lab1.Rmd); [Tutorial slides](tutorials/lab01/index.html) [(Rmd)](tutorials/lab01/index.Rmd)
 - Week 2: [Making a Monty Hall game](labs/lab2.pdf) [(Rmd)](labs/lab2.Rmd); [Tutorial slides](tutorials/lab02/index.html) [(Rmd)](tutorials/lab02/index.Rmd)
+- Week 3: [Hypothesis testing](labs/lab3.pdf) [(Rmd)](labs/lab3.Rmd); [Tutorial slides](tutorials/lab03/index.html) [(Rmd)](tutorials/lab03/index.Rmd)
 
 ## Computing information
 
