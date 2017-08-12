@@ -14,7 +14,7 @@ library(knitr)
 opts_chunk$set(
   warning = FALSE, message = FALSE, 
 	fig.path = 'figure/', cache.path = 'cache/', 
-	fig.align = 'center', dev = 'png', fig.width = 10, fig.height = 6, 
+	fig.align = 'center', fig.width = 10, fig.height = 6, 
 	fig.show = 'hold', cache = TRUE, external  =  TRUE,
   dev = 'svglite'
 )
