@@ -2,7 +2,6 @@
 library(ggplot2)
 library(dplyr)
 
-
 ## ---- ex-plot
 df <- data.frame(
   x = seq(-0.3, 7, 0.008),  
@@ -47,9 +46,9 @@ df_weibull <- data.frame(
   y3 = dweibull(xgrid, shape = 1, scale = 1)
 )
 ggplot(data = df_weibull, aes(x = xgrid)) +
-  geom_line(aes(y = y1), col = "red") +
-  geom_line(aes(y = y2), col = "blue") +
-  geom_line(aes(y = y3), col = "orange") +
+  geom_line(aes(y = y1), colour = "red") +
+  geom_line(aes(y = y2), colour = "blue") +
+  geom_line(aes(y = y3), colour = "orange") +
   xlab("x") +
   ylab("densities")
 
