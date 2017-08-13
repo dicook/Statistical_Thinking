@@ -46,8 +46,9 @@ title: Home
 ## Tutorials
 
 - Week 1: [Setting up your computing environment](labs/lab1.pdf) [(Rmd)](labs/lab1.Rmd) [SOLUTION](labs/lab1_solution.pdf) [(Rmd)](labs/lab1_solution.Rmd); [Tutorial slides](tutorials/lab01/index.html) [(Rmd)](tutorials/lab01/index.Rmd)
-- Week 2: [Making a Monty Hall game](labs/lab2.pdf) [(Rmd)](labs/lab2.Rmd); [Tutorial slides](tutorials/lab02/index.html) [(Rmd)](tutorials/lab02/index.Rmd)
+- Week 2: [Making a Monty Hall game](labs/lab2.pdf) [(Rmd)](labs/lab2.Rmd); [Tutorial slides](tutorials/lab02/index.html) [SOLUTION](labs/lab2_solution.pdf) [(Rmd)](labs/lab2_solution.Rmd); [Tutorial slides](tutorials/lab02/index.Rmd)
 - Week 3: [Hypothesis testing](labs/lab3.pdf) [(Rmd)](labs/lab3.Rmd); [Tutorial slides](tutorials/lab03/index.html) [(Rmd)](tutorials/lab03/index.Rmd)
+- Week 4: [Fitting distributions](labs/lab4.pdf) [(Rmd)](labs/lab4.Rmd); [Tutorial slides](tutorials/lab04/index.html) [(Rmd)](tutorials/lab04/index.Rmd)
 
 ## Computing information
 
