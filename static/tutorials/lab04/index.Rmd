@@ -1,0 +1,190 @@
+---
+title: "Statistical distribution"
+author: "Earo Wang"
+output:
+  xaringan::moon_reader:
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r initial, echo = FALSE, cache = FALSE, results = 'hide'}
+library(knitr)
+opts_chunk$set(
+  warning = FALSE, message = FALSE, 
+	fig.path = 'figure/', cache.path = 'cache/', 
+	fig.align = 'center', fig.width = 10, fig.height = 6, 
+	fig.show = 'hold', cache = TRUE, external  =  TRUE,
+  dev = 'svglite'
+)
+read_chunk("lab04.R")
+```
+
+class: inverse middle center
+
+# Statistical distributions
+
+---
+
+```{r lib, echo = FALSE}
+```
+
+## Compute the probabilities for $N(3.3, 1.1)$
+
+```{r ex-plot, echo = FALSE}
+```
+
+---
+
+* $\Pr(X < 1.3)$
+
+```{r ex-prob1}
+```
+
+* $\Pr(X > 1.9) = 1 - \Pr(X \le 1.9)$
+
+```{r ex-prob2}
+```
+
+* $\Pr(1.8 < X < 2.2) = \Pr(X < 2.2) - \Pr(X < 1.8)$
+
+```{r ex-prob3}
+```
+
+---
+
+## Compute the quantile values for $N(-10, 4)$
+
+```{r ex-quantile}
+```
+
+## Compute the densities for $N(12, 5)$
+
+```{r ex-dens}
+```
+
+---
+
+## Plot the density curves for Weibull
+
+```{r ex-weibull, eval = FALSE}
+```
+
+---
+
+```{r ex-weibull, echo = FALSE}
+```
+
+---
+
+class: inverse middle center
+
+# QQ-plot
+
+---
+
+## Simulate sample of size $n = 500$ from $\Gamma(4, 2)$
+
+```{r q1-a}
+```
+
+---
+
+## QQ-Plot computation
+
+a. Sort and standardise the sample values from low to high
+b. Theoretical quantiles, $n=$ sample size
+$$\begin{align}1 - 0.5^{(1/n)} \quad & i=1 \\
+   \frac{i - 0.3175}{n + 0.365} \quad & i=2, ..., n-1 \\
+   0.5^{(1/n)} \quad & i=n \end{align}$$
+
+```{r q1-b}
+```
+
+---
+
+c. Plot the theoretical vs sample quantiles 
+
+```{r q1-c, fig.height = 5}
+```
+
+---
+
+class: inverse middle center
+
+# Likelihood function
+
+---
+
+## Histogram for the sample
+
+```{r q2-df}
+```
+
+**Your turn**: write `ggplot2` code to produce the histogram below:
+
+```{r q2-hist, echo = FALSE, fig.height = 5}
+```
+
+---
+
+## Compute the likelihood function
+
+$$\begin{aligned}
+L(\alpha, \beta) &=\Pr(X_1=x_1,X_2=x_2, ... ,X_n=x_n~\big\vert~\alpha, \beta) \\      
+&=f(x_1\big\vert\alpha, \beta)f(x_2\big\vert\alpha, \beta)\cdots f(x_n\big\vert\alpha, \beta) \\
+&=\prod_{i=1}^n f(x_i;\alpha, \beta)
+\end{aligned}$$
+
+```{r q2-nmle, eval = FALSE}
+```
+
+```{r q2-nmle-fun, echo = FALSE}
+```
+
+```{r q2-plot1}
+```
+
+---
+
+## Plot the likelihood function for a range of values of $\alpha$ and $\beta$
+
+```{r q2-plot2, echo = FALSE}
+```
+
+---
+
+## Interactive 3D surface plot using `plotly`
+
+```{r q2-plotly, echo = FALSE}
+```
+
+---
+
+## Interactive 3D surface plot using `plotly`
+
+If you're curious about how to produce the 3D plot, here's the code:
+
+```{r q2-plotly, eval = FALSE}
+```
+
+---
+
+## Find the MLE estimates for $\alpha$, $\beta$
+
+```{r q2-fit}
+```
+
+p.s. if you have trouble in installing the `CASdatasets` package, the following
+code may solve the issue.
+
+```{r q3, eval = FALSE}
+```
+
+---
+
+## Online R resources
+
+* [A list of distribution functions in R](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Distributions.html)
+* [Cookbook for R](http://www.cookbook-r.com/Graphs/)
