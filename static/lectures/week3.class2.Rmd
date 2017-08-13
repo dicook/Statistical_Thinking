@@ -64,6 +64,14 @@ ggplot(df, aes(x=x, y=d)) + geom_line() + xlab("") + ylab("") +
   geom_point(data=df2, aes(x=x, y=0), colour="red")
 ```
 
+```{r eval=FALSE}
+x <- rnorm(50, 0, 1)
+df2 <- data.frame(x=x, y=0)
+ggplot(df, aes(x=x, y=d)) + geom_line() + xlab("") + ylab("") +
+  geom_hline(yintercept=0, colour="grey70") + 
+  geom_point(data=df2, aes(x=x, y=0), colour="red")
+```
+
 ---
 # Central limit theorem
 
@@ -330,6 +338,16 @@ grid.arrange(p1, p2, p3, p4, p5, p6, ncol=3)
 ---
 # How different is exponential from Pareto?
 
+Exponential:
+
+$$f(x~|~\lambda) = e^{-\lambda x} ~~ x\geq 0$$
+
+Pareto:
+
+$$
+f(x~|~\alpha, \lambda) = \frac{\alpha\lambda^\alpha}{(\lambda+x)^{\alpha+1}} ~~~x>0, \alpha>0, \lambda>0 
+$$ 
+
 ```{r fig.align='center', fig.width=8, fig.height=3, fig.show='hold'}
 rpareto <- function(n, c){
  if (c<=0) stop("c must be positive")
@@ -348,6 +366,8 @@ grid.arrange(p1, p2, p3, ncol=3)
 
 ---
 # How different can exponentials be?
+
+One of these is an exponential vs pareto, the rest are samples from exponentials. Can you pick the pareto vs exponential plot?
 
 ```{r fig.align='center', fig.width=8, fig.height=5, fig.show='hold'}
 df <- data.frame(re=sort(scale(rexp(100))), rp=sort(scale(rpareto(100, 1))),

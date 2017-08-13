@@ -1,14 +1,16 @@
 ---
-title: 'Statistical Methods for Insurance: Fitting Models'
-author: Di Cook & Souhaib Ben Taieb, Econometrics and Business Statistics, Monash
-  University
+title: 'Statistical Methods for Insurance'
+subtitle: "Fitting Models"
+author: Di Cook (dicook@monash.edu, @visnut)
 date: "W4.C1"
 output:
-  ioslides_presentation:
-    transition: default
-    widescreen: yes
-  beamer_presentation: default
-css: default.css
+  xaringan::moon_reader:
+    css: ["default", "myremark.css"]
+    self_contained: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
 ---
 
 ```{r setup, include = FALSE}
@@ -31,12 +33,12 @@ library(readr)
 library(gridExtra)
 ```
 
-## Overview of this class
+# Overview of this class
 
-- Quiz 2 
-- Fit distribution for olympic medals
+- Fitting a distribution for olympic medal tallies
 
-## Olympic medals, 2012 London
+---
+# Olympic medals, 2012 London
 
 ```{r fig.align='center', fig.width=8, fig.height=4}
 library(readr)
@@ -46,20 +48,23 @@ df <- data.frame(Total=c(rep(0, 119), sort(olympics2012$Total)))
 ggplot(df, aes(x=Total)) + geom_histogram(aes(y=..density..)) 
 ```
 
-## Data
+---
+# Data
 
 - Extracted from [https://www.olympic.org/london-2012](https://www.olympic.org/london-2012)
 - Now it is easier to pull data from [wikipedia](https://en.wikipedia.org/wiki/2012_Summer_Olympics_medal_table)
 - 204 countries participated, only countries that scored a medal (85) are listed in the medal table
 
-## Medal tally
+---
+# Medal tally
 
 - Examine the distribution of medal counts
 - Need to add 119 zeros, to account for participating countries that did not get a medal
 - Distribution is right-skewed, heavily, and unimodal
 - Use maximum likelihood to estimate parameters for plausible distributions
 
-## Fit distribution using Poisson
+---
+# Fit distribution using Poisson
 
 ```{r fig.align='center', fig.width=8, fig.height=4}
 library(MASS)
@@ -82,7 +87,8 @@ p2 <- ggplot(df1, aes(x=Total, y=q)) +
 grid.arrange(p1, p2, ncol=2)
 ```
 
-## Try lognormal
+---
+# Try lognormal
 
 ```{r fig.align='center', fig.width=8, fig.height=4}
 fitdistr(df$Total+1, "lognormal")
@@ -104,7 +110,8 @@ p2 <- ggplot(df1, aes(x=Total, y=q)) +
 grid.arrange(p1, p2, ncol=2)
 ```
  
-## Try weibull
+---
+# Try weibull
 
 ```{r fig.align='center', fig.width=8, fig.height=4}
 fitdistr(df$Total+1, "weibull")
@@ -127,7 +134,8 @@ p2 <- ggplot(df1, aes(x=Total, y=q)) +
 grid.arrange(p1, p2, ncol=2)
 ```
  
-## Try pareto
+---
+# Try pareto
 
 ```{r fig.align='center', fig.width=8, fig.height=4}
 dpareto <- function(x, c) {
@@ -157,7 +165,8 @@ ggplot(g, aes(x=cr, y=f)) + geom_line() + xlab("c") + ylab("L") + theme_bw() + g
   theme(aspect.ratio=1)
 ```
 
-## Optimization actually fails
+---
+# Optimization actually fails
 
 ```{r fig.align='center', fig.width=8, fig.height=4}
 n <- 204
@@ -179,7 +188,8 @@ p2 <- ggplot(df1, aes(x=Total, y=q)) +
 grid.arrange(p1, p2, ncol=2)
 ```
 
-## Manually
+---
+# Manually
 
 Actually using $c=0.96$.
 
@@ -203,7 +213,8 @@ p2 <- ggplot(df1, aes(x=Total, y=q)) +
 grid.arrange(p1, p2, ncol=2)
 ```
 
-## Predict largest medal count
+---
+# Predict largest medal count
 
 Using this model, what is the probability of observing a tally of more than 50 medals for a country? $P(X>50)$
 
@@ -215,7 +226,8 @@ ppareto <- function(q, c) {
 1-ppareto(50, 0.96)
 ```
 
-## How many would we expect?
+---
+# How many would we expect?
 
 If there are 204 countries, how many of them would we expect to earn more than 50 medals, assuming the $Pareto(0.96)$ model?
 
@@ -230,7 +242,8 @@ library(dplyr)
 df %>% filter(Total>50)
 ```
 
-## How well does this fit 2008 medal tally?
+---
+# How well does this fit 2008 medal tally?
 
 ```{r fig.align='center', fig.width=8, fig.height=4}
 olympics2008 <- read_csv("../data/olympics2008.csv")
@@ -254,7 +267,8 @@ p2 <- ggplot(df1, aes(x=Total, y=q)) +
 grid.arrange(p1, p2, ncol=2)
 ```
 
-## And 2004?
+---
+# And 2004?
 
 ```{r fig.align='center', fig.width=8, fig.height=4}
 olympics2004 <- read_csv("../data/olympics2004.csv")
@@ -278,27 +292,33 @@ p2 <- ggplot(df1, aes(x=Total, y=q)) +
 grid.arrange(p1, p2, ncol=2)
 ```
 
-## Doping in sports - finding anomalies
+---
+# Doping in sports - finding anomalies
 
 ![](athletics-women.png)
 
 Source: FT research, image extracted from [http://blogs.ft.com/ftdata/2015/11/16/doping-in-athletics/](http://blogs.ft.com/ftdata/2015/11/16/doping-in-athletics/)
 
-## YOUR TURN: How could we improve the model?
+---
+# YOUR TURN: How could we improve the model?
 
-## 
+---
+# 
 
 - What dependencies are there in the medal tallies?
 - What varies among Olympic years?
 - What factors might affect the medal counts?
 
-## Resources
+---
+# Resources
 
 - [2012 Medal tally](https://en.wikipedia.org/wiki/2012_Summer_Olympics_medal_table)
 - [2008 Medal tally](https://en.wikipedia.org/wiki/2008_Summer_Olympics_medal_table)
 - [2004 Medal tally](https://en.wikipedia.org/wiki/2004_Summer_Olympics_medal_table)
 - [http://blogs.ft.com/ftdata/2015/11/16/doping-in-athletics/](http://blogs.ft.com/ftdata/2015/11/16/doping-in-athletics/)
 
-## Share and share alike
+---
+class: inverse middle 
+# Share and share alike
 
-This work is licensed under the Creative Commons Attribution-Noncommercial 3.0 United States License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/ 3.0/us/ or send a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
