@@ -37,20 +37,22 @@ qnorm(c(0.53, 0.12, 0.84, 1.2), mean = -10, sd = 4)
 dnorm(c(13, 4, 20), mean = 12, sd = 5)
 
 ## ---- ex-weibull
-library(ggplot2)
-xgrid <- seq(0, 6, 0.01)
-df_weibull <- data.frame(
+library(tidyverse)
+xgrid <- seq(0, 5, 0.05)
+df <- data.frame(
   x = xgrid,
-  y1 = dweibull(xgrid, shape = 3, scale = 1.5),
-  y2 = dweibull(xgrid, shape = 2, scale = 2),
-  y3 = dweibull(xgrid, shape = 1, scale = 1)
+  d1 = dweibull(xgrid, shape = 3, scale = 1.5),
+  d2 = dweibull(xgrid, shape = 2, scale = 2),
+  d3 = dweibull(xgrid, shape = 1, scale = 1)
 )
-ggplot(data = df_weibull, aes(x = xgrid)) +
-  geom_line(aes(y = y1), colour = "red") +
-  geom_line(aes(y = y2), colour = "blue") +
-  geom_line(aes(y = y3), colour = "orange") +
-  xlab("x") +
-  ylab("densities")
+df <- df %>% 
+  gather(dist, density, d1:d3) %>%
+  mutate(dist = factor(
+    dist, levels = c("d1", "d2", "d3"), 
+    labels = c("Weibull(3, 1.5)", "Weibull(2, 2)", "Weibull(1,1)")
+  ))
+ggplot(df, aes(x=x, y = density, colour = dist)) + 
+  geom_line()
 
 ## ---- q1-a
 set.seed(123)
@@ -132,3 +134,6 @@ fitdistr(X2$x, "gamma")
 #   repos = "http://cas.uqam.ca/pub/R/", type = "source")
 library(CASdatasets)
 data(usworkcomp)
+
+## ---- rescale
+(usworkcomp$LOSS + 100) / 100000

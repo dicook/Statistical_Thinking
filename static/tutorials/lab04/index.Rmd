@@ -182,6 +182,11 @@ code may solve the issue.
 ```{r q3, eval = FALSE}
 ```
 
+Hint: rescale before the `fitdistr` function to avoid numerical problems:
+
+```{r rescale, eval = FALSE}
+```
+
 ---
 
 ## Online R resources
