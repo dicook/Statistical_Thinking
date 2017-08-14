@@ -40,10 +40,12 @@ class: center, middle, inverse, title-slide
 
 
 ```
-#&gt; [1]  0.398  2.905  0.340 -1.774 -0.087
+#&gt; [1]  1.43  0.72  0.50  1.77 -0.39
 ```
 
 &lt;img src="week3.class2_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
+
+
 
 ---
 # Central limit theorem
@@ -56,12 +58,12 @@ class: center, middle, inverse, title-slide
 ---
 # Example: Uniform parent
 
-&lt;img src="week3.class2_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="week3.class2_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 # Example: Weibull parent
 
-&lt;img src="week3.class2_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="week3.class2_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 # Estimation
@@ -103,7 +105,7 @@ $$
 ---
 # Plot it
 
-&lt;img src="week3.class2_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="week3.class2_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
 
 - The maximum is at 2.0. This is the sample mean, which we can prove algebraically is the MLE. 
 
@@ -124,7 +126,7 @@ We know it comes from a normal distribution. What are the best guesses for the `
 
 Compute the likelihood for a range of values of both parameters. 
 
-&lt;img src="week3.class2_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="week3.class2_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -183,7 +185,7 @@ qgamma(0.78, 2)
 - Quantile-quantile plot (QQplot) plots theoretical vs sample quantiles
 - Lets check the distribution of PISA math scores
 
-&lt;img src="week3.class2_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="week3.class2_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 # QQ-Plot computation
@@ -210,17 +212,29 @@ qgamma(0.78, 2)
 ---
  
 
-&lt;img src="week3.class2_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="week3.class2_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 # How different is exponential from Pareto?
 
-&lt;img src="week3.class2_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+Exponential:
+
+`$$f(x~|~\lambda) = e^{-\lambda x} ~~ x\geq 0$$`
+
+Pareto:
+
+$$
+f(x~|~\alpha, \lambda) = \frac{\alpha\lambda^\alpha}{(\lambda+x)^{\alpha+1}} ~~~x&gt;0, \alpha&gt;0, \lambda&gt;0 
+$$ 
+
+&lt;img src="week3.class2_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 # How different can exponentials be?
 
-&lt;img src="week3.class2_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
+One of these is an exponential vs pareto, the rest are samples from exponentials. Can you pick the pareto vs exponential plot?
+
+&lt;img src="week3.class2_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 # Resources
