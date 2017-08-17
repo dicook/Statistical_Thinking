@@ -1,5 +1,5 @@
 ---
-title: 'Statistical Methods for Insurance'
+title: 'Statistical Thinking using Randomisation and Simulation'
 subtitle: "Fitting Models"
 author: Di Cook (dicook@monash.edu, @visnut)
 date: "W4.C1"
