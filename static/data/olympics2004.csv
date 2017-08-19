@@ -7,7 +7,7 @@ ObsNum,Country,Gold,Silver,Bronze,Total,GoldRank,TotRank,Population
 6,GERGermany,14,16,18,48,6,5,82087361
 7,FRAFrance,11,9,13,33,7,7,58978172
 8,ITAItaly,10,11,11,32,8,8,56735130
-9,KORKorea,9,12,9,30,9,9,46884800
+9,KORSouthKorea,9,12,9,30,9,9,46884800
 10,GBRGreatBritain,9,9,12,30,10,9,59113439
 11,CUBCuba,9,7,11,27,11,11,11096395
 12,UKRUkraine,9,5,9,23,12,12,49811174
@@ -56,7 +56,7 @@ ObsNum,Country,Gold,Silver,Bronze,Total,GoldRank,TotRank,Population
 55,DOMDominicanRep,1,0,0,1,54,64,8129734
 56,IRLIreland,1,0,0,1,54,64,3632944
 57,UAEUArabEmirates,1,0,0,1,54,64,2344402
-58,PRKDPRKorea,0,4,1,5,58,37,21386109
+58,PRKNorthKorea,0,4,1,5,58,37,21386109
 59,LATLatvia,0,4,0,4,59,46,2353874
 60,MEXMexico,0,3,1,4,60,46,100294036
 61,PORPortugal,0,2,1,3,61,51,9918040

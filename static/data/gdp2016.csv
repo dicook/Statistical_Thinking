@@ -1,8 +1,8 @@
-Country,Total,Population_mil,GDP_PPP_bil,Medals_pmp,Medals_p100BGDP
+Country,Gold,Silver,Bronze,Total,Population_mil,GDP_PPP_bil,Medalspermillionpop.,Medalsper100BGDP
 UnitedStates,46,37,38,121,321.4,17950.0,0.38,0.67
 GreatBritain,27,23,17,67,64.1,2679.0,1.05,2.50
 China,26,18,26,70,1367.5,19390.0,0.05,0.36
-Russia,19,18,19,56,142.4,3718.0,0.39,1.51
+RussianFed,19,18,19,56,142.4,3718.0,0.39,1.51
 Germany,17,10,15,42,80.9,3841.0,0.52,1.09
 Japan,12,8,21,41,126.9,4830.0,0.32,0.85
 France,10,18,14,42,66.6,2647.0,0.63,1.59

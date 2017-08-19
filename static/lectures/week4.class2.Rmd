@@ -47,12 +47,18 @@ How does medal count in 2016 associate with that from the previous Olympics and 
 olympics2012 <- read_csv("../data/olympics2012.csv")
 oly_gdp2016 <- read_csv("../data/gdp2016.csv")
 
-oly_gdp_2016_2012 <- merge(oly_gdp2016, olympics2012[,c("Country","Total")],
-                     by="Country", all.x=TRUE)
-colnames(oly_gdp_2016_2012)[2] <- "Total_2016"
-colnames(oly_gdp_2016_2012)[7] <- "Total_2012"
+olympics2012 <- read_csv("../data/olympics2012.csv")
+oly_gdp2016 <- read_csv("../data/gdp2016.csv")
 
-oly_gdp_2016_2012[is.na(oly_gdp_2016_2012$Total_2012), "Total_2012"] <- 0
+oly_gdp_2016_2012 <- full_join(oly_gdp2016[,c(1,5,6,7)],
+                           olympics2012[,c("Country","Total")],
+                     by="Country")
+colnames(oly_gdp_2016_2012)[2] <- "Total_2016"
+colnames(oly_gdp_2016_2012)[5] <- "Total_2012"
+
+oly_gdp_2016_2012 <- oly_gdp_2016_2012 %>% 
+  replace_na(list(Total_2016=0, Total_2012=0))
+
 p1 <- ggplot(oly_gdp_2016_2012, aes(x=Total_2012, y=Total_2016)) +
   geom_point()
 p2 <- ggplot(oly_gdp_2016_2012, aes(x=Population_mil, y=Total_2016)) +
@@ -82,7 +88,7 @@ glance(oly_lm)
 
 ```{r fig.align='center', fig.width=8, fig.height=4}
 oly_diag <- augment(oly_lm)
-oly_diag$Country <- oly_gdp2016$Country
+oly_diag$Country <- oly_gdp2016$Country[-53]
 p1 <- ggplot(oly_diag, aes(x=.fitted, y=Total_2016, 
                                    label=Country)) +
   geom_point() + ylab("Observed Count") + xlab("Fitted") +

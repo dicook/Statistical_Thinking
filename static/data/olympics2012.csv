@@ -3,7 +3,7 @@ Rank,Country,Code,Gold,Silver,Bronze,Total,Population,Men.Total, Women.Total,Mix
 2,China,CHN,38,27,23,88,1347350000,36,50,2
 3,GreatBritain,GBR,29,17,19,65,62262000,39,22,4
 4,RussianFed,RUS,24,26,32,82,143117000,38,44,0
-5,Korea,KOR,13,8,7,28,50004441,21,7,0
+5,SouthKorea,KOR,13,8,7,28,50004441,21,7,0
 6,Germany,GER,11,19,14,44,81844000,28,14,2
 7,France,FRA,11,11,12,34,65350000,19,15,0
 8,Italy,ITA,8,9,11,28,59464644,20,8,0
@@ -18,7 +18,7 @@ Rank,Country,Code,Gold,Silver,Bronze,Total,Population,Men.Total, Women.Total,Mix
 17,Iran,IRI,4,5,3,12,75149669,12,0,0
 18,Jamaica,JAM,4,4,4,12,2709300,7,5,0
 19,CzechRepublic,CZE,4,3,3,10,10507566,5,5,0
-20,DPRKorea,PRK,4,0,2,6,24554000,3,3,0
+20,NorthKorea,PRK,4,0,2,6,24554000,3,3,0
 21,Spain,ESP,3,10,4,17,46163116,6,11,0
 22,Brazil,BRA,3,5,9,17,192376496,11,6,0
 23,SouthAfrica,RSA,3,2,1,6,50586757,4,2,0
