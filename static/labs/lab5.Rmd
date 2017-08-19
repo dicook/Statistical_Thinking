@@ -1,5 +1,5 @@
 ---
-title: "ETC 2420/5242 Lab 5 2016"
+title: "ETC 2420/5242 Lab 5 2017"
 author: "Di Cook"
 date: "Week 5"
 output: pdf_document
@@ -38,9 +38,7 @@ This lab is to practice fitting linear models.
 - The data has demographics of life expectancy and GDP per capita for 142 countries reported every 5 years between 1952 and 2007.
 
 ```{r echo=TRUE, fig.align='center', fig.width=7, fig.height=6}
-library("tidyr")
-library("dplyr")
-library("ggplot2")
+library("tidyverse")
 library("gapminder")
 glimpse(gapminder)
 ```
@@ -224,12 +222,8 @@ c. Use the statistics to investigate something of your choice related to life ex
 
 ## TURN IN 
 
-- Your `.Rmd` file
-- Your Word (or pdf) file that results from knitting the Rmd.
+- Your `.Rmd` and `.html` file
 - Make sure your group members are listed as authors, one person per group will turn in the report
-- DUE: Wednesday after the lab, by 7am, loaded into moodle
-
-
 
 ## Resources
 
