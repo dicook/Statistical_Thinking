@@ -1,0 +1,266 @@
+---
+title: "Linear models"
+author: "Thiyanga Talagala"
+output:
+  xaringan::moon_reader:
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  warning = FALSE, message = FALSE, 
+	fig.align = 'center', fig.width = 10, fig.height = 6)
+
+```
+
+## Take a glimpse at the dataset `gapminder`
+
+
+```{r}
+library(tidyverse)
+library(gapminder)
+glimpse(gapminder)
+```
+
+---
+## Data visualisation
+
+```{r eval=T}
+ggplot(data=gapminder, aes(x=year, y=lifeExp, group=country)) +
+geom_line(alpha=0.5)
+```
+
+---
+
+class: inverse, center, middle
+# Data modelling
+
+---
+## Transforming the variable `year`
+* shift year to begin in 1950
+```{r}
+gapminder2 <- gapminder %>% mutate(year1950 = year-1950)
+```
+
+```{r}
+head(gapminder2)
+```
+---
+
+## Start with Australia
+
+
+```{r}
+oz <- gapminder2 %>% filter(country=="Australia")
+head(oz)
+```
+
+---
+
+## Fit a model for Australia
+
+* Graphical representation
+```{r fig.width = 9, fig.height = 5}
+ggplot(data=oz, aes(x=year, y=lifeExp)) +
+geom_point() +
+geom_smooth(method="lm", se=FALSE)
+```
+
+---
+## Model fitting process 
+```{r}
+oz_lm <- lm(lifeExp~year1950, data=oz)
+oz_lm
+```
+
+---
+## Model fit summary
+```{r}
+summary(oz_lm)
+```
+
+---
+class: inverse, center, middle
+#broom: let's tidy up a bit
+This summary output is useful enough if you just want to read it. However, converting it to a data frame that contains all the same information, so that you can combine it with other models or do further analysis, is not trivial.
+
+```{r, out.width = "200px", echo=FALSE, fig.align='center'}
+knitr::include_graphics("https://d21ii91i3y6o6h.cloudfront.net/gallery_images/from_proof/13592/large/1466619575/rstudio-hex-broom.png")
+```
+---
+## Tidying functions
+
+* `tidy` 
+
+* `augment` 
+
+* `glance` 
+
+---
+### `tidy`: constructs a data frame that summarizes the model's statistical findings
+
+```{r}
+library("broom")
+oz_coef <- tidy(oz_lm)
+oz_coef
+
+```
+
+```{r}
+class(oz_coef)
+```
+
+
+```{r}
+class(oz_lm) # oz_lm - the messy output given by `lm`
+```
+
+---
+### `glance`:  one-row summary of the model
+
+```{r}
+oz_fit <- glance(oz_lm)
+oz_fit
+
+```
+---
+### `augment`:  add columns to the original data that was modeled
+
+```{r}
+oz_diag <- augment(oz_lm)
+head(oz_diag)
+```
+---
+class: inverse, center, middle
+#Fit a simple linear model separately to every country
+
+```{r, out.width = "200px", echo=FALSE, fig.align='center'}
+knitr::include_graphics("https://d21ii91i3y6o6h.cloudfront.net/gallery_images/from_proof/13594/large/1466619666/rstudio-hex-purrr.png")
+```
+---
+
+## Group `gapminder` by country and continent
+
+```{r}
+by_country <- gapminder2 %>%
+select(country, year1950, lifeExp, continent) %>% 
+  group_by(country, continent)
+head(by_country)
+```
+---
+## Nesting the data into list
+```{r}
+by_country <- by_country %>% 
+  nest() # nesting year 1950 and lifeExp into a list
+head(by_country)
+```
+---
+
+## data frame for Australia
+
+```{r}
+by_country$data[[6]]
+```
+
+---
+
+## Fit a simple linear model to every country using purrr
+
+```{r}
+by_country <- by_country %>%
+mutate(
+model = purrr::map(data, ~ lm(lifeExp ~ year1950,
+data = .)))
+```
+
+```{r}
+head(by_country)
+
+```
+---
+
+
+```{r}
+by_country$model[[6]]
+```
+
+---
+
+## Unnesting a list of **lm** back to dataframe
+
+```{r}
+country_coefs <- by_country %>%
+unnest(model %>% purrr::map(broom::tidy))
+```
+
+```{r}
+head(country_coefs)
+```
+---
+## Examine the fit for each country
+
+```{r}
+country_fit <- by_country %>%
+unnest(model %>%
+purrr::map(broom::glance))
+```
+
+```{r}
+head(country_fit)
+```
+
+---
+## Making a tidy report
+
+```{r}
+library(knitr)
+country_coefs <- country_coefs %>%
+select(country, continent, term, estimate) %>%
+spread(term, estimate)
+```
+
+```{r eval=F}
+head(country_coefs) %>% kable()
+```
+
+---
+## Interactive graphs using plotly
+```{r eval=F}
+library(plotly)
+p1 <- ggplot(gapminder, aes(x=lifeExp, y=gdpPercap, 
+                          colour=continent, label=country)) +
+  geom_point()
+ggplotly(p1)
+```
+
+---
+
+```{r echo=F}
+library(plotly)
+p1 <- ggplot(gapminder, aes(x=lifeExp, y=gdpPercap, 
+                          colour=continent, label=country)) +
+  geom_point()
+ggplotly(p1)
+```
+---
+
+class: inverse, center, middle
+Most of the materials I've used here are based on 
+
+['R for Data Science' by Garrett Grolemund and Hadley Wickham](http://r4ds.had.co.nz/)
+
+To learn more about purrr::map ['Read here'](http://r4ds.had.co.nz/iteration.html#the-map-functions)
+
+Read more about broom package [' here'](https://cran.r-project.org/web/packages/broom/vignettes/broom.html)
+
+# Happy learning with R :)
+
+
+
+
+
