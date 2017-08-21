@@ -49,7 +49,7 @@ title: Home
 - Week 2: [Making a Monty Hall game](labs/lab2.pdf) [(Rmd)](labs/lab2.Rmd); [Tutorial slides](tutorials/lab02/index.html) [SOLUTION](labs/lab2_solution.pdf) [(Rmd)](labs/lab2_solution.Rmd); [Tutorial slides](tutorials/lab02/index.Rmd)
 - Week 3: [Hypothesis testing](labs/lab3.pdf) [(Rmd)](labs/lab3.Rmd) [SOLUTION](labs/lab3_solution.pdf) [(Rmd)](labs/lab3_solution.Rmd); [Tutorial slides](tutorials/lab03/index.html) [(Rmd)](tutorials/lab03/index.Rmd)
 - Week 4: [Fitting distributions](labs/lab4.pdf) [(Rmd)](labs/lab4.Rmd); [Tutorial slides](tutorials/lab04/index.html) [(Rmd)](tutorials/lab04/index.Rmd) [usworkcomp.rda](labs/usworkcomp.rda)
-- Week 5: [Linear models](labs/lab5.pdf) [(Rmd)](labs/lab5.Rmd)
+- Week 5: [Linear models](labs/lab5.pdf) [(Rmd)](labs/lab5.Rmd); [Tutorial slides](tutorials/lab05/index.html) [(Rmd)](tutorials/lab05/index.Rmd)
 
 ## Computing information
 
