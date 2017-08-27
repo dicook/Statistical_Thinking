@@ -1,0 +1,407 @@
+---
+title: 'Statistical Thinking using Randomisation and Simulation'
+subtitle: "Linear models: diagnostics"
+date: "W5.C1"
+output:
+  xaringan::moon_reader:
+    css: ["default", "myremark.css"]
+    self_contained: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE,
+  echo=FALSE,
+  fig.height = 2,
+  fig.width = 5,
+  collapse = TRUE,
+  comment = "#>"
+)
+options(digits=2)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readr)
+library(gridExtra)
+library(xkcd)
+```
+
+# Modeling Olympic medal counts
+
+We fit the medal count for 2016, purely on the counts from 2012, to illustrate the influence diagnostics.
+
+```{r}
+#olympics2008 <- read_csv("../data/olympics2008.csv")
+olympics2012 <- read_csv("../data/olympics2012.csv")
+olympics2016 <- read_csv("../data/olympics2016.csv")
+
+oly <- full_join(olympics2016[,c("Country","Total")],
+             olympics2012[,c("Country","Total")], by="Country",
+             all.x=TRUE)
+colnames(oly)[2] <- "M2016"
+colnames(oly)[3] <- "M2012"
+oly <- oly %>% replace_na(list(M2016=0, M2012=0))
+
+oly_lm <- glm(M2016~M2012, data=oly)
+library(broom)
+tidy(oly_lm)
+coefs <- tidy(oly_lm)
+```
+
+Giving the model, 
+
+$M_{2016}=$ `r coefs$estimate[1]` $+$ `r coefs$estimate[2]` $M_{2012} + \varepsilon$
+
+---
+class: inverse middle 
+# Your turn
+
+- Should the model be re-fit with the intercept forced to ZERO?
+
+--
+```{r fig.align='center', fig.width=8, fig.height=6}
+library(plotly)
+p <- ggplot(oly, aes(x=M2012, y=M2016)) +
+  geom_point(aes(text=Country)) +
+  geom_smooth(method="lm", se=FALSE) + theme_xkcd() + xkcdaxis(c(0,140),c(0,140))
+ggplotly(p)
+```
+
+---
+# Model diagnostics
+
+- Based on `leave-one-out` statistics
+- For $n$ observations, fit $n$ models where each model has one observation removed. 
+- Let's take a look at fitting the medal tallies, without the USA.
+
+```{r}
+oly_noUSA <- oly %>% filter(Country != "UnitedStates")
+oly_noUSA_lm <- glm(M2016~M2012, data=oly_noUSA)
+coefs_noUSA <- tidy(oly_noUSA_lm)
+comp_estimates <- data.frame(all=coefs$estimate,
+                             noUSA=coefs_noUSA$estimate)
+comp_estimates$estimate <- c("intercept", "slope")
+comp_estimates
+```
+
+--
+- Parameter estimates change a little
+
+---
+
+
+```{r fig.align='center', fig.width=6, fig.height=4}
+comp_estimates_m <- comp_estimates %>% 
+  gather(model, stat, -estimate) %>%
+  spread(estimate, stat)
+ggplot(oly, aes(x=M2012, y=M2016)) + geom_point() +
+  geom_abline(data=comp_estimates_m, 
+              aes(intercept=intercept, slope=slope, colour=model))  + theme_xkcd() + xkcdaxis(c(0,125),c(0,125)) +
+  scale_color_brewer(palette="Dark2")
+```
+
+---
+# Other model fit parameters
+
+- deviance
+- predicted values, residuals
+
+```{r}
+comp_diag <- data.frame(
+  null.dev=c(glance(oly_lm)$null.deviance, glance(oly_noUSA_lm)$null.deviance),
+  deviance=c(glance(oly_lm)$deviance, glance(oly_noUSA_lm)$deviance), 
+  fitted=c(predict(oly_lm, oly[oly$Country=="UnitedStates",]), 
+           predict(oly_noUSA_lm, oly[oly$Country=="UnitedStates",])), 
+  resid=c(oly$M2012[oly$Country=="UnitedStates"]-
+            predict(oly_lm, oly[oly$Country=="UnitedStates",]),
+          oly$M2012[oly$Country=="UnitedStates"]-
+            predict(oly_noUSA_lm, oly[oly$Country=="UnitedStates",])))
+rownames(comp_diag) <- c("All", "No USA")
+kable(comp_diag, format="markdown", row.names=TRUE)
+```
+
+---
+# What it could look like
+
+```{r fig.align='center', fig.width=6, fig.height=4}
+set.seed(2468)
+df <- data.frame(x=c(runif(99), 10))
+df$y <- df$x+c(rnorm(99), 6)
+df_all <- glm(y~x, data=df)
+df_no <- glm(y~x, data=df[-100,])
+df_est <- data.frame(all=tidy(df_all)$estimate,
+                             no=tidy(df_no)$estimate)
+df_est$estimate <- c("intercept", "slope")
+df_est_m <- df_est %>% 
+  gather(model, stat, -estimate) %>%
+  spread(estimate, stat)
+ggplot(df, aes(x=x, y=y)) + geom_point() +
+  geom_abline(data=df_est_m, 
+              aes(intercept=intercept, slope=slope, colour=model))  + theme_xkcd() + xkcdaxis(c(0,10),c(0,16)) +
+  scale_color_brewer(palette="Dark2")
+```
+
+---
+# Leverage
+
+Leverage $h_{ii}$ is defined for each observation, $1, ..., n$, and is the $i^{th}$ diagonal element of the hat matrix:
+
+$$H=X(X^TX)^{-1}X^T$$
+
+where $X$ is the design matrix, e.g. for $\beta_0+\beta_1x$, 
+
+$$X=\left[ \begin{array}{cc} 1 & x_1 \\ 1 & x_2 \\ \vdots & \vdots \\ 1 & x_n \end{array} \right]$$
+
+Intuitively, observations which are far from the mean of the explanatory variables will have higher leverage. 
+
+YOU CAN CALCULATE THIS WITHOUT FITTING ALL $n$ MODELS!
+
+---
+# Highest leverage for medal tally model
+
+```{r}
+oly_diag <- augment(oly_lm)
+oly_diag$Country <- oly$Country
+oly_diag %>% arrange(desc(.hat)) %>% select(Country, .hat) %>% head(15)
+```
+
+Cutoff for high leverage is $2p/n = 2*1/73 = 0.027$.
+
+---
+# Plot of leverage
+
+```{r fig.align='center', fig.width=6, fig.height=4}
+ggplot(oly_diag, aes(x=.hat)) + geom_histogram() +
+  geom_vline(xintercept=0.027, colour="red") + 
+  theme_xkcd() + xkcdaxis(c(0,0.33),c(0,40))
+```
+
+---
+# Log-tranform the counts
+
+```{r fig.align='center', fig.width=6, fig.height=4}
+oly_tf <- oly
+oly_tf$M2012 <- log10(oly_tf$M2012+1)
+oly_tf$M2016 <- log10(oly_tf$M2016+1)
+ggplot(oly_tf, aes(x=M2012, y=M2016)) + geom_point() + 
+  xlab("Log counts 2012") + ylab("Log counts 2016") + 
+  theme_xkcd() + xkcdaxis(c(0,2.2),c(0,2.2))
+```
+
+---
+
+```{r}
+oly_tf_lm <- glm(M2016~M2012, data=oly_tf)
+oly_tf_diag <- augment(oly_tf_lm)
+oly_tf_diag$Country <- oly$Country
+oly_tf_diag %>% arrange(desc(.hat)) %>% select(Country, .hat) %>% head(15)
+```
+
+---
+
+
+```{r fig.align='center', fig.width=6, fig.height=4}
+ggplot(oly_tf_diag, aes(x=.hat)) + geom_histogram() +
+  geom_vline(xintercept=0.027, colour="red") + 
+  theme_xkcd() + xkcdaxis(c(0,.10),c(0,25))
+```
+
+Transforming skewed variables reduces the influence of any one, or few points. The distribution is more even, and the highest leverage value is much lower now.
+
+---
+# Hat values for simulated data
+
+```{r fig.align='center', fig.width=6, fig.height=4}
+df_lm <- glm(y~x, data=df)
+df_diag <- augment(df_lm)
+ggplot(df_diag, aes(x=.hat)) + geom_histogram() +
+  geom_vline(xintercept=0.02, colour="red") + 
+  theme_xkcd() + xkcdaxis(c(0,1),c(0,100))
+```
+
+---
+# Cooks D
+
+Leverage takes no notice of the response variable. So the USA did not have a huge influence because its medal count in 2012 was similar to that in 2008, so it was close to the trend. If for some reason the medal count in 2012 was 0, the line with the USA would be much more drawn away from the other countries. 
+
+Cooks D, and DFFITS, also use the response variable, to assess influence. 
+
+$$D_i = \frac{e_i^2}{{MSE}p}\frac{h_{ii}}{(1-h_{ii})^2}$$
+
+where $e_i$ is the $i^{th}$ residual, $p=$number of explanatory variables, and MSE is the mean squared error of the linear model.
+
+Values greater than $4/n$ are large, by a rule of thumb. Or alternatively, greater than 1 is another rule of thumb.
+
+---
+# Cooks D for Olympic medal tally
+
+$$~~~~~~~~~ Raw ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Transformed$$
+
+
+```{r}
+tbl1 <- oly_diag %>% arrange(desc(.cooksd)) %>% select(Country, .cooksd) 
+tbl2 <- oly_tf_diag %>% arrange(desc(.cooksd)) %>% select(Country, .cooksd)
+tbl <- cbind(tbl1, tbl2)
+tbl
+```
+
+---
+
+```{r fig.align='center', fig.width=10, fig.height=4}
+p1 <- ggplot(oly_diag, aes(x=.cooksd)) + geom_density(fill="black", alpha=0.5) + 
+  theme_xkcd() + xkcdaxis(c(0,0.9),c(0,200))
+p2 <- ggplot(oly_tf_diag, aes(x=.cooksd)) + geom_density(fill="black", alpha=0.5) +
+  theme_xkcd()+ xkcdaxis(c(0,0.5),c(0,70))
+grid.arrange(p1, p2, ncol=2)
+```
+
+---
+# Cooks D for simulated data
+
+```{r fig.align='center', fig.width=10, fig.height=4}
+p1 <- ggplot(df_diag, aes(x=.cooksd)) + geom_density(fill="black", alpha=0.5) + 
+  ggtitle("All cases") + theme_xkcd() + xkcdaxis(c(0,30),c(0,140))
+df_lm <- glm(y~x, data=df[-100,])
+df_diag <- augment(df_lm)
+p2 <- ggplot(df_diag, aes(x=.cooksd)) + geom_density(fill="black", alpha=0.5) + ggtitle("Without the outlier") + theme_xkcd() +
+  xkcdaxis(c(0,0.2),c(0,80))
+grid.arrange(p1, p2, ncol=2)
+```
+
+Values are more spread, when the one extreme value is removed. No other points are influential.
+
+---
+# Solutions
+
+- Remove influential observations, and re-fit model
+- Transform explanatory variables to reduce influence
+- Use weighted regression to downweight influence of extreme observations
+
+---
+class: inverse middle 
+# Your turn
+
+- What happens when there are two extreme points with virtually the same values?
+
+---
+# Collinearity
+
+Population and GDP are standardised.
+
+```{r}
+olympics2012 <- read_csv("../data/olympics2012.csv")
+oly_gdp2016 <- read_csv("../data/gdp2016.csv")
+
+oly_gdp_2016_2012 <- full_join(oly_gdp2016[,c(1,5,6,7)],
+                           olympics2012[,c("Country","Total")],
+                     by="Country")
+colnames(oly_gdp_2016_2012)[2] <- "Total_2016"
+colnames(oly_gdp_2016_2012)[5] <- "Total_2012"
+
+oly_gdp_2016_2012 <- oly_gdp_2016_2012 %>% 
+  replace_na(list(Total_2016=0, Total_2012=0))
+
+oly_lm <- glm(Total_2016~Total_2012+Population_mil+GDP_PPP_bil, data=oly_gdp_2016_2012)
+oly_lm_est <- tidy(oly_lm)$estimate
+tidy(oly_lm)
+```
+
+Giving the model $M2016=$ `r oly_lm_est[1]` $+$ `r oly_lm_est[2]` $M2012+$ `r oly_lm_est[3]` $Pop+$ `r oly_lm_est[4]` $GDP+\varepsilon$ 
+
+---
+# Plot the explanatory variables
+
+```{r fig.align='center', fig.width=10, fig.height=5}
+library(GGally)
+ggscatmat(data.frame(oly_gdp_2016_2012), columns=c(5,3,4)) 
+```
+
+---
+# Explore countries
+
+```{r fig.align='center', fig.width=7, fig.height=5.5}
+p1 <- ggplot(oly_gdp_2016_2012, aes(x=Population_mil, y=Total_2012, 
+                                    label=Country)) + 
+  geom_point() + xlim(c(0, 1500)) + ylim(c(0,150))
+library(plotly)
+ggplotly(p1)
+```
+
+---
+# Variance inflation factor (VIF)
+
+$$\frac{1}{1-R_j^2}$$
+
+where $R_j^2$ is computed by regressing variable $j$ on all other variables. VIF is a measure the collinearity of the explanatory variables. Values greater than 10 are considered to be high. 
+
+These are the VIFs for the olympic medal tally data:
+
+```{r}
+library(car)
+vif(oly_lm)
+```
+
+---
+# Suppose we add 2008 counts as an explanatory variable
+
+```{r fig.align='center', fig.width=7, fig.height=5.5}
+olympics2008 <- read_csv("../data/olympics2008.csv")
+oly_gdp_2016_12_08 <- full_join(oly_gdp_2016_2012,
+                               olympics2008[,c("Country","Total")],
+                     by="Country")
+colnames(oly_gdp_2016_12_08)[6] <- "Total_2008"
+ggplot(oly_gdp_2016_12_08, aes(x=Total_2008, y=Total_2016)) + geom_point() + 
+  theme_xkcd() + xkcdaxis(c(0,125),c(0,125))
+```
+
+---
+# Model
+
+```{r}
+oly_lm <- glm(Total_2016~Total_2012+Total_2008+Population_mil+GDP_PPP_bil, data=oly_gdp_2016_12_08)
+oly_lm_est <- tidy(oly_lm)$estimate
+tidy(oly_lm)
+```
+
+Giving the model $M2016=$ `r oly_lm_est[1]` $+$ `r oly_lm_est[2]` $2012+$ `r oly_lm_est[3]` $M2008+$ `r oly_lm_est[4]` $Pop+$ `r oly_lm_est[5]` $GDP+\varepsilon$ 
+
+---
+# VIFs
+
+```{r}
+vif(oly_lm)
+```
+
+Notice that the VIFs for both 2008 and 2012 are high. 
+
+---
+class: inverse middle 
+# Your turn
+
+- Why is it called `Variance Inflation Factor`? Look at the standard deviation of the estimates for the model with 2012 and without 2004.  
+- Why would multicollinearity inflate variance of estimates?
+
+---
+# Solutions
+
+- Drop some variables
+- Use principal component regression (more advanced courses)
+- Partial regression: Fit best variable. Regress next explanatory variable first variable and use the residuals from this fit as the second variable in the model. Continue with other variables. 
+
+---
+# Resources
+
+- [Regression Diagnostics: Identifying Influential Data and Sources of Collinearity](http://onlinelibrary.wiley.com/book/10.1002/0471725153)
+
+---
+class: inverse middle 
+# Share and share alike
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
