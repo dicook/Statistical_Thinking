@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Fitting and Diagnosing   Multiple Linear Regression Models</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Dilini Talagala" />
+    <link href="index_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Fitting and Diagnosing <br/> Multiple Linear Regression Models
+### Dilini Talagala
+
+---
+
+
+
+
+###  Let's take a look at the OECD PISA 2015 data focusing on Australia
+
+
+```r
+library("tidyverse")
+library("forcats")
+load("pisa_au.rda")
+```
+
+#### About the dataset
+
+- There are ten values for each student for the science score. 
+- The raw scores that a student earns in the test are not distributed.
+- But rather a large linear model is constructed, and ten predictions are randomly generated for each student from the model.
+
+---
+### Scatterplot matrix of the plausible scores for each student of Australia
+
+
+
+```r
+library("GGally")
+
+sci_scores &lt;- pisa_au %&gt;% select(PV1SCIE, PV2SCIE, PV3SCIE,
+                                 PV4SCIE, PV5SCIE, PV6SCIE,
+                                 PV7SCIE, PV8SCIE, PV9SCIE,
+                                 PV10SCIE) %&gt;% as.data.frame()
+
+ggscatmat(sci_scores, alpha=0.1)
+```
+---
+&lt;img src="index_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Create a new variable which is the average of the ten scores for each student
+
+
+```r
+pisa_au &lt;- pisa_au %&gt;% 
+  mutate(science = (PV1SCIE + PV2SCIE + PV3SCIE + PV4SCIE + 
+                      PV5SCIE + PV6SCIE + PV7SCIE + PV8SCIE +
+                      PV9SCIE + PV10SCIE) / 10)
+```
+---
+### Students are tested at many different schools. How many schools?
+
+
+```r
+pisa_au %&gt;% group_by(CNTSCHID) %&gt;% tally() %&gt;% 
+  arrange(desc(n)) -&gt; aus_schools
+
+dim(aus_schools)
+# [1] 758   2
+```
+
+
+```r
+head(aus_schools)
+# # A tibble: 6 x 2
+#   CNTSCHID     n
+#      &lt;dbl&gt; &lt;int&gt;
+# 1  3600331    64
+# 2  3600421    60
+# 3  3600186    53
+# 4  3600522    53
+# 5  3600388    52
+# 6  3600409    49
+```
+
+---
+### Distribution of number of students tested at each school
+
+
+
+```r
+ggplot(aus_schools, aes(x = n)) + 
+  geom_density(fill = "black", alpha = 0.5)
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Selecting a subset of data  
+
+
+```r
+pisa_au &lt;- pisa_au %&gt;% 
+  select(science, ST004D01T, OUTHOURS, ANXTEST, EMOSUPP,
+         PARED, JOYSCIE, WEALTH, ST013Q01TA, ST012Q01TA,
+         SENWT)
+
+glimpse(pisa_au)
+# Observations: 14,530
+# Variables: 11
+# $ science    &lt;dbl&gt; 589.5787, 557.2042, 569.4709, 529.0353, 504.2148, 4...
+# $ ST004D01T  &lt;dbl+lbl&gt; 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 2, 2, 2, 1, 2,...
+# $ OUTHOURS   &lt;dbl+lbl&gt; 19, 7, NA, 23, 4, 9, 46, NA, 42, 0, NA, 25, 6, ...
+# $ ANXTEST    &lt;dbl+lbl&gt; -0.1522, 0.2594, 2.5493, 0.2563, 0.4517, 0.5175...
+# $ EMOSUPP    &lt;dbl+lbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,...
+# $ PARED      &lt;dbl+lbl&gt; 12, 12, 11, 15, 15, 15, 15, 12, 10, 15, 15, 15,...
+# $ JOYSCIE    &lt;dbl+lbl&gt; NA, -0.2145, 0.1250, 2.1635, 0.8931, NA, NA, -2...
+# $ WEALTH     &lt;dbl+lbl&gt; 0.0592, 0.7605, -0.1220, 0.9314, 0.7905, 0.7054...
+# $ ST013Q01TA &lt;dbl+lbl&gt; 5, 3, 4, 6, 3, 5, 4, 4, 4, 3, 5, 3, 4, 5, 5, 1,...
+# $ ST012Q01TA &lt;dbl+lbl&gt; 2, 4, 3, 4, 3, 4, 4, 3, 4, 3, 4, 4, 4, 3, 2, 4,...
+# $ SENWT      &lt;dbl&gt; 0.55007, 0.55007, 0.55007, 0.55007, 0.65245, 0.6524...
+```
+---
+##### Make summaries for each of the variables, to examine their suitability for modeling.
+
+```r
+summary(pisa_au)
+#     science        ST004D01T        OUTHOURS        ANXTEST       
+#  Min.   :215.1   Min.   :1.000   Min.   : 0.00   Min.   :-2.5050  
+#  1st Qu.:423.7   1st Qu.:1.000   1st Qu.: 8.00   1st Qu.:-0.4305  
+#  Median :502.5   Median :2.000   Median :15.00   Median : 0.1962  
+#  Mean   :498.7   Mean   :1.507   Mean   :16.84   Mean   : 0.2053  
+#  3rd Qu.:572.8   3rd Qu.:2.000   3rd Qu.:22.00   3rd Qu.: 0.7186  
+#  Max.   :802.0   Max.   :2.000   Max.   :70.00   Max.   : 2.5493  
+#                                  NA's   :4186    NA's   :632      
+#     EMOSUPP          PARED          JOYSCIE            WEALTH       
+#  Min.   : NA     Min.   : 3.00   Min.   :-2.1154   Min.   :-6.9778  
+#  1st Qu.: NA     1st Qu.:12.00   1st Qu.:-0.7825   1st Qu.: 0.0533  
+#  Median : NA     Median :14.00   Median : 0.0992   Median : 0.6003  
+#  Mean   :NaN     Mean   :13.35   Mean   : 0.0729   Mean   : 0.5827  
+#  3rd Qu.: NA     3rd Qu.:15.00   3rd Qu.: 0.5094   3rd Qu.: 1.1207  
+#  Max.   : NA     Max.   :15.00   Max.   : 2.1635   Max.   : 4.4269  
+#  NA's   :14530   NA's   :698     NA's   :1952      NA's   :433      
+#    ST013Q01TA      ST012Q01TA        SENWT        
+#  Min.   :1.000   Min.   :1.000   Min.   :0.01951  
+#  1st Qu.:2.000   1st Qu.:3.000   1st Qu.:0.12202  
+#  Median :3.000   Median :4.000   Median :0.33399  
+#  Mean   :3.387   Mean   :3.478   Mean   :0.34412  
+#  3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:0.53531  
+#  Max.   :6.000   Max.   :4.000   Max.   :1.12726  
+#  NA's   :549     NA's   :562
+```
+
+---
+
+class: inverse, center, middle
+
+# Handling missing data
+
+
+---
+#### EMOSUPP is all missing, cannot use this variable.
+
+Actions to take:
+- Drop EMOSUPP
+
+
+```r
+pisa_au &lt;- pisa_au %&gt;% select(-EMOSUPP)
+
+glimpse(pisa_au)
+# Observations: 14,530
+# Variables: 10
+# $ science    &lt;dbl&gt; 589.5787, 557.2042, 569.4709, 529.0353, 504.2148, 4...
+# $ ST004D01T  &lt;dbl+lbl&gt; 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 2, 2, 2, 1, 2,...
+# $ OUTHOURS   &lt;dbl+lbl&gt; 19, 7, NA, 23, 4, 9, 46, NA, 42, 0, NA, 25, 6, ...
+# $ ANXTEST    &lt;dbl+lbl&gt; -0.1522, 0.2594, 2.5493, 0.2563, 0.4517, 0.5175...
+# $ PARED      &lt;dbl+lbl&gt; 12, 12, 11, 15, 15, 15, 15, 12, 10, 15, 15, 15,...
+# $ JOYSCIE    &lt;dbl+lbl&gt; NA, -0.2145, 0.1250, 2.1635, 0.8931, NA, NA, -2...
+# $ WEALTH     &lt;dbl+lbl&gt; 0.0592, 0.7605, -0.1220, 0.9314, 0.7905, 0.7054...
+# $ ST013Q01TA &lt;dbl+lbl&gt; 5, 3, 4, 6, 3, 5, 4, 4, 4, 3, 5, 3, 4, 5, 5, 1,...
+# $ ST012Q01TA &lt;dbl+lbl&gt; 2, 4, 3, 4, 3, 4, 4, 3, 4, 3, 4, 4, 4, 3, 2, 4,...
+# $ SENWT      &lt;dbl&gt; 0.55007, 0.55007, 0.55007, 0.55007, 0.65245, 0.6524...
+```
+
+---
+
+- **OUTHOURS has about one third missing, might be unreliable**
+- **JOYSCIE has 10% missing, might be unreliable**
+
+Actions to take:
+- Remove any case with missing values and check numbers remaining
+
+
+
+```r
+aus_nomiss &lt;- pisa_au %&gt;% filter(!is.na(OUTHOURS)) %&gt;%
+  filter(!is.na(ANXTEST)) %&gt;% filter(!is.na(PARED)) %&gt;%
+  filter(!is.na(JOYSCIE)) %&gt;% filter(!is.na(WEALTH)) %&gt;%
+  filter(!is.na(ST013Q01TA)) %&gt;% filter(!is.na(ST012Q01TA))
+
+nrow(pisa_au)
+# [1] 14530
+
+nrow(aus_nomiss)
+# [1] 9286
+```
+
+---
+
+### Let's look at the distribution of weights
+
+- The students all have weights associated with them. 
+- This is an indication of how many other students they represent in Australia, relative to their socioeconomic and demographic characteristics. 
+
+
+
+```r
+ggplot(aus_nomiss, aes(x=SENWT)) + 
+  geom_density(fill = "black", alpha = 0.5)
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+---
+
+#### The weights are bimodal with a few very large ones
+
+- Is the bimodality due to one of the variables in the study that we are using for the model? *It is not due to gender!*
+
+
+
+```r
+ggplot(aus_nomiss, aes(x=SENWT)) + 
+  facet_wrap(~ST004D01T) +
+  geom_density(fill="black", alpha=0.5)
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+---
+
+class: inverse, center, middle
+
+# Model building 
+
+Response: `science` (standardised)
+
+Explanatory variables:  all the remaining variables
+
+
+---
+### Transforming data
+
+- Some variables need to be treated as categorical variables
+- So it is best if they are forced to be factors before modeling:
+
+
+
+```r
+aus_nomiss &lt;- aus_nomiss %&gt;%
+  mutate(ST004D01T = factor(ST004D01T, 
+                            levels=c(1,2),
+                            labels=c("f", "m")))
+```
+
+- Standardising the response variable: `science` 
+
+```r
+aus_nomiss &lt;- aus_nomiss %&gt;% 
+  mutate(science_std = (science - mean(science)) / sd(science))
+```
+
+---
+
+##### Fitting weighted multiple regression model for science against gender, and joy of science. 
+
+
+```r
+aus_glm_test &lt;- glm(science_std ~ ST004D01T + JOYSCIE,
+                    data = aus_nomiss, weights = SENWT)
+
+summary(aus_glm_test)
+# 
+# Call:
+# glm(formula = science_std ~ ST004D01T + JOYSCIE, data = aus_nomiss, 
+#     weights = SENWT)
+# 
+# Deviance Residuals: 
+#      Min        1Q    Median        3Q       Max  
+# -2.44167  -0.32606  -0.00879   0.32087   2.10647  
+# 
+# Coefficients:
+#              Estimate Std. Error t value Pr(&gt;|t|)    
+# (Intercept) -0.025605   0.013102  -1.954   0.0507 .  
+# ST004D01Tm   0.035240   0.018813   1.873   0.0611 .  
+# JOYSCIE      0.333510   0.008377  39.815   &lt;2e-16 ***
+# ---
+# Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+# 
+# (Dispersion parameter for gaussian family taken to be 0.2996778)
+# 
+#     Null deviance: 3264.3  on 9285  degrees of freedom
+# Residual deviance: 2781.9  on 9283  degrees of freedom
+# AIC: 27324
+# 
+# Number of Fisher Scoring iterations: 2
+```
+
+---
+### Sketch what this model looks like.
+
+
+```r
+coefs &lt;- coefficients(aus_glm_test)
+
+ggplot() + 
+  geom_abline(intercept=coefs[1], slope=coefs[3], colour="red")+
+  geom_abline(intercept=coefs[1]+coefs[2], slope=coefs[3],
+              colour="blue") +
+  xlim(range(aus_nomiss$JOYSCIE)) + ylim(c(-1,1))
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+Make plots of the response variable `science_std` against each of the possible explanatory variables. 
+
+A good selection of plots are:
+
+- side-by-side boxplots for the categorical (or discrete) predictors
+
+- a smoother for the continuous predictors.
+
+---
+
+
+
+```r
+library(gridExtra)
+
+p1 &lt;- ggplot(aus_nomiss, aes(x=ST004D01T, y=science_std)) + 
+  geom_boxplot() + xlab("Gender")
+p2 &lt;- ggplot(aus_nomiss, aes(x=factor(PARED), y=science_std)) +
+  geom_boxplot() + xlab("Parents years of schools")
+p3 &lt;- ggplot(aus_nomiss, aes(x=OUTHOURS, y=science_std)) +
+  geom_smooth() + xlab("Out-of-School Study Time")
+p4 &lt;- ggplot(aus_nomiss, aes(x=WEALTH, y=science_std)) +
+  geom_smooth() + xlab("Family wealth (WLE)")
+
+grid.arrange(p1, p2, p3, p4, ncol=4)
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-19-1.png" style="display: block; margin: auto;" /&gt;
+---
+## Your turn
+
+Add the following variables to the same grid
+
+- ST012Q01TA: ("How many Televisions are there in your home ") 
+- ST013Q01TA: ("How many books are there in your home")
+- ANXTEST: ("Personality: Test Anxiety (WLE)")
+- JOYSCIE: ("Enjoyment of science (WLE)")
+
+---
+### Compute the leverage and influence statistics
+
+
+```r
+library("broom")
+model_augment &lt;- augment(your-model-here)
+
+ggplot(model_augment, aes(x=.hat, y=.cooksd)) +
+  geom_point()+
+  theme(aspect.ratio=1)
+```
+---
+
+### Compute the variance inflation factors
+
+
+```r
+library("car")
+
+vif(your-model-here)
+```
+
+---
+
+class: inverse, center, middle
+
+
+## Resources
+
+[Statistics online textbook, Diez, Barr, Cetinkaya-Rundel](https://www.openintro.org/stat/textbook.php?stat_book=isrs). 
+
+
+# Happy learning with R :)
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

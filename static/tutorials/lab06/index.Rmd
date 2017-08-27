@@ -1,0 +1,309 @@
+---
+title: "Fitting and Diagnosing <br/> Multiple Linear Regression Models"
+author: "Dilini Talagala"
+output:
+  xaringan::moon_reader:
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r echo = FALSE, message = FALSE, warning = FALSE, warning = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  error = FALSE, 
+  echo = FALSE, 
+  collapse = TRUE,
+  comment = "#",
+  fig.height = 8,
+  fig.width = 10,
+  fig.align = "center",
+  cache = FALSE
+)
+library(knitr)
+```
+
+###  Let's take a look at the OECD PISA 2015 data focusing on Australia
+
+```{r echo=TRUE}
+library("tidyverse")
+library("forcats")
+load("pisa_au.rda")
+```
+
+#### About the dataset
+
+- There are ten values for each student for the science score. 
+- The raw scores that a student earns in the test are not distributed.
+- But rather a large linear model is constructed, and ten predictions are randomly generated for each student from the model.
+
+---
+### Scatterplot matrix of the plausible scores for each student of Australia
+
+
+```{r echo=TRUE, eval=FALSE}
+library("GGally")
+
+sci_scores <- pisa_au %>% select(PV1SCIE, PV2SCIE, PV3SCIE,
+                                 PV4SCIE, PV5SCIE, PV6SCIE,
+                                 PV7SCIE, PV8SCIE, PV9SCIE,
+                                 PV10SCIE) %>% as.data.frame()
+
+ggscatmat(sci_scores, alpha=0.1)
+```
+---
+```{r eval=TRUE,  fig.height=8}
+library("GGally")
+sci_scores <- pisa_au %>% select(PV1SCIE, PV2SCIE, PV3SCIE,
+                                 PV4SCIE, PV5SCIE, PV6SCIE,
+                                 PV7SCIE, PV8SCIE, PV9SCIE,
+                                 PV10SCIE) %>% as.data.frame()
+
+ggscatmat(sci_scores, alpha=0.1)
+```
+
+---
+
+### Create a new variable which is the average of the ten scores for each student
+
+```{r echo=TRUE}
+pisa_au <- pisa_au %>% 
+  mutate(science = (PV1SCIE + PV2SCIE + PV3SCIE + PV4SCIE + 
+                      PV5SCIE + PV6SCIE + PV7SCIE + PV8SCIE +
+                      PV9SCIE + PV10SCIE) / 10)
+```
+---
+### Students are tested at many different schools. How many schools?
+
+```{r echo=TRUE}
+pisa_au %>% group_by(CNTSCHID) %>% tally() %>% 
+  arrange(desc(n)) -> aus_schools
+
+dim(aus_schools)
+
+```
+
+```{r echo = TRUE}
+head(aus_schools)
+```
+
+---
+### Distribution of number of students tested at each school
+
+
+```{r echo=TRUE, fig.height= 6}
+ggplot(aus_schools, aes(x = n)) + 
+  geom_density(fill = "black", alpha = 0.5)
+```
+
+---
+
+### Selecting a subset of data  
+
+```{r echo=TRUE}
+pisa_au <- pisa_au %>% 
+  select(science, ST004D01T, OUTHOURS, ANXTEST, EMOSUPP,
+         PARED, JOYSCIE, WEALTH, ST013Q01TA, ST012Q01TA,
+         SENWT)
+
+glimpse(pisa_au)
+```
+---
+##### Make summaries for each of the variables, to examine their suitability for modeling.
+```{r echo=TRUE, size="large"}
+summary(pisa_au)
+```
+
+---
+
+class: inverse, center, middle
+
+# Handling missing data
+
+
+---
+#### EMOSUPP is all missing, cannot use this variable.
+
+Actions to take:
+- Drop EMOSUPP
+
+```{r echo=TRUE}
+pisa_au <- pisa_au %>% select(-EMOSUPP)
+
+glimpse(pisa_au)
+
+```
+
+---
+
+- **OUTHOURS has about one third missing, might be unreliable**
+- **JOYSCIE has 10% missing, might be unreliable**
+
+Actions to take:
+- Remove any case with missing values and check numbers remaining
+
+
+```{r echo=TRUE}
+aus_nomiss <- pisa_au %>% filter(!is.na(OUTHOURS)) %>%
+  filter(!is.na(ANXTEST)) %>% filter(!is.na(PARED)) %>%
+  filter(!is.na(JOYSCIE)) %>% filter(!is.na(WEALTH)) %>%
+  filter(!is.na(ST013Q01TA)) %>% filter(!is.na(ST012Q01TA))
+
+nrow(pisa_au)
+
+nrow(aus_nomiss)
+
+```
+
+---
+
+### Let's look at the distribution of weights
+
+- The students all have weights associated with them. 
+- This is an indication of how many other students they represent in Australia, relative to their socioeconomic and demographic characteristics. 
+
+
+```{r fig.height= 4, echo=TRUE}
+ggplot(aus_nomiss, aes(x=SENWT)) + 
+  geom_density(fill = "black", alpha = 0.5)
+```
+---
+
+#### The weights are bimodal with a few very large ones
+
+- Is the bimodality due to one of the variables in the study that we are using for the model? *It is not due to gender!*
+
+
+```{r fig.height = 5, echo = TRUE}
+ggplot(aus_nomiss, aes(x=SENWT)) + 
+  facet_wrap(~ST004D01T) +
+  geom_density(fill="black", alpha=0.5)
+```
+---
+
+class: inverse, center, middle
+
+# Model building 
+
+Response: `science` (standardised)
+
+Explanatory variables:  all the remaining variables
+
+
+---
+### Transforming data
+
+- Some variables need to be treated as categorical variables
+- So it is best if they are forced to be factors before modeling:
+
+
+```{r echo=TRUE}
+aus_nomiss <- aus_nomiss %>%
+  mutate(ST004D01T = factor(ST004D01T, 
+                            levels=c(1,2),
+                            labels=c("f", "m")))
+```
+
+- Standardising the response variable: `science` 
+```{r echo=TRUE, out.height= 3}
+aus_nomiss <- aus_nomiss %>% 
+  mutate(science_std = (science - mean(science)) / sd(science))
+
+```
+
+---
+
+##### Fitting weighted multiple regression model for science against gender, and joy of science. 
+
+```{r echo=TRUE, size="small"}
+aus_glm_test <- glm(science_std ~ ST004D01T + JOYSCIE,
+                    data = aus_nomiss, weights = SENWT)
+
+summary(aus_glm_test)
+```
+
+---
+### Sketch what this model looks like.
+
+```{r echo=TRUE, fig.height= 4}
+coefs <- coefficients(aus_glm_test)
+
+ggplot() + 
+  geom_abline(intercept=coefs[1], slope=coefs[3], colour="red")+
+  geom_abline(intercept=coefs[1]+coefs[2], slope=coefs[3],
+              colour="blue") +
+  xlim(range(aus_nomiss$JOYSCIE)) + ylim(c(-1,1))
+
+```
+
+---
+
+Make plots of the response variable `science_std` against each of the possible explanatory variables. 
+
+A good selection of plots are:
+
+- side-by-side boxplots for the categorical (or discrete) predictors
+
+- a smoother for the continuous predictors.
+
+---
+
+
+```{r echo = TRUE, eval = TRUE, fig.height=3}
+library(gridExtra)
+
+p1 <- ggplot(aus_nomiss, aes(x=ST004D01T, y=science_std)) + 
+  geom_boxplot() + xlab("Gender")
+p2 <- ggplot(aus_nomiss, aes(x=factor(PARED), y=science_std)) +
+  geom_boxplot() + xlab("Parents years of schools")
+p3 <- ggplot(aus_nomiss, aes(x=OUTHOURS, y=science_std)) +
+  geom_smooth() + xlab("Out-of-School Study Time")
+p4 <- ggplot(aus_nomiss, aes(x=WEALTH, y=science_std)) +
+  geom_smooth() + xlab("Family wealth (WLE)")
+
+grid.arrange(p1, p2, p3, p4, ncol=4)
+```
+---
+## Your turn
+
+Add the following variables to the same grid
+
+- ST012Q01TA: ("How many Televisions are there in your home ") 
+- ST013Q01TA: ("How many books are there in your home")
+- ANXTEST: ("Personality: Test Anxiety (WLE)")
+- JOYSCIE: ("Enjoyment of science (WLE)")
+
+---
+### Compute the leverage and influence statistics
+
+```{r echo = TRUE, fig.height= 5, eval = FALSE}
+library("broom")
+model_augment <- augment(your-model-here)
+
+ggplot(model_augment, aes(x=.hat, y=.cooksd)) +
+  geom_point()+
+  theme(aspect.ratio=1)
+```
+---
+
+### Compute the variance inflation factors
+
+```{r echo= TRUE, eval = FALSE}
+library("car")
+
+vif(your-model-here)
+```
+
+---
+
+class: inverse, center, middle
+
+
+## Resources
+
+[Statistics online textbook, Diez, Barr, Cetinkaya-Rundel](https://www.openintro.org/stat/textbook.php?stat_book=isrs). 
+
+
+# Happy learning with R :)
