@@ -536,7 +536,6 @@ ggplot(florida_all) + geom_point(aes(x=fitted, y=Log_Buchanan)) +
 # Resources
 
 - [Statistics online textbook, Diez, Barr, Cetinkaya-Rundel](https://www.openintro.org/stat/textbook.php?stat_book=isrs)
-- [Mike Akritas PSU lecture notes](http://sites.stat.psu.edu/~mga/401/course.info/lesson8.pdf)
 - [Nice example for automotive costs](http://fmwww.bc.edu/cef00/papers/paper71.pdf)
 - [2000 US Election Florida undercount](http://www.ssc.wisc.edu/~bhansen/vote/florida.pdf)
 
