@@ -372,7 +372,7 @@ glimpse(florida)
 ```
 
 ---
-# Fit model
+# Fit model, without Palm Beach
 
 ```{r}
 florida_lm <- glm(Log_Buchanan~`age 65 (%)` + Black + Hispanic + 
