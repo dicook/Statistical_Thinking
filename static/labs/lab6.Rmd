@@ -209,7 +209,7 @@ ggplot(aus_glm_augment, aes(x=.hat, y=.cooksd)) + geom_point()
 
 ## Question 4
 
-- Plot the observed vs fitted values. How good is the model for predicting math score? (Is it weak, moderate or strong?)
+- Plot the observed vs fitted values. How good is the model for predicting science score? (Is it weak, moderate or strong?)
 
 ```{r eval=FALSE}
 ggplot(aus_glm_augment, aes(x=.fitted, y=science_std)) + geom_point()

@@ -35,7 +35,7 @@ title: Home
 - Week 3: Hypothesis testing [Slides 1](lectures/week3.class1.html) ([Rmd](lectures/week3.class1.Rmd)) [Slides 2](lectures/week3.class2.html) ([Rmd](lectures/week3.class2.Rmd)); Reading: [Data Scientist’s Crib Sheet](https://blog.cloudera.com/blog/2015/12/common-probability-distributions-the-data-scientists-crib-sheet/), [Gallery of distributions](http://www.itl.nist.gov/div898/handbook/eda/section3/eda366.htm), [Distributions for Actuaries](http://www.casact.org/pubs/monographs/papers/02-Bahnemann.pdf)
 - Week 4: Distribution theory; [Slides 1](lectures/week4.class1.html) ([Rmd](lectures/week4.class1.Rmd)) [Slides 2](lectures/week4.class2.html) ([Rmd](lectures/week4.class2.Rmd))  [Data science explanation of MLE](https://medium.com/towards-data-science/parameter-inference-maximum-likelihood-2382ef895408) [PSU Stat 414](https://onlinecourses.science.psu.edu/stat414/node/191)
 - Week 5: Linear models: [Slides 1](lectures/week5.class1.html) ([Rmd](lectures/week5.class1.Rmd)), [Slides 2](lectures/week5.class2.html) ([Rmd](lectures/week5.class2.Rmd)); Reading: Chapter 5 of textbook, linear models
-- Week 6: [Bootstrap intervals](lectures/week6.class1.html) ([Rmd](lectures/week6.class1.Rmd))); Generalised linear models; Reading:  Reading: Chapter 4.5 of textbook (its a bit misleading, though), and [A really simple explanation](http://www.dummies.com/education/science/biology/the-bootstrap-method-for-standard-errors-and-confidence-intervals/),  wikipedia page on [bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)), 
+- Week 6: [Bootstrap intervals](lectures/week6.class1.html) ([Rmd](lectures/week6.class1.Rmd)); Generalised linear models; Reading:  Reading: Chapter 4.5 of textbook (its a bit misleading, though), and [A really simple explanation](http://www.dummies.com/education/science/biology/the-bootstrap-method-for-standard-errors-and-confidence-intervals/),  wikipedia page on [bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)), 
 - Week 7: Mixed effects models
 - Week 8: Data wrangling
 - Week 9: Modelling risk and loss
@@ -50,6 +50,7 @@ title: Home
 - Week 3: [Hypothesis testing](labs/lab3.pdf) [(Rmd)](labs/lab3.Rmd) [SOLUTION](labs/lab3_solution.pdf) [(Rmd)](labs/lab3_solution.Rmd); [Tutorial slides](tutorials/lab03/index.html) [(Rmd)](tutorials/lab03/index.Rmd)
 - Week 4: [Fitting distributions](labs/lab4.pdf) [(Rmd)](labs/lab4.Rmd); [Tutorial slides](tutorials/lab04/index.html) [(Rmd)](tutorials/lab04/index.Rmd) [usworkcomp.rda](labs/usworkcomp.rda)
 - Week 5: [Linear models](labs/lab5.pdf) [(Rmd)](labs/lab5.Rmd); [Tutorial slides](tutorials/lab05/index.html) [(Rmd)](tutorials/lab05/index.Rmd)
+- Week 6: [Diagnosing models](labs/lab5.pdf) [(Rmd)](labs/lab6.Rmd); [Tutorial slides](tutorials/lab06/index.html) [(Rmd)](tutorials/lab06/index.Rmd)
 
 ## Computing information
 

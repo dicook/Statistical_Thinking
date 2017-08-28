@@ -227,7 +227,14 @@ summary(aus_glm_test)
 ---
 ### Sketch what this model looks like.
 
-```{r echo=TRUE, fig.height= 4}
+- Think about it
+- The basic model is a line
+- What estimate changes between girls and boys
+- How does this estimate change the straight line equation, does it modify the intersection or the slope or both?
+- Now hand-sketch what it looks like, even if you need to air draw, or dust on the desk draw!
+- To check your answer run the code give in the lab
+
+```{r eval=FALSE, fig.height= 4}
 coefs <- coefficients(aus_glm_test)
 
 ggplot() + 

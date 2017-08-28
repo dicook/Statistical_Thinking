@@ -2,7 +2,7 @@
 title: 'Statistical Thinking using Randomisation and Simulation'
 subtitle: 'Bootstrap, Permutation and Linear Models'
 author: Di Cook (dicook@monash.edu, @visnut)
-date: "W5.C2"
+date: "W6.C1"
 output:
   xaringan::moon_reader:
     css: ["default", "myremark.css"]
@@ -86,11 +86,11 @@ $$\frac{b_1}{SE(b_1)}$$
 
 where
 
-$$SE(b_1)=\frac{MSE}{\sqrt{\sum_{i=1}^n(x_i - \bar{x})^2}}$$
+$$SE(b_1)=\sqrt{\frac{MSE}{\sum_{i=1}^n(x_i - \bar{x})^2}}$$
 
 and 
 
-$$ MSE=\sqrt{\frac{\sum_{i=1}^n (y_i - \hat{y}_i)^2}{(n - 2)}}$$
+$$ MSE=\frac{\sum_{i=1}^n (y_i - \hat{y}_i)^2}{(n - 2)}$$
 
 Check the numbers in the table.
 
@@ -125,7 +125,7 @@ Explanation: We are 95% sure that the slope of a regression model fitted to the 
 ---
 # Confidence interval for predicted value
 
-For a given value of $x$, $\hat{y} \pm t_{\alpha/2, n-2}MSE\sqrt{\frac{1}{n}+\frac{n(x-\bar{X})^2}{n\sum_{i=1}^n(X_i-\bar{X})^2}}$
+For a given value of $x$, $\hat{y} \pm t_{\alpha/2, n-2}\sqrt{MSE(\frac{1}{n}+\frac{n(x-\bar{X})^2}{n\sum_{i=1}^n(X_i-\bar{X})^2})}$
 
 ```{r}
 newdat <- data.frame(M2008=seq(0, 2.2, 0.1), M2012=NA)
@@ -142,7 +142,7 @@ ggplot(oly, aes(x=M2008, y=M2012)) + geom_point(alpha=0.3) +
 ---
 # Prediction interval for NEW value
 
-For a given value of $x$, $\hat{y} \pm t_{\alpha/2, n-2}MSE\sqrt{1+\frac{1}{n}+\frac{n(x-\bar{X})^2}{n\sum_{i=1}^n(X_i-\bar{X})^2}}$
+For a given value of $x$, $\hat{y} \pm t_{\alpha/2, n-2}\sqrt{MSE(1+\frac{1}{n}+\frac{n(x-\bar{X})^2}{n\sum_{i=1}^n(X_i-\bar{X})^2})}$
 
 MSE from model fit is `r sqrt(summary(oly_lm)$dispersion)`.
 
