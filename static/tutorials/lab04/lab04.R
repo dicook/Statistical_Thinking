@@ -51,7 +51,7 @@ df <- df %>%
     dist, levels = c("d1", "d2", "d3"), 
     labels = c("Weibull(3, 1.5)", "Weibull(2, 2)", "Weibull(1,1)")
   ))
-ggplot(df, aes(x=x, y = density, colour = dist)) + 
+ggplot(df, aes(x = x, y = density, colour = dist)) + 
   geom_line()
 
 ## ---- q1-a
@@ -93,8 +93,7 @@ nmle <- function(x, alpha, beta) {
 
 ## ---- q2-nmle-fun
 nmle <- function(x, alpha, beta) {
-  likelihood <- prod(dgamma(x, alpha, beta))
-  return(likelihood)
+  prod(dgamma(x, alpha, beta))
 }
 
 
@@ -116,6 +115,7 @@ ggplot(g, aes(x = x, y = y, fill = l)) +
   ylab(expression(beta)) + 
   theme_bw() + 
   theme(aspect.ratio = 1)
+
 
 ## ---- q2-plotly
 m <- matrix(g$l, nrow = length(alpha))
