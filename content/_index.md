@@ -36,7 +36,7 @@ title: Home
 - Week 4: Distribution theory; [Slides 1](lectures/week4.class1.html) ([Rmd](lectures/week4.class1.Rmd)) [Slides 2](lectures/week4.class2.html) ([Rmd](lectures/week4.class2.Rmd))  [Data science explanation of MLE](https://medium.com/towards-data-science/parameter-inference-maximum-likelihood-2382ef895408) [PSU Stat 414](https://onlinecourses.science.psu.edu/stat414/node/191)
 - Week 5: Linear models: [Slides 1](lectures/week5.class1.html) ([Rmd](lectures/week5.class1.Rmd)), [Slides 2](lectures/week5.class2.html) ([Rmd](lectures/week5.class2.Rmd)); Reading: Chapter 5 of textbook, linear models
 - Week 6: [Bootstrap intervals](lectures/week6.class1.html) ([Rmd](lectures/week6.class1.Rmd)); [Generalised linear models](lectures/week6.class2.html) ([Rmd](lectures/week6.class2.Rmd)); Reading:  Reading: Chapter 4.5 of textbook (its a bit misleading, though), and [A really simple explanation](http://www.dummies.com/education/science/biology/the-bootstrap-method-for-standard-errors-and-confidence-intervals/),  wikipedia page on [bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(statistics))
-- Week 7: Mixed effects models
+- Week 7: Mixed effects models; Reading: [Fitting linear mixed effects models](https://www.jstatsoft.org/article/view/v067i01/v67i01.pdf) sections 1, 2 and 5
 - Week 8: Data wrangling
 - Week 9: Modelling risk and loss
 - Week 10: Bayesian inference
