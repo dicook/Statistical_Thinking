@@ -53,6 +53,13 @@ title: Home
 - Week 6: [Diagnosing models](labs/lab6.pdf) [(Rmd)](labs/lab6.Rmd); [Tutorial slides](tutorials/lab06/index.html) [(Rmd)](tutorials/lab06/index.Rmd) [pisa_au.rda](tutorials/lab06/pisa_au.rda)
 - Week 7: [Bootstrap intervals](labs/lab7.pdf) [(Rmd)](labs/lab7.Rmd); [Tutorial slides](tutorials/lab07/index.html) [(Rmd)](tutorials/lab07/index.Rmd)
 
+## Last year's exams 
+
+Note that it was open book, 3 hours, and worth 70%
+
+- [Exam](exam/ETC2420_exam2016.pdf), [SOLUTION](exam/ETC2420_exam2016_solution.pdf)
+- [Practice Exam](exam/practice_exam2016_ETC2420_5242.pdf), [SOLUTION](exam/practice_exam2016_ETC2420_5242_solution.pdf)
+
 ## Computing information
 
 - R (Friday 2017-06-30, Single Candle) R-3.4.1, install on your computer from https://cran.r-project.org
