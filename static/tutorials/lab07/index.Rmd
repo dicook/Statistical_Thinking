@@ -1,0 +1,168 @@
+---
+title: "Bootstrap Confidence Intervals"
+author: "Thiyanga Talagala"
+output:
+  xaringan::moon_reader:
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  warning = FALSE, message = FALSE, 
+	fig.align = 'center', fig.width = 10, fig.height = 6)
+
+```
+
+## Data
+
+Model building will be done using:
+
+- Response: `science` (standardised)
+- Explanatory variables: `ST004D01T, JOYSCIE, ST013Q01TA, ST012Q01TA`.
+
+
+```{r echo=TRUE}
+library(tidyverse)
+load("pisa_au.rda")
+
+pisa_au <- pisa_au %>% 
+  mutate(science = (PV1SCIE+PV2SCIE+PV3SCIE+PV4SCIE+
+                    PV5SCIE+PV6SCIE+PV7SCIE+PV8SCIE+
+                    PV9SCIE+PV10SCIE)/10) %>%
+  select(science, ST004D01T, JOYSCIE, ST013Q01TA, ST012Q01TA, SENWT)
+```
+
+---
+class: inverse middle 
+# Your turn
+
+ - remove cases with missing values
+ - change gender to be a factor
+ - standardise the science scores
+
+---
+## Model building
+
+```{r echo=F}
+aus_nomiss <- pisa_au %>% 
+  filter(!is.na(JOYSCIE)) %>% 
+  filter(!is.na(ST013Q01TA)) %>% filter(!is.na(ST012Q01TA))
+aus_nomiss <- aus_nomiss %>%
+  mutate(ST004D01T=factor(ST004D01T, levels=c(1,2), labels=c("f", "m")), 
+         science_std = (science-mean(science))/sd(science)) %>%
+  rename(gender=ST004D01T, nbooks=ST013Q01TA, ntvs=ST012Q01TA)
+```
+
+```{r}
+aus_glm <- glm(science_std~gender+JOYSCIE+nbooks+ntvs, data=aus_nomiss, weights=SENWT)
+summary(aus_glm)
+```
+---
+## Classical confidence interval
+
+$$\hat{\beta}_{4} \pm t_{\alpha/2, n - (k + 1)} \times \mathrm{S.E.}(\hat{\beta}_{4})$$
+
+```{r}
+coef <- summary(aus_glm)$coefficients
+n <- nrow(aus_nomiss)# no. of observations
+beta_4 <- coef[4, 1] # coefficient
+se_4 <- coef[4, 2] # standard error
+df <- n - 5 # degree of freedom = n - (k + 1)
+t_crit <- qt(0.975, df) # t critical value
+c(beta_4 - t_crit * se_4, beta_4 + t_crit * se_4) # (lower, upper)
+
+```
+---
+## Confidence intervals via bootsrap
+
+Step 1:
+
+- `boot` package can generate bootsrap samples for weighted data.
+-  To use the `boot` function for drawing samples, you need a function to compute the statistic of interest.
+-  Write the function to return the slope for `nbooks` after fitting a `glm` to a bootstrap sample.
+
+The skeleton of the function:
+```{r eval=F}
+calc_stat <- function(d, i) { # d-data, i - vector of indices of the bootstrap sample
+  x <- d[i,] 
+  mod <- FILL IN THE NECESSARY CODE
+  stat <- FILL IN THE NECESSARY CODE
+  return(stat)
+}
+```
+
+---
+## Confidence intervals via bootsrap (cont.)
+
+Step 2:
+ - Make a 95% bootsrap confidence interval
+```{r eval=F}
+library(boot)
+stat <- boot(aus_nomiss, statistic=calc_stat, R=1000,
+     weights=aus_nomiss$SENWT)
+stat
+
+```
+
+---
+## Confidence intervals via bootsrap (cont.)
+
+```{r echo=FALSE}
+library(boot)
+calc_stat <- function(d, i) {
+  x <- d[i,]
+  mod <- glm(science_std~gender+JOYSCIE+nbooks+ntvs, data=x, weights=SENWT)
+  stat <- as.numeric(coefficients(mod)[4])
+  return(stat)
+}
+stat <- boot(aus_nomiss, statistic=calc_stat, R=1000,
+     weights=aus_nomiss$SENWT)
+stat
+```
+ 
+The 95% bootsrap confidence interval is 
+```{r}
+c(sort(stat$t)[25],sort(stat$t)[975])
+```
+ 
+---
+## Bootstrap confidence interval for predicted value
+
+Step 1:
+- Write a function to calculate the predicted value for a girl, enjoys science (JOYSCIE=1.0) two TVs and 26-100 books in the home. The weight for a student like this is 0.2. 
+
+The skeleton of the function:
+```{r eval=F}
+calc_pred <- function(d, i, newd) {
+  x <- d[i,]
+  mod <- FILL IN THE NECESSARY CODE
+  pred <- FILL IN THE NECESSARY CODE
+  return(pred)
+}
+```
+
+Step 02: 
+- Make a 95% bootsrap confidence interval
+- Be sure to convert the values back into the actual math score range
+
+---
+## Prediction Interval
+
+- Compute the residuals from the fitted model 
+- Bootstrap the residuals
+- Find the desired quantiles of the residuals
+- Compute prediction intervals by adding residual quantiles to fitted value
+
+```{r eval=F}
+calc_res <- function(d, i) {
+  x <- d[i,]
+  mod <- FILL IN THE NECESSARY CODE
+  res <- FILL IN THE NECESSARY CODE
+  return(c(l=min(res), u=max(res)))
+}
+```
