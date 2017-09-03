@@ -1,0 +1,266 @@
+---
+title: "ETC 2420/5242 Lab 4 2017"
+author: "SOLUTION"
+date: "Week 4"
+output: pdf_document
+---
+
+```{r echo = FALSE, message = FALSE, warning = FALSE, warning = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  error = FALSE, 
+  echo = FALSE, 
+  collapse = TRUE,
+  comment = "#",
+  fig.height = 4,
+  fig.width = 8,
+  fig.align = "center",
+  cache = FALSE
+)
+```
+
+## Purpose
+
+This lab is to examine different statistical distributions, fit distributions to samples by estimating the parameters by maximum likelihood and checking the fit with QQ-plots. 
+
+## Reading
+
+Read the material on maximum likelihood estimation at [https://onlinecourses.science.psu.edu/stat414/node/191](https://onlinecourses.science.psu.edu/stat414/node/191). 
+
+Read the code in the lecture notes from Week 3. Particularly look at the functions for making QQ-plots, computing and plotting the likelihood functions.
+
+## Warmup exercises
+
+- Compute these probabilities for $X\sim N(3.3, 1.1)$
+    + $P(X<1.3)$ `r pnorm(1.3, 3.3, 1.1)`
+    + $P(X>1.9)$ `r 1-pnorm(1.9, 3.3, 1.1)`
+    + $P(1.8<X<2.2)$ `r pnorm(2.2, 3.3, 1.1)-pnorm(1.8, 3.3, 1.1)`
+- Compute the quantile value (X) for $X\sim N(-10, 4)$ which matches these probabilities
+    + $P(X<x)=0.53$ `r qnorm(0.53, -10, 4)`
+    + $P(X<x)=0.12$ `r qnorm(0.12, -10, 4)`
+    + $P(X<x)=0.84$ `r qnorm(0.84, -10, 4)`
+    + $P(X<x)=1.2$ `Not possible`
+- Compute the value of the density function for a $N(12, 5)$ corresponding to $X=$
+    + 13.0 `r dnorm(13, 12, 5)`
+    + 4.0 `r dnorm(4, 12, 5)`
+    + 20.0 `r dnorm(20, 12, 5)`
+- Plot the density curves a 
+    + $Weibull(3, 1.5)$ 
+    + $Weibull(2, 2)$
+    + $Weibull(1, 1)$
+on the same plot.
+
+```{r}
+library(tidyverse)
+df <- data.frame(x=seq(0, 5, 0.1),  
+                d1=dweibull(seq(0, 5, 0.1), 3, 1.5),
+                d2=dweibull(seq(0, 5, 0.1), 2, 2), 
+                d3=dweibull(seq(0, 5, 0.1), 1, 1))
+df <- df %>% gather(dist, density, d1:d3) %>%
+  mutate(dist=factor(dist, levels=c("d1", "d2", "d3"), 
+    labels=c("Weibull(3, 1.5)", "Weibull(2, 2)", "Weibull(1,1)")))
+ggplot(df, aes(x=x, y=density, colour=dist)) + geom_line()
+```
+
+## Question 1 (9pts)
+
+a. (2pt) Simulate samples of size $n=$ 30, 100, 500 from these distributions
+    i. Lognormal(4, 2)
+    ii. Gamma(3, 3)
+    
+```{r echo=TRUE}
+library(gridExtra)
+set.seed(4)
+df_30 <- data.frame(x1=rlnorm(30, 4, 2), x2=rgamma(30, 3, 3))
+p1 <- ggplot(df_30, aes(x=x1)) + geom_histogram(binwidth=250) + ggtitle("n=30, lognorm")
+p2 <- ggplot(df_30, aes(x=x2)) + geom_histogram(binwidth=0.25) + ggtitle("n=30, gamma")
+df_100 <- data.frame(x1=rlnorm(100, 4, 2), x2=rgamma(100, 3, 3))
+p3 <- ggplot(df_100, aes(x=x1)) + geom_histogram(binwidth=2500) + ggtitle("n=100, lognorm")
+p4 <- ggplot(df_100, aes(x=x2)) + geom_histogram(binwidth=0.25) + ggtitle("n=100, gamma")
+df_500 <- data.frame(x1=rlnorm(500, 4, 2), x2=rgamma(500, 3, 3))
+p5 <- ggplot(df_500, aes(x=x1)) + geom_histogram(binwidth=2500) + ggtitle("n=500, lognorm")
+p6 <- ggplot(df_500, aes(x=x2)) + geom_histogram(binwidth=0.25) + ggtitle("n=500, gamma")
+grid.arrange(p1, p3, p5, p2, p4, p6, ncol=3)
+```
+
+b. (2pt) Do an internet search to find an example of where a lognormal distribution, and a gamma distribution might be used.
+
+```
+Lognormal: (http://www.statisticshowto.com/lognormal-distribution/)
+- Milk production by cows.
+- Lives of industrial units with failure modes that are characterized by fatigue-stress.
+- Amounts of rainfall.
+- Size distributions of rainfall droplets.
+- The volume of gas in a petroleum reserve.
+gamma: (https://en.wikipedia.org/wiki/Gamma_distribution)
+ the waiting time until death 
+```
+
+`Be sure to provide the reference link for your information.`
+
+c. (5pt) Make a QQ-plot of each these samples. Explain how closely the samples, of different sizes, appears to match the theoretical distribution.
+
+
+```{r echo=TRUE, fig.show='hold', fig.height=6, fig.width=6}
+n <- 30
+df_30$x1q = qlnorm(c(1 - 0.5^(1/n), (2:(n-1) - 0.3175) / 
+                       (n + 0.365),0.5^(1/n)), 4, 2) 
+df_30$x2q = qgamma(c(1 - 0.5^(1/n), (2:(n-1) - 0.3175) / 
+                       (n + 0.365),0.5^(1/n)), 3, 3) 
+lims1 <- c(min(min(df_30$x1), min(df_30$x1q)), max(max(df_30$x1), max(df_30$x1q)))
+lims2 <- c(min(min(df_30$x2), min(df_30$x2q)), max(max(df_30$x2), max(df_30$x2q)))
+p1 <- ggplot(df_30, aes(x=sort(x1), y=x1q)) + 
+  geom_abline(intercept=0, slope=1) +
+  geom_point() + coord_equal() + 
+  xlim(lims1) + ylim(lims1) +
+  xlab("Sample quantiles") + ylab("Theoretical quantiles") +
+  ggtitle("lognormal(2,4)")
+p2 <- ggplot(df_30, aes(x=sort(x2), y=x2q)) + 
+  geom_abline(intercept=0, slope=1) +
+  geom_point() + coord_equal() + 
+  xlim(lims2) + ylim(lims2) +
+  xlab("Sample quantiles") + ylab("Theoretical quantiles") +
+  ggtitle("gamma(3,3)")
+grid.arrange(p1, p2, ncol=2)
+n <- 100
+df_100$x1q = qlnorm(c(1 - 0.5^(1/n), (2:(n-1) - 0.3175) / 
+                       (n + 0.365),0.5^(1/n)), 4, 2) 
+df_100$x2q = qgamma(c(1 - 0.5^(1/n), (2:(n-1) - 0.3175) / 
+                       (n + 0.365),0.5^(1/n)), 3, 3) 
+lims1 <- c(min(min(df_100$x1), min(df_100$x1q)), max(max(df_100$x1), max(df_100$x1q)))
+lims2 <- c(min(min(df_100$x2), min(df_100$x2q)), max(max(df_100$x2), max(df_100$x2q)))
+p1 <- ggplot(df_100, aes(x=sort(x1), y=x1q)) + 
+  geom_abline(intercept=0, slope=1) +
+  geom_point() + coord_equal() + 
+  xlim(lims1) + ylim(lims1) +
+  xlab("Sample quantiles") + ylab("Theoretical quantiles") +
+  ggtitle("lognormal(2,4)")
+p2 <- ggplot(df_100, aes(x=sort(x2), y=x2q)) + 
+  geom_abline(intercept=0, slope=1) +
+  geom_point() + coord_equal() + 
+  xlim(lims2) + ylim(lims2) +
+  xlab("Sample quantiles") + ylab("Theoretical quantiles") +
+  ggtitle("gamma(3,3)")
+grid.arrange(p1, p2, ncol=2)
+n <- 500
+df_500$x1q = qlnorm(c(1 - 0.5^(1/n), (2:(n-1) - 0.3175) / 
+                       (n + 0.365),0.5^(1/n)), 4, 2) 
+df_500$x2q = qgamma(c(1 - 0.5^(1/n), (2:(n-1) - 0.3175) / 
+                       (n + 0.365),0.5^(1/n)), 3, 3) 
+lims1 <- c(min(min(df_500$x1), min(df_500$x1q)), max(max(df_500$x1), max(df_500$x1q)))
+lims2 <- c(min(min(df_500$x2), min(df_500$x2q)), max(max(df_500$x2), max(df_500$x2q)))
+p1 <- ggplot(df_500, aes(x=sort(x1), y=x1q)) + 
+  geom_abline(intercept=0, slope=1) +
+  geom_point() + coord_equal() + 
+  xlim(lims1) + ylim(lims1) +
+  xlab("Sample quantiles") + ylab("Theoretical quantiles") +
+  ggtitle("lognormal(2,4)")
+p2 <- ggplot(df_500, aes(x=sort(x2), y=x2q)) + 
+  geom_abline(intercept=0, slope=1) +
+  geom_point() + coord_equal() + 
+  xlim(lims2) + ylim(lims2) +
+  xlab("Sample quantiles") + ylab("Theoretical quantiles") +
+  ggtitle("gamma(3,3)")
+grid.arrange(p1, p2, ncol=2)
+```
+
+```
+With larger sample sizes the points should lie more closely on the guide line. For the most part this is true. The lognormal has a few really extreme values generated, which messes this up. And it looks like there is a small problem with the gamma at the upper tail.
+```
+
+## Question 2 (12pts)
+
+Using this code, generate a sample of size $n=544$ from a $Gamma(3.2, 1.7)$ distribution.
+
+```{r echo=TRUE}
+set.seed(123)
+X2 <- rgamma(n=544, 3.2, 1.7)
+```
+
+a. (2pt) Plot the sample, using a histogram, describe the shape of the distribution.
+`unimodal, slightly right-skewed`
+```{r echo=TRUE}
+ggplot(data.frame(X2), aes(x=X2)) + geom_histogram(binwidth=1)
+```
+b. (1pt) What parameters of the gamma distribution were used to simulate the sample? ($\alpha=3.2, \beta=1.7$) 
+c. (1pt) If we are to use maximum likelihood distribution what values would we expect to get as the parameter estimates? `(3.2, 1.7) `
+d. (2pt) Write a function to compute the likelihood function. 
+```{r echo=TRUE}
+nmle <- function(x, a, b) {
+  f <- prod(dgamma(x, a, b))
+  return(f)
+}
+```
+e. (3pt) Plot the likelihood function for a range of values of $\alpha, \beta$ that shows the maximum likelihood estimates for each parameter.
+```{r echo=TRUE}
+a <- seq(2.5, 4.2, 0.05)
+b <- seq(1.5, 2.5, 0.05)
+g <- expand.grid(x=a, y=b)
+g$f <- 0
+for (i in 1:nrow(g)) {
+  cat(i,"\n")
+  g$f[i] <- nmle(X2, g$x[i], g$y[i])
+}
+ggplot(g, aes(x=x, y=y, fill=f)) + geom_tile() + xlab(expression(alpha)) + ylab(expression(beta)) + theme_bw() + 
+  scale_fill_continuous("L") +
+  theme(aspect.ratio=1)
+g[which.max(g$f),]
+```
+f. (3pt) Look up the function `fitdistr` from the `MASS` library. Explain what this does. Use it to find the MLE estimates for $\alpha, \beta$. How do these compare with the values you read off your plot? `The values from the plot are very similar.`
+```{r echo=TRUE}
+library(MASS)
+fitdistr(X2, "gamma")
+```
+
+## Question 3 (9pts)
+
+Take a look at the data set `usworkcomp` from the `CASdatasets` library. Read the documentation about this data on [http://cas.uqam.ca/pub/R/web/CASdatasets-manual.pdf](http://cas.uqam.ca/pub/R/web/CASdatasets-manual.pdf). 
+
+```{r echo=FALSE, eval=FALSE}
+library(CASdatasets)
+data(usworkcomp)
+```
+
+A copy of the data is provided with the lab, in case the CASdatasets are not all available.
+
+```{r}
+load("usworkcomp.rda")
+```
+
+a. (2pt) Make a histogram of the `LOSS`. Describe the shape. `Heavily right-skewed, unimodal`
+```{r echo=TRUE}
+ggplot(usworkcomp, aes(x=LOSS)) + geom_histogram()
+```
+b. (3pt) Fit both a gamma and lognormal distribution to the sample, i.e. find the MLEs.  
+```{r echo=TRUE}
+fitdistr((usworkcomp$LOSS+100)/100000, "gamma")
+fitdistr((usworkcomp$LOSS+100)/100000, "lognormal")
+```
+c. (2pt) Produce a QQ-plot for each of the distributions. 
+```{r echo=TRUE}
+n <- nrow(usworkcomp)
+df <- data.frame(x1=sort(usworkcomp$LOSS))
+df$qg = (qgamma(c(1 - 0.5^(1/n), (2:(n-1) - 0.3175) / 
+     (n + 0.365),0.5^(1/n)), 0.367774667, 0.023499352))*100000-100
+df$qln = (qlnorm(c(1 - 0.5^(1/n), (2:(n-1) - 0.3175) / 
+     (n + 0.365),0.5^(1/n)), 0.93691677, 2.84185608))*100000-100
+p1 <- ggplot(df, aes(x=x1, y=qg)) + 
+  geom_abline(intercept=0, slope=1) +
+  geom_point() + theme(aspect.ratio=1) +
+  ggtitle("gamma")
+p2 <- ggplot(df, aes(x=x1, y=qln)) + 
+  geom_abline(intercept=0, slope=1) +
+  geom_point() + theme(aspect.ratio=1) +
+  ggtitle("lognormal")
+grid.arrange(p1, p2, ncol=2)
+```
+d. (2pt) Which is the better fit to the sample? `Gamma. It is fairly close, except for high values.`
+
+## TURN IN 
+
+- Your `.Rmd` file
+- Your html file that results from knitting the Rmd.
+- Make sure your group members are listed as authors, one person per group will turn in the report
+
+
