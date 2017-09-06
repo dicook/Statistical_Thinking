@@ -29,7 +29,6 @@ title: Home
 
 ## Lecture notes
 
-
 - Week 1: Introduction and motivation[ Slides 1](lectures/week1.class1.html) ([Rmd](lectures/week1.class1.Rmd)); [Slides 2](lectures/week1.class2.html) ([Rmd](lectures/week1.class2.Rmd)); __Reading:__ [Yihui's fun package](https://yihui.name/en/2011/08/the-fun-package-use-r-for-fun/), Textbook: Chapter 1. 1.1-1.5
 - Week 2: Games [Slides 1](lectures/week2.class1.html) ([Rmd](lectures/week2.class1.Rmd)); [Slides 2](lectures/week2.class2.html) ([Rmd](lectures/week2.class2.Rmd)); Videos: [1](https://vimeo.com/227187709), [2](https://vimeo.com/227190457), [3](https://vimeo.com/227192379), [4](https://vimeo.com/227350960), [5](https://vimeo.com/227350968), [6](https://vimeo.com/227350985), [7](https://vimeo.com/227350988); Textbook Reading: Chapter 2.1-2.4
 - Week 3: Hypothesis testing [Slides 1](lectures/week3.class1.html) ([Rmd](lectures/week3.class1.Rmd)) [Slides 2](lectures/week3.class2.html) ([Rmd](lectures/week3.class2.Rmd)); Reading: [Data Scientist’s Crib Sheet](https://blog.cloudera.com/blog/2015/12/common-probability-distributions-the-data-scientists-crib-sheet/), [Gallery of distributions](http://www.itl.nist.gov/div898/handbook/eda/section3/eda366.htm), [Distributions for Actuaries](http://www.casact.org/pubs/monographs/papers/02-Bahnemann.pdf)
@@ -52,6 +51,8 @@ title: Home
 - Week 5: [Linear models](labs/lab5.pdf) [(Rmd)](labs/lab5.Rmd) [SOLUTION](labs/lab5_solution.pdf) [(Rmd)](labs/lab5_solution.Rmd); [Tutorial slides](tutorials/lab05/index.html) [(Rmd)](tutorials/lab05/index.Rmd)
 - Week 6: [Diagnosing models](labs/lab6.pdf) [(Rmd)](labs/lab6.Rmd); [Tutorial slides](tutorials/lab06/index.html) [(Rmd)](tutorials/lab06/index.Rmd) [pisa_au.rda](tutorials/lab06/pisa_au.rda)
 - Week 7: [Bootstrap intervals](labs/lab7.pdf) [(Rmd)](labs/lab7.Rmd); [Tutorial slides](tutorials/lab07/index.html) [(Rmd)](tutorials/lab07/index.Rmd)
+
+## [ETC5242 Project](project/project.pdf)
 
 ## Last year's exams 
 
