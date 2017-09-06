@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bootstrap Confidence Intervals</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Thiyanga Talagala" />
+    <link href="index_files/remark-css/example.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Bootstrap Confidence Intervals
+### Thiyanga Talagala
+
+---
+
+
+
+
+## Data
+
+Model building will be done using:
+
+- Response: `science` (standardised)
+- Explanatory variables: `ST004D01T, JOYSCIE, ST013Q01TA, ST012Q01TA`.
+
+
+
+```r
+library(tidyverse)
+load("pisa_au.rda")
+
+pisa_au &lt;- pisa_au %&gt;% 
+  mutate(science = (PV1SCIE+PV2SCIE+PV3SCIE+PV4SCIE+
+                    PV5SCIE+PV6SCIE+PV7SCIE+PV8SCIE+
+                    PV9SCIE+PV10SCIE)/10) %&gt;%
+  select(science, ST004D01T, JOYSCIE, ST013Q01TA, ST012Q01TA, SENWT)
+```
+
+---
+class: inverse middle 
+# Your turn
+
+ - remove cases with missing values
+ - change gender to be a factor
+ - standardise the science scores
+
+---
+## Model building
+
+
+
+
+```r
+aus_glm &lt;- glm(science_std~gender+JOYSCIE+nbooks+ntvs, data=aus_nomiss, weights=SENWT)
+summary(aus_glm)
+```
+
+```
+## 
+## Call:
+## glm(formula = science_std ~ gender + JOYSCIE + nbooks + ntvs, 
+##     data = aus_nomiss, weights = SENWT)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -2.42754  -0.29052  -0.00837   0.28447   1.97050  
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.324459   0.043067  -7.534 5.27e-14 ***
+## genderm      0.052947   0.015299   3.461  0.00054 ***
+## JOYSCIE      0.277368   0.006645  41.744  &lt; 2e-16 ***
+## nbooks       0.216462   0.005469  39.576  &lt; 2e-16 ***
+## ntvs        -0.113736   0.010720 -10.610  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.2542255)
+## 
+##     Null deviance: 4231.3  on 12355  degrees of freedom
+## Residual deviance: 3139.9  on 12351  degrees of freedom
+## AIC: 35006
+## 
+## Number of Fisher Scoring iterations: 2
+```
+---
+## Classical confidence interval
+
+`$$\hat{\beta}_{4} \pm t_{\alpha/2, n - (k + 1)} \times \mathrm{S.E.}(\hat{\beta}_{4})$$`
+
+
+```r
+coef &lt;- summary(aus_glm)$coefficients
+n &lt;- nrow(aus_nomiss)# no. of observations
+beta_4 &lt;- coef[4, 1] # coefficient
+se_4 &lt;- coef[4, 2] # standard error
+df &lt;- n - 5 # degree of freedom = n - (k + 1)
+t_crit &lt;- qt(0.975, df) # t critical value
+c(beta_4 - t_crit * se_4, beta_4 + t_crit * se_4) # (lower, upper)
+```
+
+```
+## [1] 0.2057405 0.2271826
+```
+---
+## Confidence intervals via bootsrap
+
+Step 1:
+
+- `boot` package can generate bootsrap samples for weighted data.
+-  To use the `boot` function for drawing samples, you need a function to compute the statistic of interest.
+-  Write the function to return the slope for `nbooks` after fitting a `glm` to a bootstrap sample.
+
+The skeleton of the function:
+
+```r
+calc_stat &lt;- function(d, i) { # d-data, i - vector of indices of the bootstrap sample
+  x &lt;- d[i,] 
+  mod &lt;- FILL IN THE NECESSARY CODE
+  stat &lt;- FILL IN THE NECESSARY CODE
+  return(stat)
+}
+```
+
+---
+## Confidence intervals via bootsrap (cont.)
+
+Step 2:
+ - Make a 95% bootsrap confidence interval
+
+```r
+library(boot)
+stat &lt;- boot(aus_nomiss, statistic=calc_stat, R=1000,
+     weights=aus_nomiss$SENWT)
+stat
+```
+
+---
+## Confidence intervals via bootsrap (cont.)
+
+
+```
+## 
+## WEIGHTED BOOTSTRAP
+## 
+## 
+## Call:
+## boot(data = aus_nomiss, statistic = calc_stat, R = 1000, weights = aus_nomiss$SENWT)
+## 
+## 
+## Bootstrap Statistics :
+##      original       bias    std. error  mean(t*)
+## t1* 0.2164616 -0.001094138 0.006303779 0.2153674
+```
+ 
+The 95% bootsrap confidence interval is 
+
+```r
+c(sort(stat$t)[25],sort(stat$t)[975])
+```
+
+```
+## [1] 0.2023871 0.2271530
+```
+ 
+---
+## Bootstrap confidence interval for predicted value
+
+Step 1:
+- Write a function to calculate the predicted value for a girl, enjoys science (JOYSCIE=1.0) two TVs and 26-100 books in the home. The weight for a student like this is 0.2. 
+
+The skeleton of the function:
+
+```r
+calc_pred &lt;- function(d, i, newd) {
+  x &lt;- d[i,]
+  mod &lt;- FILL IN THE NECESSARY CODE
+  pred &lt;- FILL IN THE NECESSARY CODE
+  return(pred)
+}
+```
+
+Step 02: 
+- Make a 95% bootsrap confidence interval
+- Be sure to convert the values back into the actual math score range
+
+---
+## Prediction Interval
+
+- Compute the residuals from the fitted model 
+- Bootstrap the residuals
+- Find the desired quantiles of the residuals
+- Compute prediction intervals by adding residual quantiles to fitted value
+
+
+```r
+calc_res &lt;- function(d, i) {
+  x &lt;- d[i,]
+  mod &lt;- FILL IN THE NECESSARY CODE
+  res &lt;- FILL IN THE NECESSARY CODE
+  return(c(l=min(res), u=max(res)))
+}
+```
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
