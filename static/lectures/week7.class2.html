@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Statistical Thinking using Randomisation and Simulation</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Di Cook (dicook@monash.edu, @visnut)" />
+    <link href="week7.class2_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <link rel="stylesheet" href="myremark.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistical Thinking using Randomisation and Simulation
+## Models by Partitioning
+### Di Cook (<a href="mailto:dicook@monash.edu">dicook@monash.edu</a>, <span class="citation">@visnut</span>)
+### W7.C2
+
+---
+
+
+
+
+# Overview of this class
+
+- Regression trees
+- Random forests
+
+---
+# Subsetting as a way to model
+
+- Regression (decision) trees recursively partition the data, and use the average response value of each partition as the model estimate
+- Computationally intensive technique, involves examining ALL POSSIBLE partitions. 
+- Chooses the BEST partition by optimizing a criteria
+- For regression, with a quantitative response variable, the criteria is called ANOVA:
+
+`$$SS_T-(SS_L+SS_R)$$`
+where `\(SS_T = \sum (y_i-\bar{y})^2\)`, and `\(SS_L, SS_R\)` are the equivalent values for the two subsets created by partitioning.
+
+---
+# What it looks like
+
+Here's a synthetic data set for illustration
+
+&lt;img src="week7.class2_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+Model
+
+
+```r
+library(rpart)
+df_rp &lt;- rpart(y~x, data=df)
+df_rp
+```
+
+```
+## n= 100 
+## 
+## node), split, n, deviance, yval
+##       * denotes terminal node
+## 
+##  1) root 100 2.7000  0.0458  
+##    2) x&gt;=0.198 23 0.3460 -0.1330  
+##      4) x&gt;=0.273 16 0.2470 -0.1620 *
+##      5) x&lt; 0.273 7 0.0512 -0.0643 *
+##    3) x&lt; 0.198 77 1.4100  0.0990  
+##      6) x&lt; 0.0961 63 0.8340  0.0669  
+##       12) x&gt;=-0.386 53 0.5430  0.0401  
+##         24) x&gt;=-0.175 26 0.2110  0.0154  
+##           48) x&lt; 1.26e-05 19 0.1190 -0.0164 *
+##           49) x&gt;=1.26e-05 7 0.0205  0.1020 *
+##         25) x&lt; -0.175 27 0.3010  0.0639 *
+##       13) x&lt; -0.386 10 0.0516  0.2090 *
+##      7) x&gt;=0.0961 14 0.2160  0.2440 *
+```
+
+---
+# Model decision tree
+
+&lt;img src="week7.class2_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+Next, picture the model on the data
+
+---
+# Splits
+
+
+```
+##   count ncat improve     index adj
+## x   100    1  0.3514  1.98e-01   0
+## x    23    1  0.1357  2.73e-01   0
+## x    77   -1  0.2548  9.61e-02   0
+## x    63    1  0.2866 -3.86e-01   0
+## x    53    1  0.0572 -1.75e-01   0
+## x    26   -1  0.3382  1.26e-05   0
+```
+
+---
+
+&lt;img src="week7.class2_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="week7.class2_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="week7.class2_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="week7.class2_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="week7.class2_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="week7.class2_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="week7.class2_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# When do we stop?
+
+- Its an algorithm. Why did it stop at 7 groups?
+- Stopping rules ar needed, else the algorithm will keep fitting until every observartion is in its own group.
+- Control parameters set stopping points:
+   + minsplit: minimum number of points in a node that algorithm is allowed to split
+   + minbucket: minimum number of points in a terminal node
+- In addition, we can also look at the change in value of `\(SS_T-(SS_L+SS_R)\)` at each split, and if the change is too *small*, stop. To decide on a suitable value for *small* a cross-validation procedure is used.
+
+---
+# Stop points in example model
+
+
+```
+## List of 9
+##  $ minsplit      : int 20
+##  $ minbucket     : num 7
+##  $ cp            : num 0.01
+##  $ maxcompete    : int 4
+##  $ maxsurrogate  : int 5
+##  $ usesurrogate  : int 2
+##  $ surrogatestyle: int 0
+##  $ maxdepth      : int 30
+##  $ xval          : int 10
+```
+
+---
+# Changing control parameters
+
+
+```r
+df_rp &lt;- rpart(y~x, data=df, 
+  control = rpart.control(minsplit=5, minbucket = 2))
+df_rp
+```
+
+```
+## n= 100 
+## 
+## node), split, n, deviance, yval
+##       * denotes terminal node
+## 
+##  1) root 100 2.70000  0.0458  
+##    2) x&gt;=0.198 23 0.34600 -0.1330  
+##      4) x&gt;=0.242 18 0.25000 -0.1620  
+##        8) x&gt;=0.409 4 0.06450 -0.2460 *
+##        9) x&lt; 0.409 14 0.14900 -0.1380  
+##         18) x&lt; 0.36 11 0.07630 -0.1650 *
+##         19) x&gt;=0.36 3 0.03420 -0.0372 *
+##      5) x&lt; 0.242 5 0.02370 -0.0267 *
+##    3) x&lt; 0.198 77 1.41000  0.0990  
+##      6) x&lt; 0.0961 63 0.83400  0.0669  
+##       12) x&gt;=-0.386 53 0.54300  0.0401  
+##         24) x&lt; 0.0472 49 0.49500  0.0323  
+##           48) x&gt;=-0.175 22 0.13400 -0.0064 *
+##           49) x&lt; -0.175 27 0.30100  0.0639 *
+##         25) x&gt;=0.0472 4 0.00925  0.1360 *
+##       13) x&lt; -0.386 10 0.05160  0.2090 *
+##      7) x&gt;=0.0961 14 0.21600  0.2440  
+##       14) x&gt;=0.18 2 0.00101  0.1050 *
+##       15) x&lt; 0.18 12 0.17000  0.2670  
+##         30) x&lt; 0.144 6 0.06420  0.2000  
+##           60) x&gt;=0.113 3 0.00784  0.1200 *
+##           61) x&lt; 0.113 3 0.01790  0.2800 *
+##         31) x&gt;=0.144 6 0.05120  0.3340 *
+```
+
+---
+
+
+```r
+df_rp &lt;- rpart(y~x, data=df, 
+  control = rpart.control(minsplit=30, minbucket = 10))
+df_rp
+```
+
+```
+## n= 100 
+## 
+## node), split, n, deviance, yval
+##       * denotes terminal node
+## 
+##  1) root 100 2.7000  0.0458  
+##    2) x&gt;=0.198 23 0.3460 -0.1330 *
+##    3) x&lt; 0.198 77 1.4100  0.0990  
+##      6) x&lt; 0.0961 63 0.8340  0.0669  
+##       12) x&gt;=-0.386 53 0.5430  0.0401  
+##         24) x&gt;=-0.175 26 0.2110  0.0154 *
+##         25) x&lt; -0.175 27 0.3010  0.0639 *
+##       13) x&lt; -0.386 10 0.0516  0.2090 *
+##      7) x&gt;=0.0961 14 0.2160  0.2440 *
+```
+
+---
+# What's the computation?
+
+Illustration showing the calculations made to decide on the first partition.
+
+&lt;img src="week7.class2_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Residuals
+
+&lt;img src="week7.class2_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Goodness of fit
+
+
+```r
+gof &lt;- printcp(df_rp, digits=3)
+```
+
+```
+## 
+## Regression tree:
+## rpart(formula = y ~ x, data = df)
+## 
+## Variables actually used in tree construction:
+## [1] x
+## 
+## Root node error: 2.7/100 = 0.027
+## 
+## n= 100 
+## 
+##       CP nsplit rel error xerror   xstd
+## 1 0.3514      0     1.000  1.016 0.1449
+## 2 0.1327      1     0.649  0.718 0.0965
+## 3 0.0884      2     0.516  0.685 0.0919
+## 4 0.0190      3     0.428  0.575 0.0784
+## 5 0.0173      5     0.390  0.577 0.0786
+## 6 0.0100      6     0.372  0.569 0.0766
+```
+
+The relative error is `\(1-R^2\)`. For this example, after 6 splits it is 0.372. So `\(R^2=\)` 0.628. 
+
+
+```
+## [1] 0.628
+```
+
+---
+# Strengths and weaknesses
+
+- There are no parametric assumptions underlying partitioning methods
+- Also means that there is not a nice formula for the model as a result, or inference about populations available
+- By minimizing sum of squares (ANOVA) we are forcing the partitions to have relatively equal variance. The method could be influenced by outliers, but it would be isolating the effect to one partition.
+- Because it operates on single variables, it can efficiently handle missing values. 
+
+---
+# Bootstrapping
+
+- Taking bootstrap samples, then fitting a model to each sample, and combining model predictions reduces predictive accuracy
+- The famous example is a random forest. 
+- A forest is constructed by taking a bootstrap sample, and a random sample of available explanatory variables, fitting a tree to each, then pooling the model predictions.
+
+---
+# Resources
+
+- [Quick R: Tree-based models](http://www.statmethods.net/advstats/cart.html)
+- [Recursive partitioning by Terry Therneau](https://cran.r-project.org/web/packages/rpart/vignettes/longintro.pdf)
+
+---
+class: inverse middle 
+# Share and share alike
+
+&lt;a rel="license" href="http://creativecommons.org/licenses/by/4.0/"&gt;&lt;img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /&gt;&lt;/a&gt;&lt;br /&gt;This work is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by/4.0/"&gt;Creative Commons Attribution 4.0 International License&lt;/a&gt;.
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

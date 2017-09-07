@@ -1,0 +1,274 @@
+---
+title: 'Statistical Thinking using Randomisation and Simulation'
+subtitle:  'Models by Partitioning'
+author: Di Cook (dicook@monash.edu, @visnut)
+date: "W7.C2"
+output:
+  xaringan::moon_reader:
+    css: ["default", "myremark.css"]
+    self_contained: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE,
+  echo=FALSE,
+  fig.height = 6,
+  fig.width = 9,
+  fig.align='center'
+)
+options(digits=3)
+library(tidyverse)
+library(gridExtra)
+library(broom)
+```
+
+# Overview of this class
+
+- Regression trees
+- Random forests
+
+---
+# Subsetting as a way to model
+
+- Regression (decision) trees recursively partition the data, and use the average response value of each partition as the model estimate
+- Computationally intensive technique, involves examining ALL POSSIBLE partitions. 
+- Chooses the BEST partition by optimizing a criteria
+- For regression, with a quantitative response variable, the criteria is called ANOVA:
+
+$$SS_T-(SS_L+SS_R)$$
+where $SS_T = \sum (y_i-\bar{y})^2$, and $SS_L, SS_R$ are the equivalent values for the two subsets created by partitioning.
+
+---
+# What it looks like
+
+Here's a synthetic data set for illustration
+
+```{r}
+set.seed(8000)
+x=sort(runif(100)-0.5)
+df <- data.frame(x, y=c(x[1:50]^2, x[51:75]*2, -x[76:100]^2)+rnorm(100)*0.1)
+ggplot(df, aes(x=x, y=y)) + geom_point()
+```
+
+---
+Model
+
+```{r echo=TRUE}
+library(rpart)
+df_rp <- rpart(y~x, data=df)
+df_rp
+```
+
+---
+# Model decision tree
+
+```{r}
+library(rpart.plot)
+rpart.plot(df_rp)
+```
+
+Next, picture the model on the data
+
+---
+# Splits
+
+```{r}
+df_rp$splits
+```
+
+---
+
+```{r}
+ggplot(df, aes(x=x, y=y)) + geom_point() +
+  geom_vline(xintercept = df_rp$splits[1,4], colour="hotpink", linetype=2, size=2) + scale_x_continuous(breaks=seq(-0.5, 0.5, 0.1))
+```
+
+---
+
+```{r}
+ggplot(df, aes(x=x, y=y)) + geom_point() +
+  geom_vline(xintercept = df_rp$splits[1,4], colour="hotpink") + 
+  geom_vline(xintercept = df_rp$splits[2,4], colour="hotpink", linetype=2, size=2) + scale_x_continuous(breaks=seq(-0.5, 0.5, 0.1))
+```
+
+---
+
+```{r}
+ggplot(df, aes(x=x, y=y)) + geom_point() +
+  geom_vline(xintercept = df_rp$splits[1,4], colour="hotpink") + 
+  geom_vline(xintercept = df_rp$splits[2,4], colour="hotpink") +
+  geom_vline(xintercept = df_rp$splits[3,4], colour="hotpink", linetype=2, size=2) + scale_x_continuous(breaks=seq(-0.5, 0.5, 0.1))
+```
+
+---
+
+```{r}
+ggplot(df, aes(x=x, y=y)) + geom_point() +
+  geom_vline(xintercept = df_rp$splits[1,4], colour="hotpink") + 
+  geom_vline(xintercept = df_rp$splits[2,4], colour="hotpink") +
+  geom_vline(xintercept = df_rp$splits[3,4], colour="hotpink") +
+  geom_vline(xintercept = df_rp$splits[4,4], colour="hotpink", linetype=2, size=2) + scale_x_continuous(breaks=seq(-0.5, 0.5, 0.1))
+```
+
+---
+
+```{r}
+ggplot(df, aes(x=x, y=y)) + geom_point() +
+  geom_vline(xintercept = df_rp$splits[1,4], colour="hotpink") + 
+  geom_vline(xintercept = df_rp$splits[2,4], colour="hotpink") +
+  geom_vline(xintercept = df_rp$splits[3,4], colour="hotpink") +
+  geom_vline(xintercept = df_rp$splits[4,4], colour="hotpink") +
+  geom_vline(xintercept = df_rp$splits[5,4], colour="hotpink", linetype=2, size=2) + scale_x_continuous(breaks=seq(-0.5, 0.5, 0.1))
+```
+
+---
+
+```{r}
+ggplot(df, aes(x=x, y=y)) + geom_point() +
+  geom_vline(xintercept = df_rp$splits[1,4], colour="hotpink") + 
+  geom_vline(xintercept = df_rp$splits[2,4], colour="hotpink") +
+  geom_vline(xintercept = df_rp$splits[3,4], colour="hotpink") +
+  geom_vline(xintercept = df_rp$splits[4,4], colour="hotpink") +
+  geom_vline(xintercept = df_rp$splits[5,4], colour="hotpink") +
+  geom_vline(xintercept = df_rp$splits[6,4], colour="hotpink", linetype=2, size=2) + scale_x_continuous(breaks=seq(-0.5, 0.5, 0.1))
+```
+
+---
+
+```{r}
+df_fit <- df %>%
+  mutate(partitions = cut(x, 
+      breaks=c(-Inf, sort(df_rp$splits[,4]), Inf))) %>%
+  group_by(partitions) %>%
+  summarise(x=mean(x), y=mean(y))
+ggplot(df, aes(x=x, y=y)) + geom_point() +
+  geom_vline(xintercept = df_rp$splits[1,4], colour="hotpink") + 
+  geom_vline(xintercept = df_rp$splits[2,4], colour="hotpink") +
+  geom_vline(xintercept = df_rp$splits[3,4], colour="hotpink") +
+  geom_vline(xintercept = df_rp$splits[4,4], colour="hotpink") +
+  geom_vline(xintercept = df_rp$splits[5,4], colour="hotpink") +
+  geom_vline(xintercept = df_rp$splits[6,4], colour="hotpink") + scale_x_continuous(breaks=seq(-0.5, 0.5, 0.1)) +
+  geom_point(data=df_fit, aes(x=x, y=y),
+             colour="hotpink", size=5, alpha=0.7)
+```
+
+---
+# When do we stop?
+
+- Its an algorithm. Why did it stop at 7 groups?
+- Stopping rules ar needed, else the algorithm will keep fitting until every observartion is in its own group.
+- Control parameters set stopping points:
+   + minsplit: minimum number of points in a node that algorithm is allowed to split
+   + minbucket: minimum number of points in a terminal node
+- In addition, we can also look at the change in value of $SS_T-(SS_L+SS_R)$ at each split, and if the change is too *small*, stop. To decide on a suitable value for *small* a cross-validation procedure is used.
+
+---
+# Stop points in example model
+
+```{r}
+str(df_rp$control)
+```
+
+---
+# Changing control parameters
+
+```{r echo=TRUE}
+df_rp <- rpart(y~x, data=df, 
+  control = rpart.control(minsplit=5, minbucket = 2))
+df_rp
+```
+
+---
+
+```{r echo=TRUE}
+df_rp <- rpart(y~x, data=df, 
+  control = rpart.control(minsplit=30, minbucket = 10))
+df_rp
+```
+
+---
+# What's the computation?
+
+Illustration showing the calculations made to decide on the first partition.
+
+```{r}
+sst <- var(df$y)*(nrow(df)-1)
+compute_anova <- function(left, right) {
+  ssl <- var(left$y)*(nrow(left)-1)
+  if (nrow(left) == 1)
+    ssl <- 1
+  ssr <- var(right$y)*(nrow(right)-1)
+  if (nrow(right) == 1)
+    ssr <- 1
+  av <- sst - (ssl+ssr)
+  return(av)
+}
+aov_f <- data.frame(x=df$x[-1], f=df$y[-1])
+for (i in 2:nrow(df)) {
+  left <- df[1:(i-1),]
+  right <- df[i:nrow(df),]
+  aov_f$x[i-1] <- mean(df$x[c(i-1, i)])
+  aov_f$f[i-1] <- compute_anova(left, right)
+}
+ggplot(df, aes(x=x, y=y)) + geom_point(alpha=0.5) + scale_x_continuous(breaks=seq(-0.5, 0.5, 0.1)) +
+  geom_line(data=aov_f, aes(x=x, y=f), colour="hotpink") +
+    geom_vline(xintercept = df_rp$splits[1,4], colour="hotpink", linetype=2)
+```
+
+---
+# Residuals
+
+```{r}
+df_rp <- rpart(y~x, data=df)
+df_rp_aug <- cbind(df, e=residuals(df_rp))
+ggplot(df_rp_aug, aes(x=x, y=e)) + geom_point() +
+  ylab("residuals") + scale_x_continuous(breaks=seq(-0.5, 0.5, 0.1))
+```
+
+---
+# Goodness of fit
+
+```{r echo=TRUE}
+gof <- printcp(df_rp, digits=3)
+```
+
+The relative error is $1-R^2$. For this example, after 6 splits it is `r gof[6,3]`. So $R^2=$ `r 1-gof[6,3]`. 
+
+```{r eval=FALSE}
+1-sum(df_rp_aug$e^2)/sum((df$y-mean(df$y))^2)
+```
+
+---
+# Strengths and weaknesses
+
+- There are no parametric assumptions underlying partitioning methods
+- Also means that there is not a nice formula for the model as a result, or inference about populations available
+- By minimizing sum of squares (ANOVA) we are forcing the partitions to have relatively equal variance. The method could be influenced by outliers, but it would be isolating the effect to one partition.
+- Because it operates on single variables, it can efficiently handle missing values. 
+
+---
+# Bootstrapping
+
+- Taking bootstrap samples, then fitting a model to each sample, and combining model predictions reduces predictive accuracy
+- The famous example is a random forest. 
+- A forest is constructed by taking a bootstrap sample, and a random sample of available explanatory variables, fitting a tree to each, then pooling the model predictions.
+
+---
+# Resources
+
+- [Quick R: Tree-based models](http://www.statmethods.net/advstats/cart.html)
+- [Recursive partitioning by Terry Therneau](https://cran.r-project.org/web/packages/rpart/vignettes/longintro.pdf)
+
+---
+class: inverse middle 
+# Share and share alike
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
