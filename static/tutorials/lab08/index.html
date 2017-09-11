@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Predicting house prices in Melbourne</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Stuart Lee" />
+    <link href="libs/remark-css-0.0.1/example.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Predicting house prices in Melbourne
+### Stuart Lee
+
+---
+
+
+# Preliminaries
+We will be using the following packages in today's lab. Please make sure
+you have them installed before we begin.
+
+
+```r
+library(tidyverse)
+library(caret)
+library(rpart)
+library(rpart.plot)
+library(randomForest)
+```
+
+---
+
+# Loading the data
+
+- Today we will be looking at Melbourne house prices obtained from auction reports
+(collected by Dr Julia Polak).
+
+
+```r
+library(tidyverse)
+melb_auctions &lt;- read_csv("melb_auctions.csv")
+glimpse(melb_auctions)
+```
+
+```
+## Observations: 614
+## Variables: 15
+## $ id            &lt;int&gt; 115, 668, 3069, 3924, 5451, 7882, 8039, 8201, 86...
+## $ suburb        &lt;chr&gt; "Clayton", "Clayton", "Clayton", "Clayton", "Cla...
+## $ price         &lt;dbl&gt; 3.75, 5.20, 4.53, 4.78, 5.14, 6.60, 6.13, 6.38, ...
+## $ result        &lt;chr&gt; "PI", "VB", "SP", "S", "S", "S", "S", "SP", "VB"...
+## $ nbeds         &lt;int&gt; 2, 2, 3, 3, 3, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, ...
+## $ property_type &lt;chr&gt; "h", "h", "h", "h", "h", "h", "h", "h", "h", "h"...
+## $ day           &lt;int&gt; 23, 25, 30, 28, 9, 23, 6, 9, 13, 21, 23, 1, 14, ...
+## $ month         &lt;chr&gt; "March", "October", "August", "March", "April", ...
+## $ year          &lt;int&gt; 2013, 2014, 2014, 2015, 2016, 2013, 2013, 2013, ...
+## $ nvisits       &lt;int&gt; 165, 127, 27, 113, 149, 12, 164, 44, 177, 26, 58...
+## $ rating        &lt;int&gt; 1, 2, 3, 3, 2, 6, 7, 5, 5, 9, 7, 9, 0, 4, 7, 5, ...
+## $ ncars         &lt;int&gt; 0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...
+## $ nbaths        &lt;dbl&gt; 1.0, 1.0, 1.0, 1.5, 1.0, 1.5, 1.0, 1.5, 1.0, 1.0...
+## $ land_size     &lt;dbl&gt; 490, 327, 414, 325, 410, 344, 743, 478, 706, 798...
+## $ house_size    &lt;dbl&gt; 101, 129, 155, 161, 242, 124, 214, 143, 123, 205...
+```
+
+---
+
+# Exploring the data
+
+YOUR TURN
+- How many suburbs are there in the data-set? What 
+was the median house price in each suburb last year?
+- How many houses sold prior to auction?
+- For each suburb and property type plot how the distribution of price has changed over time.
+- For the number of beds in a property plot how the distribution of price has changed over time.
+
+
+---
+
+# Getting ready to model
+
+We are going to predict price using suburb, result, nbeds and property type
+as explantory variables.
+
+
+```r
+melb_auctions &lt;- melb_auctions %&gt;%
+  select(price, suburb, result, nbeds, property_type) %&gt;%
+  filter(result != "SA") 
+# remove this category as it  only occurs once in the data
+```
+
+---
+
+# Getting ready to model
+In order to assess how well our model performs we will randomly partition half of
+our data into a training set and the remainder into test set. That is,
+we will fit models on the training set and use the test set to see how well
+our model predicts prices.
+
+
+```r
+library(caret)
+set.seed(10)
+indx &lt;- createDataPartition(melb_auctions$suburb, list=FALSE)
+train &lt;- melb_auctions %&gt;% slice(indx)
+test &lt;- melb_auctions %&gt;% slice(-indx)
+```
+---
+
+# Evaluating your predictions
+YOUR TURN. Write a function to compute the mean-square error.
+
+
+```r
+MSE &lt;- function(model, data) {
+  pred &lt;- FILL IN
+  error &lt;- FILL IN
+  mse &lt;- FILL IN 
+  return(mse)
+}
+```
+
+---
+
+## Regression trees
+
+We will first try fitting a regression tree on our training data.
+
+
+```r
+library(rpart)
+train_rp &lt;- rpart(price~suburb+result+nbeds+property_type,
+                  data=train)
+train_rp$cptable
+```
+
+```
+##       CP nsplit rel error xerror   xstd
+## 1 0.3145      0     1.000  1.010 0.1966
+## 2 0.1504      1     0.685  0.742 0.1537
+## 3 0.0800      2     0.535  0.688 0.1474
+## 4 0.0325      3     0.455  0.615 0.1257
+## 5 0.0222      4     0.423  0.536 0.1102
+## 6 0.0113      5     0.400  0.475 0.1042
+## 7 0.0100      6     0.389  0.456 0.0894
+```
+
+```r
+MSE(train_rp, test) # the test set MSE
+```
+
+```
+## [1] 16.3
+```
+
+```r
+# printcp(train_rp) 
+```
+
+---
+
+# Evaluating the regression tree 
+
+
+```r
+rpart.plot::rpart.plot(train_rp) 
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# and trying new models
+Use the `rpart.control` function to change parameters when fitting the model.
+What does the `cp` parameter do? What about the `minsplit` parameter?
+
+```r
+cntrl &lt;- rpart.control(minsplit = 10, cp = 0.05)
+
+train_rp2 &lt;- rpart(price~suburb+result+nbeds+property_type,
+                   data=train, control = cntrl)
+MSE(train_rp2, test)
+```
+
+```
+## [1] 19.5
+```
+
+YOUR TURN: trying fitting models with the following cp parameters. 
+How does the MSE change?
+
+```r
+cp &lt;- seq(0.001, 0.1, 0.001)
+```
+
+---
+
+# Random forest modelling
+A rough overview of the algorithm.
+
+- Construct a forest of n trees: 
+  - Iterate n times:
+    - Bootstrap the data
+    - Randomly sample m explanatory variables in the data (`mtry`)
+    - Constuct a regression tree using the bootstrapped data
+    
+- Decide on  final predictions by voting over the trees
+  - take the average of the predictions over all trees 
+
+We will fit random forests using the `randomForest` package:
+
+```r
+# need to make sure all categorical variables are coded as factors
+train2 &lt;- train %&gt;% 
+  mutate_at(vars(suburb, result, property_type), factor)
+test2 &lt;- test %&gt;% 
+  mutate_at(vars(suburb, result, property_type), factor)
+```
+---
+
+# Fitting Random forests
+
+```r
+library(randomForest)
+train_rf &lt;- randomForest(price~suburb+result+nbeds+property_type, 
+             data=train2, importance=TRUE)
+ 
+train_rf
+```
+
+```
+## 
+## Call:
+##  randomForest(formula = price ~ suburb + result + nbeds + property_type,      data = train2, importance = TRUE) 
+##                Type of random forest: regression
+##                      Number of trees: 500
+## No. of variables tried at each split: 1
+## 
+##           Mean of squared residuals: 16.9
+##                     % Var explained: 50.1
+```
+---
+
+# Evaluating the random forest
+Look at variable importance
+
+```r
+YOUR TURN
+```
+
+Try modifying the `mtry` and `ntree` parameters
+
+
+```r
+YOUR TURN
+```
+
+
+---
+
+class: inverse, center, middle
+For more details about fitting tree models see:
+http://www.statmethods.net/advstats/cart.html
+https://www.stat.berkeley.edu/~breiman/RandomForests/
+
+
+# Happy learning with R!
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

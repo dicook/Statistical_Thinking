@@ -1,0 +1,200 @@
+---
+title: "Predicting house prices in Melbourne"
+author: "Stuart Lee"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+
+---
+```{r setup, echo=FALSE}
+options(digits = 3)
+MSE <- function(model, data) {
+  pred <- predict(model, data)
+  error <- data$price - pred
+  mean(error^2)
+}
+```
+# Preliminaries
+We will be using the following packages in today's lab. Please make sure
+you have them installed before we begin.
+
+```{r, eval=FALSE}
+library(tidyverse)
+library(caret)
+library(rpart)
+library(rpart.plot)
+library(randomForest)
+```
+
+---
+
+# Loading the data
+
+- Today we will be looking at Melbourne house prices obtained from auction reports
+(collected by Dr Julia Polak).
+
+```{r, message=FALSE}
+library(tidyverse)
+melb_auctions <- read_csv("melb_auctions.csv")
+glimpse(melb_auctions)
+```
+
+---
+
+# Exploring the data
+
+YOUR TURN
+- How many suburbs are there in the data-set? What 
+was the median house price in each suburb last year?
+- How many houses sold prior to auction?
+- For each suburb and property type plot how the distribution of price has changed over time.
+- For the number of beds in a property plot how the distribution of price has changed over time.
+
+
+---
+
+# Getting ready to model
+
+We are going to predict price using suburb, result, nbeds and property type
+as explantory variables.
+
+```{r}
+melb_auctions <- melb_auctions %>%
+  select(price, suburb, result, nbeds, property_type) %>%
+  filter(result != "SA") 
+# remove this category as it  only occurs once in the data
+```
+
+---
+
+# Getting ready to model
+In order to assess how well our model performs we will randomly partition half of
+our data into a training set and the remainder into test set. That is,
+we will fit models on the training set and use the test set to see how well
+our model predicts prices.
+
+```{r, message = FALSE}
+library(caret)
+set.seed(10)
+indx <- createDataPartition(melb_auctions$suburb, list=FALSE)
+train <- melb_auctions %>% slice(indx)
+test <- melb_auctions %>% slice(-indx)
+```
+---
+
+# Evaluating your predictions
+YOUR TURN. Write a function to compute the mean-square error.
+
+```{r, eval = FALSE}
+MSE <- function(model, data) {
+  pred <- FILL IN
+  error <- FILL IN
+  mse <- FILL IN 
+  return(mse)
+}
+```
+
+---
+
+## Regression trees
+
+We will first try fitting a regression tree on our training data.
+
+```{r, message = FALSE}
+library(rpart)
+train_rp <- rpart(price~suburb+result+nbeds+property_type,
+                  data=train)
+train_rp$cptable
+MSE(train_rp, test) # the test set MSE
+# printcp(train_rp) 
+```
+
+---
+
+# Evaluating the regression tree 
+
+```{r, fig.align='center'}
+
+rpart.plot::rpart.plot(train_rp) 
+
+```
+
+---
+
+# and trying new models
+Use the `rpart.control` function to change parameters when fitting the model.
+What does the `cp` parameter do? What about the `minsplit` parameter?
+```{r}
+cntrl <- rpart.control(minsplit = 10, cp = 0.05)
+
+train_rp2 <- rpart(price~suburb+result+nbeds+property_type,
+                   data=train, control = cntrl)
+MSE(train_rp2, test)
+```
+
+YOUR TURN: trying fitting models with the following cp parameters. 
+How does the MSE change?
+```{r}
+cp <- seq(0.001, 0.1, 0.001)
+```
+
+---
+
+# Random forest modelling
+A rough overview of the algorithm.
+
+- Construct a forest of n trees: 
+  - Iterate n times:
+    - Bootstrap the data
+    - Randomly sample m explanatory variables in the data (`mtry`)
+    - Constuct a regression tree using the bootstrapped data
+    
+- Decide on  final predictions by voting over the trees
+  - take the average of the predictions over all trees 
+
+We will fit random forests using the `randomForest` package:
+```{r}
+# need to make sure all categorical variables are coded as factors
+train2 <- train %>% 
+  mutate_at(vars(suburb, result, property_type), factor)
+test2 <- test %>% 
+  mutate_at(vars(suburb, result, property_type), factor)
+```
+---
+
+# Fitting Random forests
+```{r, message = FALSE}
+library(randomForest)
+train_rf <- randomForest(price~suburb+result+nbeds+property_type, 
+             data=train2, importance=TRUE)
+ 
+train_rf
+```
+---
+
+# Evaluating the random forest
+Look at variable importance
+```{r, eval = FALSE}
+YOUR TURN
+```
+
+Try modifying the `mtry` and `ntree` parameters
+
+```{r, eval = FALSE}
+YOUR TURN
+```
+
+
+---
+
+class: inverse, center, middle
+For more details about fitting tree models see:
+http://www.statmethods.net/advstats/cart.html
+https://www.stat.berkeley.edu/~breiman/RandomForests/
+
+
+# Happy learning with R! 
