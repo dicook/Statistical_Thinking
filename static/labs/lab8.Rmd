@@ -98,20 +98,11 @@ $$\frac{1}{n}\sum_{i=1}^n (y_i-\hat{y})^2$$
 
 Write a function to compute the MSE.
 
-```{r}
-MSE <- function(model, data) {
-  pred <- predict(model, data)
-  e <- data$price - pred
-  mse <- sum(e^2)/length(e)
-  return(mse)
-}
-```
-
 ## Question 1
 
 a. Fit a regression tree, to the training data, with the default parameters to the data.
 
-```{r}
+```{r eval=FALSE}
 library(rpart)
 train_rp <- rpart(price~suburb+result+nbeds+property_type,
                   data=train)
@@ -119,20 +110,21 @@ train_rp <- rpart(price~suburb+result+nbeds+property_type,
 
 b. Plot the tree. How many terminal nodes? What variables are used?
 
-```{r}
+```{r eval=FALSE}
 library(rpart.plot)
 rpart.plot(train_rp)
 ```
 
-c. Compute the MSE of the test data.
+c. (2pts) Compute the MSE of the test data.
 
-```{r}
+```{r eval=FALSE}
 MSE(train_rp, test)
 ```
 
 d. Change the `cp` input parameter, try several different values. What cp value gives the best model, as measured by the smallest test MSE? 
 
-```{r}
+
+```{r eval=FALSE}
 cp <- seq(0.001, 0.1, 0.001)
 m <- NULL
 for (i in 1:length(cp)) {
@@ -150,20 +142,13 @@ train_rp <- rpart(price~suburb+result+nbeds+property_type, data=train,
 
 a. Fit a generalised linear model to the same set of variables.
 
-```{r}
-train_glm <- glm(price~suburb+result+nbeds+property_type, data=train)
-train_glm
-```
 
 b. Summarise the variable importance.
 
-```{r}
-summary(train_glm)$coefficients
-```
 
 c. Compute the MSE of the test data.
 
-```{r}
+```{r eval=FALSE}
 MSE(train_glm, test)
 ```
 
@@ -173,7 +158,7 @@ d. Try including some interaction terms to improve the model, by reducing the te
 
 a. Build a random forest model, using the default parameters. what is the reported MSE? (This is the training set MSE.)
 
-```{r}
+```{r eval=FALSE}
 # randomForest function crashes if character variables are not factors
 train_sub <- train
 train_sub$suburb <- factor(train_sub$suburb)
@@ -192,19 +177,19 @@ train_rf
 
 b. Summarise the variable importance. Which variable is the most important?
 
-```{r}
+```{r eval=FALSE}
 train_rf$importance
 ```
 
 c. Compute the MSE of the test data.
 
-```{r}
+```{r eval=FALSE}
 MSE(train_rf, test_sub)
 ```
 
 d. Explore the effect of `mtry` and `ntree` parameters, on the MSE.
 
-```{r}
+```{r eval=FALSE}
 train_rf <- randomForest(price~suburb+result+nbeds+property_type, 
              data=train_sub, importance=TRUE, mtry=3)
 train_rf
@@ -219,7 +204,7 @@ MSE(train_rf, test_sub)
 
 How do the predicted values compare for the different models? (Use the best model for each method.)
 
-```{r}
+```{r eval=FALSE}
 pred1 <- predict(train_rp, test, type="vector")
 pred2 <- predict(train_glm, test)
 pred3 <- predict(train_rf, test_sub)
