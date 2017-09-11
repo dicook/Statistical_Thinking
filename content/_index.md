@@ -50,7 +50,7 @@ title: Home
 - Week 3: [Hypothesis testing](labs/lab3.pdf) [(Rmd)](labs/lab3.Rmd) [SOLUTION](labs/lab3_solution.pdf) [(Rmd)](labs/lab3_solution.Rmd); [Tutorial slides](tutorials/lab03/index.html) [(Rmd)](tutorials/lab03/index.Rmd)
 - Week 4: [Fitting distributions](labs/lab4.pdf) [(Rmd)](labs/lab4.Rmd) [SOLUTION](labs/lab4_solution.pdf) [(Rmd)](labs/lab4_solution.Rmd); [Tutorial slides](tutorials/lab04/index.html) [(Rmd)](tutorials/lab04/index.Rmd) [usworkcomp.rda](labs/usworkcomp.rda)
 - Week 5: [Linear models](labs/lab5.pdf) [(Rmd)](labs/lab5.Rmd) [SOLUTION](labs/lab5_solution.pdf) [(Rmd)](labs/lab5_solution.Rmd); [Tutorial slides](tutorials/lab05/index.html) [(Rmd)](tutorials/lab05/index.Rmd)
-- Week 6: [Diagnosing models](labs/lab6.pdf) [(Rmd)](labs/lab6.Rmd); [Tutorial slides](tutorials/lab06/index.html) [(Rmd)](tutorials/lab06/index.Rmd) [pisa_au.rda](tutorials/lab06/pisa_au.rda)
+- Week 6: [Diagnosing models](labs/lab6.pdf) [(Rmd)](labs/lab6.Rmd); [SOLUTION](labs/lab6_solution.pdf) [(Rmd)](labs/lab6_solution.Rmd) [Tutorial slides](tutorials/lab06/index.html) [(Rmd)](tutorials/lab06/index.Rmd) [pisa_au.rda](tutorials/lab06/pisa_au.rda)
 - Week 7: [Bootstrap intervals](labs/lab7.pdf) [(Rmd)](labs/lab7.Rmd); [Tutorial slides](tutorials/lab07/index.html) [(Rmd)](tutorials/lab07/index.Rmd)
 - Weel 8: [Tree models](labs/lab8.pdf) [(Rmd)](labs/lab7=8.Rmd); [Tutorial slides](tutorials/lab08/index.html) [(Rmd)](tutorials/lab08/index.Rmd) 
 
