@@ -52,6 +52,7 @@ title: Home
 - Week 5: [Linear models](labs/lab5.pdf) [(Rmd)](labs/lab5.Rmd) [SOLUTION](labs/lab5_solution.pdf) [(Rmd)](labs/lab5_solution.Rmd); [Tutorial slides](tutorials/lab05/index.html) [(Rmd)](tutorials/lab05/index.Rmd)
 - Week 6: [Diagnosing models](labs/lab6.pdf) [(Rmd)](labs/lab6.Rmd); [Tutorial slides](tutorials/lab06/index.html) [(Rmd)](tutorials/lab06/index.Rmd) [pisa_au.rda](tutorials/lab06/pisa_au.rda)
 - Week 7: [Bootstrap intervals](labs/lab7.pdf) [(Rmd)](labs/lab7.Rmd); [Tutorial slides](tutorials/lab07/index.html) [(Rmd)](tutorials/lab07/index.Rmd)
+- Weel 8: [Tree models](labs/lab8.pdf) [(Rmd)](labs/lab7=8.Rmd); [Tutorial slides](tutorials/lab08/index.html) [(Rmd)](tutorials/lab08/index.Rmd) 
 
 ## [ETC5242 Project](project/project.pdf)
 
