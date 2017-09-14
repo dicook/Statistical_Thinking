@@ -17,8 +17,8 @@ footnotereturnlinkcontents = "↩"
     url = "/"
     weight = 1
 [[menu.main]]
-    name = "Textbook"
-    url = "https://www.openintro.org/stat/textbook.php?stat_book=isrs"
+    name = "Textbook (3rd ed)"
+    url = "https://www.openintro.org/stat/textbook.php?stat_book=os"
     weight = 2
 [[menu.main]]
     name = "Moodle (lecture videos)"
