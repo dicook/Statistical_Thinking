@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Statistical Thinking using Randomisation and Simulation</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Di Cook (dicook@monash.edu, @visnut)" />
+    <link href="week8.class2_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <link rel="stylesheet" href="myremark.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistical Thinking using Randomisation and Simulation
+## Boosted models
+### Di Cook (<a href="mailto:dicook@monash.edu">dicook@monash.edu</a>, <span class="citation">@visnut</span>)
+### W8.C2
+
+---
+
+
+
+
+# Boosting
+
+- Why do you want to know about boosting? *The winners of almost all of the recent data competitions have used boosted models.*
+- The given definition is: "the method that converts weak learner to strong learners"
+- Actually, its better to think about it as *iteratively re-weighting cases to get a better fit for cases that are poorly predicted*
+
+---
+# Relationship with weighted regression
+
+- Weighted regression is typically used when working with survey data, that to infer from the sample to the population we need to take the sample weights into account
+- Boosting fits a model, with equal weights. Then increases the weight for the cases with the biggest residuals, and re-fits. 
+
+---
+# Boosting steps
+
+- 1.Fit some regression model, where all observations have weight `\(1/n\)`, call this `\(m_1\)` with predictions `\(\hat{y}_1\)`
+- 2.Compute the residuals, use these to set weights
+- 3.Fit regression model again, with the weights, call this `\(m_j\)` with predictions `\(\hat{y}_j\)`
+- 4.Repeat steps 2, 3 many times, say `\(K\)`
+- 5.Final prediction is `\(\hat{y} = \sum_{i=1}^K \alpha_j \hat{y}_j\)`, where `\(\alpha_j\)` is linear coefficient, that sets the particular combination of the model predictions, could be `\(1/K\)`.
+
+Some really nice little animated gifs by Arthur Charpentier [here](https://www.r-bloggers.com/an-attempt-to-understand-boosting-algorithms/). Main ones are on the next few slides.
+
+---
+
+Using a decision tree model. Blue is model from a single tee. Red is the boosted tree model.
+
+![](boosting-algo-3.gif)
+
+---
+# Let's try it
+
+&lt;img src="week8.class2_files/figure-html/unnamed-chunk-1-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Generate a test set 
+
+Boosting can fit training data too closely, so need a test set to protect against this.
+
+&lt;img src="week8.class2_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Boosted tree - using xgboost
+
+
+```r
+library(xgboost)
+mat &lt;- as.matrix(df)
+df_xgb &lt;- xgboost(data=mat, label=mat[,2], 
+    nrounds=50, max_depth = 1, eta=0.1, gamma=0.1) 
+```
+
+&lt;img src="week8.class2_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+
+Error is reported as Root Mean Square Error (RMSE). Training error gets smaller with each iteration. About 26 iterations both converge.
+
+---
+# Fitted model
+
+&lt;img src="week8.class2_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Comparison of models 
+
+We will use RMSE, since this was the xgboost statistic.
+
+
+
+
+
+Boosted tree model: RMSE=0.073
+
+Random forest model: RMSE=0.13
+
+It doesn't make sense to fit a GLM to this data.
+
+---
+# Fitted models
+
+&lt;img src="week8.class2_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Tennis data
+
+Women's grand slam performance statistics for 2012. 
+
+Response variable: `won` whether the player won the match or not
+
+Explanatory variables: `Winners`, `Unforced.Errors`, `First.Serves.In`, `Total.Aces`, `Total.Double.Faults`, `First.Serve.Pts.Won`, `Receiving.Points.Won`, `Break.Point.Conversions`, `RPW.TPW`, `W.minus.Aces`, `SPW.TPW`
+
+
+
+---
+# Generalised linear model
+
+Why the binomial family??
+
+
+```r
+tennis_glm &lt;- glm(won~Winners+Unforced.Errors+
+                            RPW.TPW+W.minus.Aces+
+                  SPW.TPW+First.Serves.In+Total.Aces+
+                  Total.Double.Faults+First.Serve.Pts.Won+
+                  Receiving.Points.Won+Break.Point.Conversions,
+                  data=train, family=binomial())
+glm_pred &lt;- predict(tennis_glm, test, type="response")
+```
+
+---
+# Random forest
+
+
+```r
+tennis_rf &lt;- randomForest(won~Winners+Unforced.Errors+
+                            RPW.TPW+W.minus.Aces+
+                  SPW.TPW+First.Serves.In+Total.Aces+
+                  Total.Double.Faults+First.Serve.Pts.Won+
+                  Receiving.Points.Won+Break.Point.Conversions,
+                  data=train, na.action=na.omit, importance=TRUE)
+rf_pred &lt;- predict(tennis_rf, test) 
+#data.frame(rf_pred) %&gt;% mutate(p=ifelse(X0&gt;X1, X0, X1))
+#rf_pred &lt;- rf_pred$p
+```
+
+---
+# Boosted tree
+
+
+```r
+mat &lt;- as.matrix(train[,c(12, 16, 17, 18, 19, 21, 24, 25, 32, 33, 34, 37)])
+mat_test &lt;- as.matrix(test[,c(12, 16, 17, 18, 19, 21, 24, 25, 32, 33, 34, 37)])
+tennis_xgb &lt;- xgboost(data=mat, label=mat[,12], 
+    nrounds=50, max_depth = 1, eta=0.1, gamma=0.1)
+xgb_pred &lt;- predict(tennis_xgb, mat_test)
+```
+
+---
+# Comparison
+
+GLM model: 0.183
+
+Random forest model: 0.29
+
+Boosted tree model: 0.016
+
+---
+# Model fits
+
+&lt;img src="week8.class2_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Variable importance
+
+Generalised linear model
+
+
+```r
+summary(tennis_glm)$coefficients
+```
+
+```
+##                         Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept)             -81.7899    18.6726  -4.380 1.19e-05
+## Winners                   0.0778     0.1280   0.608 5.43e-01
+## Unforced.Errors          -0.0167     0.0472  -0.354 7.23e-01
+## RPW.TPW                 -19.6733     8.3110  -2.367 1.79e-02
+## W.minus.Aces             -0.1094     0.1348  -0.812 4.17e-01
+## SPW.TPW                  65.2715    17.7823   3.671 2.42e-04
+## First.Serves.In          -0.6364     0.1371  -4.643 3.43e-06
+## Total.Double.Faults      -0.2739     0.1388  -1.973 4.85e-02
+## First.Serve.Pts.Won       0.8149     0.2152   3.787 1.53e-04
+## Receiving.Points.Won      1.5078     0.3194   4.721 2.35e-06
+## Break.Point.Conversions  -0.0204     0.0295  -0.690 4.90e-01
+```
+
+---
+
+Random forest
+
+
+```r
+tennis_rf$importance
+```
+
+```
+##                         %IncMSE IncNodePurity
+## Winners                 0.01088          3.86
+## Unforced.Errors         0.01735          4.48
+## RPW.TPW                 0.01168          3.80
+## W.minus.Aces            0.00603          2.85
+## SPW.TPW                 0.01478          5.57
+## First.Serves.In         0.01634          4.38
+## Total.Aces              0.01512          4.66
+## Total.Double.Faults     0.00413          2.57
+## First.Serve.Pts.Won     0.03407          8.34
+## Receiving.Points.Won    0.21016         31.15
+## Break.Point.Conversions 0.02565         10.33
+```
+
+---
+# Resources
+
+- [Tutorial on Boosting ](http://xgboost.readthedocs.io/en/latest/R-package/xgboostPresentation.html)
+- [Hacker earth's tutorial](https://www.hackerearth.com/practice/machine-learning/machine-learning-algorithms/beginners-tutorial-on-xgboost-parameter-tuning-r/tutorial/)
+- [Analytics Vidhya introduction](https://www.analyticsvidhya.com/blog/2015/11/quick-introduction-boosting-algorithms-machine-learning/)
+
+---
+class: inverse middle 
+# Share and share alike
+
+&lt;a rel="license" href="http://creativecommons.org/licenses/by/4.0/"&gt;&lt;img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /&gt;&lt;/a&gt;&lt;br /&gt;This work is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by/4.0/"&gt;Creative Commons Attribution 4.0 International License&lt;/a&gt;.
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

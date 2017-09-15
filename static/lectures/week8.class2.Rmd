@@ -1,0 +1,276 @@
+---
+title: 'Statistical Thinking using Randomisation and Simulation'
+subtitle:  'Boosted models'
+author: Di Cook (dicook@monash.edu, @visnut)
+date: "W8.C2"
+output:
+  xaringan::moon_reader:
+    css: ["default", "myremark.css"]
+    self_contained: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE,
+  echo=FALSE,
+  fig.height = 6,
+  fig.width = 9,
+  fig.align='center'
+)
+options(digits=3)
+library(tidyverse)
+library(gridExtra)
+library(broom)
+```
+
+# Boosting
+
+- Why do you want to know about boosting? *The winners of almost all of the recent data competitions have used boosted models.*
+- The given definition is: "the method that converts weak learner to strong learners"
+- Actually, its better to think about it as *iteratively re-weighting cases to get a better fit for cases that are poorly predicted*
+
+---
+# Relationship with weighted regression
+
+- Weighted regression is typically used when working with survey data, that to infer from the sample to the population we need to take the sample weights into account
+- Boosting fits a model, with equal weights. Then increases the weight for the cases with the biggest residuals, and re-fits. 
+
+---
+# Boosting steps
+
+- 1.Fit some regression model, where all observations have weight $1/n$, call this $m_1$ with predictions $\hat{y}_1$
+- 2.Compute the residuals, use these to set weights
+- 3.Fit regression model again, with the weights, call this $m_j$ with predictions $\hat{y}_j$
+- 4.Repeat steps 2, 3 many times, say $K$
+- 5.Final prediction is $\hat{y} = \sum_{i=1}^K \alpha_j \hat{y}_j$, where $\alpha_j$ is linear coefficient, that sets the particular combination of the model predictions, could be $1/K$.
+
+Some really nice little animated gifs by Arthur Charpentier [here](https://www.r-bloggers.com/an-attempt-to-understand-boosting-algorithms/). Main ones are on the next few slides.
+
+---
+
+Using a decision tree model. Blue is model from a single tee. Red is the boosted tree model.
+
+![](boosting-algo-3.gif)
+
+---
+# Let's try it
+
+```{r}
+set.seed(8000)
+x=sort(runif(100)-0.5)
+df <- data.frame(x, y=c(x[1:50]^2, x[51:75]*2, -x[76:100]^2)+rnorm(100)*0.1)
+ggplot(df, aes(x=x, y=y)) + geom_point()
+```
+
+---
+# Generate a test set 
+
+Boosting can fit training data too closely, so need a test set to protect against this.
+
+```{r}
+x=sort(runif(100)-0.5)
+df_test <- data.frame(x, y=c(x[1:50]^2, x[51:75]*2, -x[76:100]^2)+rnorm(100)*0.1)
+ggplot(df, aes(x=x, y=y)) + geom_point() + 
+  geom_point(data=df_test, aes(x=x, y=y), shape=2, colour="blue")
+```
+
+---
+# Boosted tree - using xgboost
+
+```{r echo=TRUE, results='hide', fig.width=5, fig.height=4}
+library(xgboost)
+mat <- as.matrix(df)
+df_xgb <- xgboost(data=mat, label=mat[,2], 
+    nrounds=50, max_depth = 1, eta=0.1, gamma=0.1) 
+```
+
+```{r fig.width=5, fig.height=4}
+d <- data.frame(df_xgb$evaluation_log)
+d$test_rmse <- 1
+mat_test <- as.matrix(df_test)
+for (i in 1:nrow(d)) {
+   d$test_rmse[i] <- sqrt(sum((df_test$y-predict(df_xgb, 
+          mat_test, ntreelimit=i))^2)/nrow(df_test))
+}
+d_m <- d %>% gather(type, rmse, -iter)
+ggplot(d_m) + geom_line(aes(x=iter, y=rmse, colour=type)) +
+  scale_colour_brewer(palette="Dark2")
+```
+
+Error is reported as Root Mean Square Error (RMSE). Training error gets smaller with each iteration. About 26 iterations both converge.
+
+---
+# Fitted model
+
+```{r fig.height=5, fig.width=10}
+pred <- predict(df_xgb, mat, ntreelimit=26)
+df_aug <- cbind(df, pred)
+p1 <- ggplot(df_aug, aes(x=x, y=y)) + 
+  geom_point() + ggtitle("training data") +
+  geom_line(aes(y=pred), colour="hotpink", 
+             alpha=0.5)
+pred <- predict(df_xgb, mat_test, ntreelimit=26)
+df_test_aug <- cbind(df_test, pred)
+p2 <- ggplot(df_test_aug, aes(x=x, y=y)) + 
+  geom_point() + ggtitle("test data") +
+  geom_line(aes(y=pred), colour="hotpink", 
+             alpha=0.5)
+grid.arrange(p1, p2, ncol=2)
+```
+
+---
+# Comparison of models 
+
+We will use RMSE, since this was the xgboost statistic.
+
+```{r}
+RMSE <- function(obs, pred) {
+  e <- obs - pred
+  rmse <- sqrt(sum(e^2)/length(e))
+  return(rmse)
+}
+```
+
+```{r}
+library(randomForest)
+df_rf <- randomForest(y~x, data=df, ntree=50)
+rf_pred <- predict(df_rf, df_test)
+df_test_aug <- cbind(df_test_aug, rf_pred)
+```
+
+Boosted tree model: RMSE=`r RMSE(df_test$y, df_test_aug$pred)`
+
+Random forest model: RMSE=`r RMSE(df_test$y, df_test_aug$rf_pred)`
+
+It doesn't make sense to fit a GLM to this data.
+
+---
+# Fitted models
+
+```{r fig.height=5, fig.width=10}
+p1 <- ggplot(df_test_aug, aes(x=x, y=y)) + 
+  geom_point() + ggtitle("boosted tree") +
+  geom_line(aes(y=pred), colour="hotpink", 
+             alpha=0.5)
+p2 <- ggplot(df_test_aug, aes(x=x, y=y)) + 
+  geom_point() + ggtitle("random forest") +
+  geom_line(aes(y=rf_pred), colour="hotpink", 
+             alpha=0.5)
+grid.arrange(p1, p2, ncol=2)
+```
+
+
+---
+# Tennis data
+
+Women's grand slam performance statistics for 2012. 
+
+Response variable: `won` whether the player won the match or not
+
+Explanatory variables: `Winners`, `Unforced.Errors`, `First.Serves.In`, `Total.Aces`, `Total.Double.Faults`, `First.Serve.Pts.Won`, `Receiving.Points.Won`, `Break.Point.Conversions`, `RPW.TPW`, `W.minus.Aces`, `SPW.TPW`
+
+```{r}
+library(caret)
+tennis <- read_csv("../data/tennis_2012_wta_fixed.csv")
+indx <- createDataPartition(tennis$won, p=0.67, list=FALSE)
+train <- tennis[indx,]
+test <- tennis[-indx,]
+```
+
+---
+# Generalised linear model
+
+Why the binomial family??
+
+```{r echo=TRUE}
+tennis_glm <- glm(won~Winners+Unforced.Errors+
+                            RPW.TPW+W.minus.Aces+
+                  SPW.TPW+First.Serves.In+Total.Aces+
+                  Total.Double.Faults+First.Serve.Pts.Won+
+                  Receiving.Points.Won+Break.Point.Conversions,
+                  data=train, family=binomial())
+glm_pred <- predict(tennis_glm, test, type="response")
+```
+
+---
+# Random forest
+
+```{r echo=TRUE}
+tennis_rf <- randomForest(won~Winners+Unforced.Errors+
+                            RPW.TPW+W.minus.Aces+
+                  SPW.TPW+First.Serves.In+Total.Aces+
+                  Total.Double.Faults+First.Serve.Pts.Won+
+                  Receiving.Points.Won+Break.Point.Conversions,
+                  data=train, na.action=na.omit, importance=TRUE)
+rf_pred <- predict(tennis_rf, test) 
+#data.frame(rf_pred) %>% mutate(p=ifelse(X0>X1, X0, X1))
+#rf_pred <- rf_pred$p
+```
+
+---
+# Boosted tree
+
+```{r results='hide', echo=TRUE}
+mat <- as.matrix(train[,c(12, 16, 17, 18, 19, 21, 24, 25, 32, 33, 34, 37)])
+mat_test <- as.matrix(test[,c(12, 16, 17, 18, 19, 21, 24, 25, 32, 33, 34, 37)])
+tennis_xgb <- xgboost(data=mat, label=mat[,12], 
+    nrounds=50, max_depth = 1, eta=0.1, gamma=0.1)
+xgb_pred <- predict(tennis_xgb, mat_test)
+```
+
+---
+# Comparison
+
+GLM model: `r RMSE(test$won, glm_pred)`
+
+Random forest model: `r RMSE(test$won, rf_pred)`
+
+Boosted tree model: `r RMSE(test$won, xgb_pred)`
+
+---
+# Model fits
+
+```{r fig.height=4, fig.width=12}
+test_aug <- cbind(test, glm_pred, rf_pred, xgb_pred)
+p1 <- ggplot(test_aug, aes(x=glm_pred, y=won)) + geom_point()
+p2 <- ggplot(test_aug, aes(x=rf_pred, y=won)) + geom_point()
+p3 <- ggplot(test_aug, aes(x=xgb_pred, y=won)) + geom_jitter()
+grid.arrange(p1, p2, p3, ncol=3)
+```
+
+---
+# Variable importance
+
+Generalised linear model
+
+```{r echo=TRUE}
+summary(tennis_glm)$coefficients
+```
+
+---
+
+Random forest
+
+```{r echo=TRUE}
+tennis_rf$importance
+```
+
+---
+# Resources
+
+- [Tutorial on Boosting ](http://xgboost.readthedocs.io/en/latest/R-package/xgboostPresentation.html)
+- [Hacker earth's tutorial](https://www.hackerearth.com/practice/machine-learning/machine-learning-algorithms/beginners-tutorial-on-xgboost-parameter-tuning-r/tutorial/)
+- [Analytics Vidhya introduction](https://www.analyticsvidhya.com/blog/2015/11/quick-introduction-boosting-algorithms-machine-learning/)
+
+---
+class: inverse middle 
+# Share and share alike
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
