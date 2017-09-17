@@ -1,0 +1,420 @@
+---
+title: 'Statistical Thinking using Randomisation and Simulation'
+subtitle:  'Bayesian Thinking'
+author: Di Cook (dicook@monash.edu, @visnut)
+date: "W9.C1"
+output:
+  xaringan::moon_reader:
+    css: ["default", "myremark.css"]
+    self_contained: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE,
+  echo=FALSE,
+  fig.height = 6,
+  fig.width = 9,
+  fig.align='center'
+)
+options(digits=3)
+library(tidyverse)
+library(gridExtra)
+library(broom)
+```
+
+# The frequentist
+
+*The essence of the frequentist technique is to apply probability to data. If you suspect your friend has a weighted coin, for example, and you observe that it came up heads nine times out of 10, a frequentist would calculate the probability of getting such a result with an unweighted coin. The answer (about 1 percent) is not a direct measure of the probability that the coin is weighted; it's a measure of how improbable the nine-in-10 result is — a piece of information that can be useful in investigating your suspicion.* F. D. Flam, Sep 29, 2014, "The Odds, Continually Updated" New York Times
+
+---
+# The Bayesian
+
+In contrast, Bayesian calculations will directly compute the probability of  that the coin is weighted, given the data observed, and perhaps other information such as whether you have seen your friend use a weighted coin previously. 
+
+*The Bayesian applies the data and other expert knowledge to the probability calculation.*
+
+The complication is that you need to have these other plausible options. frequentist is easier because the argument is simply fair (under which we know the probabilities) or not. 
+
+With a Bayesian approach an alternative set is required, and then using conditional methods, the probability of observing the data under those scenarios, is computed. 
+
+Computing resources today have made is easier to do these complicated calculations. 
+
+---
+# Origin of frequentist methods
+
+Flam reports that the origins of frequentist methods date to a physician named John Arbuthnot who was curious about male to female birth ratios:
+
+*Arbuthnot gathered christening records from 1629 to 1710 and found that in London, a few more boys were recorded every year. He then calculated the odds that such an 82-year run could occur simply by chance, and found that it was one in trillions. This frequentist calculation can’t tell them what is causing the sex ratio to be skewed. Arbuthnot proposed that God skewed the birthrates to balance the higher mortality that had been observed among boys, but scientists today favor a biological explanation over a theological one.*
+
+This is the hypothesis testing that we have already seen. What's the null hypothesis? Alternative? Test statistic?
+
+---
+# Origin of Bayes
+
+*Reverend Thomas Bayes, a nonconformist English minister whose 1763 posthumously published paper, "An Essay Towards Solving a Problem in the Doctrine of Chances," contains what is arguably the first detailed description of the theorem from elementary probability theory.* Fienberg, 2006
+
+Bayes theorem says, for two events $A, B$, where $P(B)\neq 0$
+
+$$P(A|B) = \frac{P(A)P(B|A)}{P(B)}$$
+
+Doesn't look like much, huh? But its appeared on ["Big Bang Theory"](https://www.youtube.com/watch?v=jFB2QDNswmE)!
+
+---
+# Conditional probability
+
+A conditional probability is a probability based on some background information. For example, in the Monty Hall problem, $P(door ~C ~has~ prize|host ~showed ~door ~B, and ~you ~picked ~door ~A)$. 
+
+For two events, $A, B$, $p(A ~and ~B)$ means the probability that $A$ and $B$ are both true. 
+
+If $A, B$ are independent $p(A ~and ~B)=P(A)P(B)$. But more generally, $p(A ~and ~B)=P(A)P(B|A)$.
+
+---
+# Bayes theorem
+
+We know that $p(A ~and ~B) = p(B ~and ~A)$.
+
+And then we have $p(A ~and ~B)=P(A)P(B|A)$, $p(B ~and ~A)=P(B)P(B|A)$. 
+
+So $p(B) p(A|B) = p(A) p(B|A)$, then dividing by $P(B)$, gives
+
+$$P(A|B) = \frac{P(A)P(B|A)}{P(B)}$$
+
+---
+# Example
+
+Suppose there are two bowls of cookies. Bowl 1 contains 30 vanilla cookies and 10 chocolate cookies. Bowl 2 contains 20 of each.
+Now suppose you choose one of the bowls at random and, without looking, select a cookie at random. The cookie is vanilla $(V)$. What is the probability that it came from Bowl 1 $(B_1)$?
+
+This is a conditional probability; we want $p(B_1|V)$, but it is not obvious how to compute it. If I asked a different question—the probability of a vanilla cookie  given Bowl 1 -- it would be easy:
+$p(V|B_1) = 3/4$
+
+Sadly, $p(A|B)$ is not the same as $p(B|A)$, but there is a way to get from one to the other: Bayes' theorem.
+
+---
+
+We want $p(B_1|V)$. 
+
+We know $p(B_1) = 1/2$, $p(V|B_1) = 3/4$, $p(V)=50/80=5/8$.
+
+Then
+
+$$p(B_1|V) = \frac{p(B_1)p(V|B_1)}{p(V)} = \frac{(1/2)(3/4)}{5/8} = 3/5=0.6$$
+
+Its more likely that you chose from Bowl 1, if you picked a vanilla cookie.
+
+---
+# Another way to think about it
+
+It gives us a way to update the probability of a hypothesis, $H$, in light of some body of data, $D$. This is called the "diachronic interpretation", where diachronic is something that happens over time, the as time goes on the hypothesis changes, as new data arrives.  Write this as
+
+$$P(H|D) = \frac{P(H)P(H|D)}{P(D)}$$
+
+- $p(H)$ is the probability of the hypothesis before we see the data, called the "prior probability", or just "prior".
+- $p(H|D)$ is what we want to compute,the probability of the hypothesis after we see the data, called the "posterior".
+- $p(D|H)$ is the probability of the data under the hypothesis, called the "likelihood" - *we've seen this before!*
+- $p(D)$ is the probability of the data under any hypothesis, called the "normalising constant".
+
+---
+# Prior
+
+Sometimes we can compute the prior based on background information. For example, the cookie problem specifies that we choose a bowl at random with equal probability.
+
+In other cases the prior is subjective; that is, reasonable people might disagree, either because they use different background information or because they interpret the same information differently.
+
+---
+# Likelihood
+
+$$\begin{aligned}
+L(\theta) &=P(X_1=x_1,X_2=x_2, ... ,X_n=x_n~|~\theta) \\      &=f(x_1|\theta)f(x_2|\theta)\cdots f(x_n|\theta) \\
+&=\prod_{i=1}^n f(x_i;\theta)
+\end{aligned}$$
+
+---
+# Normalising constant
+
+The probability of seeing the data under any hypothesis at all. Huh?
+ 
+We need to assume a set of possible hypotheses, a "suite" that has these properties:
+
+- *Mutually exclusive*: At most one hypothesis in the set can be true, and
+- *Collectively exhaustive*: There are no other possibilities; at least one of the hypotheses has to be true.
+
+$$p(D)=p(H_1)p(D|H_1)+ ... +p(H_k)p(D|H_k)$$
+
+e.g. cookie problem, $p(D) = (1/2) (3/4) + (1/2) (1/2) = 5/8$
+
+---
+# Monty Hall problem
+
+- Car behind one of the doors $A$, $B$, $C$. Random location.
+- You pick a door, say $A$. 
+- Monty increases the suspense by opening either Door $B$ or $C$, whichever does not have the car.
+- Monty offers you the option to stick with your original choice or switch to the one remaining unopened door.
+- The question is, should you "stick" or "switch" or does it make no difference?
+
+Most people have the strong intuition that it makes no difference. There are two doors left, they reason, so the chance that the car is behind Door A is 50%. But that is *wrong*. In fact, the chance of winning if you stick with Door A is only 1/3; if you switch, your chances are 2/3.
+
+---
+
+To start, we should make a careful statement of the data, $D$. Here we will define it as, $D$ consists of two parts: Monty chooses a door with  no car behind it. $P(D)=1$. 
+
+Next we define three hypotheses: $A$, $B$, and $C$ represent the hypothesis that the car is behind Door $A$, Door $B$, or Door $C$.
+
+![](monty_hall.png)
+
+---
+
+The priors are easy because we are told that the prizes are arranged at random, which suggests that the car is equally likely to be behind any door.
+
+---
+
+Figuring out the likelihoods takes some thought:
+
+- If the car is actually behind $A$, Monty could safely open Doors $B$ or $C$. So the probability that he chooses $B$ is 1/2. And since the car is actually behind $A$, the probability that the car is not behind $B$ is 1.
+- If the car is actually behind $B$, Monty has to open door $C$, so the prob- ability that he opens door $B$ is 0.
+- Finally, if the car is behind Door $C$, Monty opens $B$ with probability 1 and finds no car there with probability 1.
+
+---
+# Estimation
+
+Suppose we have a box of dice that contains a 4-sided die, a 6-sided die, an 8-sided die, a 12-sided die, and a 20-sided die.
+
+Suppose I select a die from the box at random, roll it, and get a 6. What is the probability that the die is the 4, 6, 8, 12 or 20-sided one?
+
+Three-step strategy for approaching the problem. 
+
+- 1.Choose a representation for the hypotheses, e.g. Suite is `dice = c(4, 6, 8, 12, 20)`
+- 2.Choose a representation for the data, e.g. integers 1, ..., 20; `x=6` 
+- 3.Write the likelihood function.
+
+---
+
+likelihood function:
+
+```{r echo=TRUE}
+dice <- c(4, 6, 8, 12, 20)
+dice_likelihood <- function(x, dice) {
+  if (x>dice)
+    l <- 0
+  else 
+    l <- 1/dice
+  return(l)
+}
+```
+
+---
+
+Let the prior be a uniform distribution, each die is equally likely.
+
+```{r echo=TRUE}
+prior <- 1/5
+prob_D <- c(rep(5/50, 4), rep(4/50, 2), rep(3/50, 2), 
+            rep(2/50, 4), rep(1/50, 8))
+dice_posterior <- function(x, dice, prior, prob_D) {
+  post <- NULL
+  pD <- prod(prob_D[x])
+  for (i in 1:length(dice)) {
+    post <- c(post, prior*dice_likelihood(x, dice[i])/pD) 
+  }
+  df <- data.frame(dice, post=post/sum(post))
+  return(df)
+}
+dice_posterior(6, dice, prior, prob_D)
+```
+
+---
+
+Suppose we observe multiple rolls of the same die, 6, 8, 7, 7, 5, and 4. The likelihood is now a product:
+
+
+```{r echo=TRUE}
+dice_likelihood <- function(x, dice) {
+  ll <- 1
+  for (i in 1:length(x)) {
+    if (x[i]>dice)
+      l <- 0
+    else 
+      l <- 1/dice
+    ll <- ll*l
+  }
+  return(ll)
+}
+dice_posterior(c(6, 8, 7, 7, 5, 4), dice, prior, prob_D)
+```
+
+It is highly likely that it is die 8.
+
+---
+# Incorporating a prior
+
+Suppose that the dice are not uniformly distributed, e.g. suppose there are 3 20-sided die. What changes?
+
+---
+# The locomotive problem
+
+"A railroad numbers its locomotives in order 1..N. One day you see a locomotive with the number 60. Estimate how many loco- motives the railroad has."
+
+Based on this observation, we know the railroad has 60 or more locomo- tives. But how many more? To apply Bayesian reasoning, we can break this problem into two steps:
+
+- 1.What did we know about $N$ before we saw the data?
+- 2.For any given value of $N$, what is the likelihood of seeing the data (a locomotive with number 60)?
+
+The answer to the first question is the prior. The answer to the second is the likelihood.
+
+---
+# Posterior
+
+We have no information upon which to base a prior, so we will start with something simple. Let's assume that N is equally likely to be any value from 1 to 1000.
+
+```{r fig.width=6, fig.height=4}
+loco_likelihood <- function(x, loco){
+  if (x>loco)
+    l <- 0
+  else 
+    l <- 1/loco
+}
+l <- NULL
+for (i in 1:1000)
+  l <- c(l, loco_likelihood(60, i))
+df <- data.frame(hyp=1:1000, l, post=l/sum(l))
+ggplot(df, aes(hyp, post)) + geom_line() + xlab("Number of trains") +
+  ylab("Probability")
+```
+
+---
+
+What do you guess for the number of locomotives?
+
+60 is the most likely value. But this doesn't seem like a very good guess - what are the chances that you happened to see the locomotive with the largest number?
+
+Another approach is to take the mean of the posterior distribution, $\sum posterior * hypothesis$ = `r round(sum(df$post*df$hyp), 0)`
+
+---
+# Priors
+
+If the upper bound on the number of locomotives were 500, the posterior mean would be 207. With an upper bound of 2000, the posterior mean is 552. So our decision changes substantially depending on the choice of upper bound. Two solutions:
+
+- Get more data.
+- Get more background information.
+
+With more data, posterior distributions based on different priors tend to converge.
+
+---
+
+Suppose we add a power law prior, that the chance of there being small companies is high relative to large companies. Thus smaller upper bounds get a higher probability of occurring:
+
+$$prior(x) = \left(\frac{1}{x}\right)^\alpha$$
+
+```{r fig.width=6, fig.height=4}
+alpha=0.9
+prior <- (1/1:1000)^alpha
+df <- data.frame(hyp=1:1000, l, unif=l/sum(l))
+df$power <- l*prior
+df$power <- df$power/sum(df$power)
+df_m <- df %>% gather(prior, posterior, unif, power)
+ggplot(df_m, aes(x=hyp, y=posterior, color=prior)) + geom_line() + xlab("Number of trains") +
+  ylab("Probability") +
+  scale_color_brewer(palette="Dark2")
+```
+
+Then the best guess would be the posterior mean `r round(sum(df$power*df$hyp), 0)`. This is more robust to different choices of upper bounds. 
+
+---
+# Credible intervals
+
+Rather than provide a single point estimate, we can provide a range of credible values, like a confidence interval. For example, a 90% credible interval for the number of locomotives would be
+
+```{r echo=TRUE}
+probs <- cumsum(df$power)
+```
+
+(`r which(probs > 0.05)[1]`, `r which(probs > 0.95)[1]`).
+
+its pretty wide, indicating how uncertain we are.
+
+---
+# A success story
+
+*During World War II, the Economic Warfare Division of the American Em- bassy in London used statistical analysis to estimate German production of tanks and other equipment.*
+
+*The Western Allies had captured log books, inventories, and repair records that included chassis and engine serial numbers for individual tanks.*
+
+*Analysis of these records indicated that serial numbers were allocated by manufacturer and tank type in blocks of 100 numbers, that numbers in each block were used sequentially, and that not all numbers in each block were used. So the problem of estimating German tank production could be re- duced, within each block of 100 numbers, to a form of the locomotive prob- lem.*
+
+*Based on this insight, American and British analysts produced estimates substantially lower than estimates from other forms of intelligence. And after the war, records indicated that they were substantially more accurate.*
+
+---
+# Continuous distributions
+
+- We are interested in the unknown parameter, $\theta$. 
+- We choose a probability density $\pi(\theta)$, called the *prior* distribution, that expresses our thinking, based on expert knowledge or prior experience, about the parameter $\theta$ before we see any data.
+- We choose a probability distribution $f(x|\theta)$ that reflects our beliefs about the random variable $X$ given $\theta$.
+- After observing data $x$, we update our beliefs and calculate the posterior distribution $\pi(\theta|x)$:
+
+$$\pi(\theta|x) = \frac{f(x|\theta)\pi(\theta)}{f(x)} \propto f(x|\theta)\pi(\theta)$$
+
+where $f(x) = \int_\theta f(x|\theta)\pi(\theta)d\theta$ (its a constant). 
+
+---
+# Comparison with MLE
+
+- If we use an uninformative prior, such as a uniform distribution, the posterior distribution is effectively the likelihood.
+- With MLE, we would use the maximum value of this function to estimate $\theta$. 
+- With Bayesian methods we use the posterior mean as the point estimate of $\theta$.  This is not the same as the MLE.
+
+---
+# Example
+
+Suppose that $X_1, \dots, X_n \sim N(\mu, \sigma_0)$ where $\sigma_0$ is a known value, and $\pi(\theta) \sim N(\mu, \tau)$. We need to find the posterior distribution $\pi(\theta|x_1, \dots, x_n)$. 
+
+The likelihood is
+
+$$f(x_1, \dots, x_n|\theta) = \prod_{i=1}^n \exp \left\{ -\frac{1}{2} \left(\frac{x_i-\theta}{\sigma_0}\right)^2 \right\}$$
+
+
+$$= \exp \left\{ -\frac{n}{2} \left(\frac{\bar{x}-\theta}{\sigma_0}\right)^2 \right\}$$
+
+and the prior is $\exp \left\{ -\frac{1}{2} \left(\frac{\theta-\mu}{\tau}\right)^2 \right\}$.
+
+---
+# Posterior
+
+$$\pi(\theta|x_1, \dots, x_n) = \exp \left\{-\frac{1}{2} \left(\frac{n}{\sigma_0^2}+\frac{1}{\tau^2}\right) \left(\theta - \frac{n\bar{x}/\sigma_0^2+\mu/\tau^2}{n/\sigma_0^2+1/\tau^2}\right)^2\right\}$$
+
+which is itself a normal density function with 
+
+$$\bar{\mu} = \frac{n\bar{x}/\sigma_0^2+\mu/\tau^2}{n/\sigma_0^2+1/\tau^2}$$
+and
+
+$$\bar{\sigma}^2 = \left( \frac{n}{\sigma_0^2}+\frac{1}{\tau^2}\right) ^{-1}$$
+
+which are the posterior mean and variance.
+
+---
+# Conjugate priors
+
+For some combinations of priors and data distributions, it is possible to algebraicly determine the posterior distribution. When the posterior is in the same family as the prior distribution they are called *conjugate distributions*, and the prior is called a conjugate prior for the likelihood function.
+
+Mostly, the posterior distribution has to be calculated computationally.
+
+---
+# Resources
+
+- [A visual guide to Bayesian thinking](https://www.youtube.com/watch?v=BrK7X_XlGB8)
+- [The Odds, Continually Updated](https://www.nytimes.com/2014/09/30/science/the-odds-continually-updated.html?mcubz=3)
+- [Think Bayes](http://www.greenteapress.com/thinkbayes/thinkbayes.pdf)
+- [Origin of Bayes](http://www.stat.cmu.edu/~fienberg/fienberg-BA-06-Bayesian.pdf)
+
+---
+class: inverse middle 
+# Share and share alike
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
