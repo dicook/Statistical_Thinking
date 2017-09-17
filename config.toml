@@ -28,6 +28,10 @@ footnotereturnlinkcontents = "↩"
     name = "ED (assignments & quizzes)"
     url = "https://edstem.com.au/"
     weight = 4
+[[menu.main]]
+    name = "kaggle challenge"
+    url = "https://inclass.kaggle.com/c/vitticeps"
+    weight = 5
 
 [params]
     description = "A website built through Hugo and blogdown."
