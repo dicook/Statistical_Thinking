@@ -1,0 +1,155 @@
+---
+title: "ETC 2420/5242 Lab 7 2017"
+author: "Di Cook"
+date: "SOLUTION"
+output: pdf_document
+---
+
+```{r echo = FALSE, message = FALSE, warning = FALSE, warning = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  error = FALSE, 
+  echo = FALSE, 
+  collapse = TRUE,
+  comment = "#",
+  fig.height = 4,
+  fig.width = 8,
+  fig.align = "center",
+  cache = FALSE
+)
+options(digits = 3)
+library(knitr)
+```
+
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+load("pisa_au.rda")
+pisa_au <- pisa_au %>% 
+  mutate(science = (PV1SCIE+PV2SCIE+PV3SCIE+PV4SCIE+
+                    PV5SCIE+PV6SCIE+PV7SCIE+PV8SCIE+
+                    PV9SCIE+PV10SCIE)/10) %>%
+  select(science, ST004D01T, JOYSCIE, ST013Q01TA, ST012Q01TA, SENWT)
+aus_nomiss <- pisa_au %>% 
+  filter(!is.na(JOYSCIE)) %>% 
+  filter(!is.na(ST013Q01TA)) %>% filter(!is.na(ST012Q01TA))
+aus_nomiss <- aus_nomiss %>%
+  mutate(ST004D01T=factor(ST004D01T, levels=c(1,2), labels=c("f", "m")), 
+         science_std = (science-mean(science))/sd(science)) %>%
+  rename(gender=ST004D01T, nbooks=ST013Q01TA, ntvs=ST012Q01TA)
+aus_glm <- glm(science_std~gender+JOYSCIE+nbooks+ntvs, data=aus_nomiss, weights=SENWT)
+summary(aus_glm)
+```
+
+## Question 1 (3 pts)
+
+```{r}
+coef <- summary(aus_glm)$coefficients
+n <- nrow(aus_nomiss)
+```
+
+a. Compute and report the 95% confidence interval for the parameter for the number of books in the household (nbooks), using classical t-interval methods.
+
+The 95% confidence interval is (`r coef[4,1]-qt(0.975, n-5)*coef[4,2]` , `r coef[4,1]+qt(0.975, n-5)*coef[4,2]`)
+
+b. Use this to test the hypothesis that `nbooks` is not important for the model. Write down the null and alternative hypotheses you are using.
+
+$H_o: \beta_4=0$ vs $H_o: \beta_4 \neq 0$
+
+`0 is outside the interval, so it is not a plausible value for the parameter.` $H_o$ `would be rejected, and the conclusion would be that the parameter is not 0.`
+
+## Question 2 (3 pts)
+
+a. The boot package can generate bootstrap samples for weighted data. To use the `boot` function for drawing samples, you need a function to compute the statistic of interest. Write the function to return the slope for `nbooks` after fitting a `glm` to a bootstrap sample. The skeleton of the function `calc_stat` is below, where `d` is the data, and `i` is the vector of indices of the bootstrap sample.
+
+```{r echo=TRUE}
+library(boot)
+calc_stat <- function(d, i) {
+  x <- d[i,]
+  mod <- glm(science_std~gender+JOYSCIE+nbooks+ntvs, data=x, weights=SENWT)
+  stat <- as.numeric(coefficients(mod)[4])
+  return(stat)
+}
+stat <- boot(aus_nomiss, statistic=calc_stat, R=1000,
+     weights=aus_nomiss$SENWT)
+stat
+```
+
+The 95% confidence interval is (`r sort(stat$t)[25]` , `r sort(stat$t)[975]`). 
+
+b. How does the bootstrap interval compare with the t-interval? Compare and constrast them. `The two intervals are virtually identical.`
+
+## Question 3 (3 pts)
+
+Now make a 95% bootstrap confidence interval for predicted value for a girl, enjoys science (JOYSCIE=1.0) two TVs and 26-100 books in the home. The weight for a student like this is 0.2. Be sure to convert the values back into the actual science score range.
+
+```{r echo=TRUE}
+calc_pred <- function(d, i, newd) {
+  x <- d[i,]
+  mod <- glm(science_std~gender+JOYSCIE+nbooks+ntvs, data=x,
+             weights=SENWT)
+  pred <- predict(mod, newd)
+  return(pred)
+}
+new_data <- data.frame(gender=1, JOYSCIE=1.0, nbooks=3, ntvs=3, SENWT=0.2)
+new_data$gender <- factor(new_data$gender, levels=c(1,2), labels=c("f","m"))
+pred <- boot(aus_nomiss, statistic=calc_pred, R=1000,
+     weights=aus_nomiss$SENWT, newd=new_data)
+pred
+sort(pred$t)[25]
+sort(pred$t)[975]
+```
+
+The 95% confidence interval for the predicted value is (`r sort(pred$t)[25]*sd(aus_nomiss$science)+mean(aus_nomiss$science)` , `r sort(pred$t)[975]*sd(aus_nomiss$science)+mean(aus_nomiss$science)` ). 
+
+## Question 4  (3 pts)
+
+Do the same 95% bootstrap confidence interval for predicted value for a boy, all other values remain the same. Compare and contrast the intervals for the girl and boy, on the raw science score scale. 
+
+```{r}
+new_data <- data.frame(gender=2, JOYSCIE=1.0, nbooks=3, ntvs=3, SENWT=0.2)
+new_data$gender <- factor(new_data$gender, levels=c(1,2), labels=c("f","m"))
+pred <- boot(aus_nomiss, statistic=calc_pred, R=1000,
+     weights=aus_nomiss$SENWT, newd=new_data)
+pred
+sort(pred$t)[25]
+sort(pred$t)[975]
+```
+
+The 95% confidence interval for the predicted value is (`r sort(pred$t)[25]*sd(aus_nomiss$science)+mean(aus_nomiss$science)` , `r sort(pred$t)[975]*sd(aus_nomiss$science)+mean(aus_nomiss$science)` ). 
+
+
+The confidence interval for the predicted score for a girl was shifted down by five points from the boys. That is, an average boy with the same demographics would be expected to score five points more on science than the average girl.  
+
+## Question 5  (3 pts)
+
+Compute a bootstrap 95% prediction interval for the girl as in question 3. Be sure to convert the values back into the actual science score range.
+
+
+```{r echo=TRUE}
+calc_res <- function(d, i) {
+  x <- d[i,]
+  mod <- glm(science_std~gender+JOYSCIE+nbooks+ntvs, data=x,
+             weights=SENWT)
+  res <- residuals(mod)
+  return(c(l=min(res), u=max(res)))
+}
+res <- boot(aus_nomiss, statistic=calc_res, R=1000,
+     weights=aus_nomiss$SENWT)
+l <- sort(res$t[,1])[25]
+u <- sort(res$t[,2])[975]
+new_data <- data.frame(gender=1, JOYSCIE=1.0, nbooks=3, ntvs=3, SENWT=0.2)
+new_data$gender <- factor(new_data$gender, levels=c(1,2), labels=c("f","m"))
+pred <- predict(aus_glm, new_data)
+```
+
+The 95% prediction interval is (`r (pred+l)*sd(aus_nomiss$science)+mean(aus_nomiss$science)` , `r (pred+u)*sd(aus_nomiss$science)+mean(aus_nomiss$science)`)
+
+
+
+
