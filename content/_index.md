@@ -63,7 +63,7 @@ Note that it was open book, 3 hours, and worth 70%. This year's exam is 2 hours 
 
 - [Exam](exam/ETC2420_exam2016.pdf), [SOLUTION](exam/ETC2420_exam2016_solution.pdf)
 - [Practice Exam](exam/practice_exam2016_ETC2420_5242.pdf), [SOLUTION](exam/practice_exam2016_ETC2420_5242_solution.pdf)
-- [Formula sheet for this year](ETC2420_FORMULA_SHEET.pdf)
+- [Formula sheet for this year](lectures/ETC2420_FORMULA_SHEET.pdf)
 
 ## Computing information
 
