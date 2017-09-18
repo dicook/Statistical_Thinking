@@ -37,8 +37,8 @@ title: Home
 - Week 5: Linear models: [Slides 1](lectures/week5.class1.html) ([Rmd](lectures/week5.class1.Rmd)), [Slides 2](lectures/week5.class2.html) ([Rmd](lectures/week5.class2.Rmd)); Reading: Chapter 5 of textbook, linear models
 - Week 6: [Bootstrap intervals](lectures/week6.class1.html) ([Rmd](lectures/week6.class1.Rmd)); [Generalised linear models](lectures/week6.class2.html) ([Rmd](lectures/week6.class2.Rmd)); Reading:  Reading: Chapter 4.5 of textbook (its a bit misleading, though), and [A really simple explanation](http://www.dummies.com/education/science/biology/the-bootstrap-method-for-standard-errors-and-confidence-intervals/),  wikipedia page on [bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(statistics))
 - Week 7: [Mixed effects models](lectures/week7.class1.html) ([Rmd](lectures/week7.class1.Rmd)), [Models by partitioning](lectures/week7.class2.html) ([Rmd](lectures/week7.class2.Rmd)); Reading: [Fitting linear mixed effects models](https://www.jstatsoft.org/article/view/v067i01/v67i01.pdf) sections 1, 2 and 5
-- Week 8: Ensemble models with [bootstrapping](lectures/week8.class1.html)([Rmd](lectures/week8.class1.Rmd)) and [boosting](lectures/week8.class2.html)([Rmd](lectures/week8.class2.Rmd)); Reading: [Introduction to Recursive Partitioning](https://cran.r-project.org/web/packages/rpart/vignettes/longintro.pdf); [tennis_2012_wta_fixed.csv](data/tennis_2012_wta_fixed.csv)
-- Week 9: [Bayesian inference](lectures/week9.class1.html)([Rmd](lectures/week9.class1.Rmd))); Reading: [Gentle intro to boosting](https://www.analyticsvidhya.com/blog/2015/11/quick-introduction-boosting-algorithms-machine-learning/), [Conditional probability and Bayesian methods](https://www.analyticsvidhya.com/blog/2017/03/conditional-probability-bayes-theorem/), [Intro to Bayesian methods](https://www.analyticsvidhya.com/blog/2016/06/bayesian-statistics-beginners-simple-english/), [A visual guide to Bayesian thinking](https://www.youtube.com/watch?v=BrK7X_XlGB8), [The Odds, Continually Updated](https://www.nytimes.com/2014/09/30/science/the-odds-continually-updated.html?mcubz=3), [Think Bayes](http://www.greenteapress.com/thinkbayes/thinkbayes.pdf)
+- Week 8: Ensemble models with [bootstrapping](lectures/week8.class1.html)([Rmd](lectures/week8.class1.Rmd)) and [boosting](lectures/week8.class2.html)([Rmd](lectures/week8.class2.Rmd)); Reading: [Introduction to Recursive Partitioning](https://cran.r-project.org/web/packages/rpart/vignettes/longintro.pdf), [Gentle intro to boosting](https://www.analyticsvidhya.com/blog/2015/11/quick-introduction-boosting-algorithms-machine-learning/);  [tennis_2012_wta_fixed.csv](data/tennis_2012_wta_fixed.csv)
+- Week 9: [Bayesian inference](lectures/week9.class1.html)([Rmd](lectures/week9.class1.Rmd))); Reading: [Conditional probability and Bayesian methods](https://www.analyticsvidhya.com/blog/2017/03/conditional-probability-bayes-theorem/), [Intro to Bayesian methods](https://www.analyticsvidhya.com/blog/2016/06/bayesian-statistics-beginners-simple-english/), [A visual guide to Bayesian thinking](https://www.youtube.com/watch?v=BrK7X_XlGB8), [The Odds, Continually Updated](https://www.nytimes.com/2014/09/30/science/the-odds-continually-updated.html?mcubz=3), [Think Bayes](http://www.greenteapress.com/thinkbayes/thinkbayes.pdf)
 - Week 10: Modelling risk and loss
 - Week 11: Data wrangling
 - Week 12: Project presentations
@@ -51,7 +51,7 @@ title: Home
 - Week 4: [Fitting distributions](labs/lab4.pdf) [(Rmd)](labs/lab4.Rmd) [SOLUTION](labs/lab4_solution.pdf) [(Rmd)](labs/lab4_solution.Rmd); [Tutorial slides](tutorials/lab04/index.html) [(Rmd)](tutorials/lab04/index.Rmd) [usworkcomp.rda](labs/usworkcomp.rda)
 - Week 5: [Linear models](labs/lab5.pdf) [(Rmd)](labs/lab5.Rmd) [SOLUTION](labs/lab5_solution.pdf) [(Rmd)](labs/lab5_solution.Rmd); [Tutorial slides](tutorials/lab05/index.html) [(Rmd)](tutorials/lab05/index.Rmd)
 - Week 6: [Diagnosing models](labs/lab6.pdf) [(Rmd)](labs/lab6.Rmd); [SOLUTION](labs/lab6_solution.pdf) [(Rmd)](labs/lab6_solution.Rmd) [Tutorial slides](tutorials/lab06/index.html) [(Rmd)](tutorials/lab06/index.Rmd) [pisa_au.rda](tutorials/lab06/pisa_au.rda)
-- Week 7: [Bootstrap intervals](labs/lab7.pdf) [(Rmd)](labs/lab7.Rmd); [Tutorial slides](tutorials/lab07/index.html) [(Rmd)](tutorials/lab07/index.Rmd)
+- Week 7: [Bootstrap intervals](labs/lab7.pdf) [(Rmd)](labs/lab7.Rmd); [SOLUTION](labs/lab7_solution.pdf) [(Rmd)](labs/lab7_solution.Rmd); [Tutorial slides](tutorials/lab07/index.html) [(Rmd)](tutorials/lab07/index.Rmd)
 - Week 8: [Tree models](labs/lab8.pdf) [(Rmd)](labs/lab8.Rmd); [Tutorial slides](tutorials/lab08/index.html) [(Rmd)](tutorials/lab08/index.Rmd) [melb_auctions.csv](labs/melb_auctions.csv)
 - Week 9: Bayesian Thinking
 
@@ -59,10 +59,11 @@ title: Home
 
 ## Last year's exams 
 
-Note that it was open book, 3 hours, and worth 70%
+Note that it was open book, 3 hours, and worth 70%. This year's exam is 2 hours long, closed notes and worth 60%.
 
 - [Exam](exam/ETC2420_exam2016.pdf), [SOLUTION](exam/ETC2420_exam2016_solution.pdf)
 - [Practice Exam](exam/practice_exam2016_ETC2420_5242.pdf), [SOLUTION](exam/practice_exam2016_ETC2420_5242_solution.pdf)
+- [Formula sheet for this year](lectures/ETC2420_FORMULA_SHEET.pdf)
 
 ## Computing information
 

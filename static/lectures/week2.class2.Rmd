@@ -233,7 +233,7 @@ Sample statistics are used to compute the test statistic with the sample
 - The court failed to reject $H_0$ (i.e. failed to convict the person) when he was in fact guilty ($ H_a$ true).
 - $1 − \beta$: Power of the test
 
-The signifcance level selected for a test should reflect the real-world consequences associated with making a Type 1 or Type 2 Error.
+The significance level selected for a test should reflect the real-world consequences associated with making a Type 1 or Type 2 Error.
 
 ---
 #  Test statistic

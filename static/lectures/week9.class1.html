@@ -65,7 +65,7 @@ A conditional probability is a probability based on some background information.
 
 For two events, `\(A, B\)`, `\(p(A ~and ~B)\)` means the probability that `\(A\)` and `\(B\)` are both true. 
 
-If `\(A, B\)` are independent `\(p(A ~and ~B)=P(A)P(B)\)`. But more generally, `\(p(A ~and ~B)=P(A)P(B|A)\)`.
+If `\(A, B\)` are independent `\(P(A ~and ~B)=P(A)P(B)\)`. But more generally, `\(P(A ~and ~B)=P(A)P(B|A)\)`.
 
 ---
 # Bayes theorem
@@ -106,7 +106,7 @@ Its more likely that you chose from Bowl 1, if you picked a vanilla cookie.
 
 It gives us a way to update the probability of a hypothesis, `\(H\)`, in light of some body of data, `\(D\)`. This is called the "diachronic interpretation", where diachronic is something that happens over time, the as time goes on the hypothesis changes, as new data arrives.  Write this as
 
-`$$P(H|D) = \frac{P(H)P(H|D)}{P(D)}$$`
+`$$P(H|D) = \frac{P(H)P(D|H)}{P(D)}$$`
 
 - `\(p(H)\)` is the probability of the hypothesis before we see the data, called the "prior probability", or just "prior".
 - `\(p(H|D)\)` is what we want to compute,the probability of the hypothesis after we see the data, called the "posterior".
