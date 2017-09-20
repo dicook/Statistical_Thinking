@@ -37,7 +37,7 @@ Watch the video "[A visual guide to Bayesian thinking](https://www.youtube.com/w
 
 A situation where Bayes theorem is routinely used is the spam filter in your mail server. The message is scrutinized for the appearance of key words which make it likely that the message is spam. Let us describe how one of these filters might work. We imagine that the evidence for spam is that the subject message of the mail contains the word "easy". We define events *spam* (the message is spam) and *easy* (the subject line contains this word).
 
-From previous examination of my mail I have learned that 70% of emails are spam, 2% of spam email have "free" in the subject line, and .1% of non-spam emails have this word in the subject line.
+From previous examination of my mail I have learned that 70% of emails are spam, 2% of spam email have "easy" in the subject line, and .1% of non-spam emails have this word in the subject line.
 
 Use Bayes Theorem to tackle to find *$P(\text{spam} | \text{easy})$*. 
 
@@ -66,7 +66,7 @@ Suppose there were 3 20-side dice. Re-do the calculations for `P(H|D)` if a 6 is
 
 ## Exercise 4
 
-In the lecture we used a power law prior to dampen down the estimate of the number of locomotives. Instead fit a $U[\mu-10, \mu+10]$ prior. Instead fit a $N(\mu, 100)$ prior. Plot the posterior distributions. 
+In the lecture we used a power law prior to dampen down the estimate of the number of locomotives. Instead fit a $N(\mu, 100)$ prior. Plot the posterior distributions. 
 
 
 ## Exercise 5
