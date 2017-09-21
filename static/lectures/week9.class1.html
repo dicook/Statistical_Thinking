@@ -155,7 +155,7 @@ Most people have the strong intuition that it makes no difference. There are two
 
 ---
 
-To start, we should make a careful statement of the data, `\(D\)`. Here we will define it as, `\(D\)` consists of two parts: Monty chooses a door with  no car behind it. `\(P(D)=1\)`. 
+To start, we should make a careful statement of the data, `\(D\)`. Here we will define it as, `\(D\)` consists of two parts: Monty chooses door B with no car behind it. 
 
 Next we define three hypotheses: `\(A\)`, `\(B\)`, and `\(C\)` represent the hypothesis that the car is behind Door `\(A\)`, Door `\(B\)`, or Door `\(C\)`.
 
@@ -170,7 +170,7 @@ The priors are easy because we are told that the prizes are arranged at random, 
 Figuring out the likelihoods takes some thought:
 
 - If the car is actually behind `\(A\)`, Monty could safely open Doors `\(B\)` or `\(C\)`. So the probability that he chooses `\(B\)` is 1/2. And since the car is actually behind `\(A\)`, the probability that the car is not behind `\(B\)` is 1.
-- If the car is actually behind `\(B\)`, Monty has to open door `\(C\)`, so the prob- ability that he opens door `\(B\)` is 0.
+- If the car is actually behind `\(B\)`, Monty has to open door `\(C\)`, so the probability that he opens door `\(B\)` is 0.
 - Finally, if the car is behind Door `\(C\)`, Monty opens `\(B\)` with probability 1 and finds no car there with probability 1.
 
 ---
@@ -272,9 +272,9 @@ Suppose that the dice are not uniformly distributed, e.g. suppose there are 3 20
 ---
 # The locomotive problem
 
-"A railroad numbers its locomotives in order 1..N. One day you see a locomotive with the number 60. Estimate how many loco- motives the railroad has."
+"A railroad numbers its locomotives in order 1..N. One day you see a locomotive with the number 60. Estimate how many locomotives the railroad has."
 
-Based on this observation, we know the railroad has 60 or more locomo- tives. But how many more? To apply Bayesian reasoning, we can break this problem into two steps:
+Based on this observation, we know the railroad has 60 or more locomotives. But how many more? To apply Bayesian reasoning, we can break this problem into two steps:
 
 - 1.What did we know about `\(N\)` before we saw the data?
 - 2.For any given value of `\(N\)`, what is the likelihood of seeing the data (a locomotive with number 60)?
@@ -284,17 +284,19 @@ The answer to the first question is the prior. The answer to the second is the l
 ---
 # Posterior
 
-We have no information upon which to base a prior, so we will start with something simple. Let's assume that N is equally likely to be any value from 1 to 1000.
+We have no information upon which to base a prior, so we will start with something simple. Let's assume that N is equally likely to be any value from 1 to 1000 `\((N)\)`. Then the 
+
+- likelihood is `\(1/N\)`
+- `\(D=60\)`
+- posterior looks like
 
 &lt;img src="week9.class1_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
-What do you guess for the number of locomotives?
-
-60 is the most likely value. But this doesn't seem like a very good guess - what are the chances that you happened to see the locomotive with the largest number?
-
-Another approach is to take the mean of the posterior distribution, `\(\sum posterior * hypothesis\)` = 333
+- What do you guess for the number of locomotives?
+- 60 is the most likely value. But this doesn't seem like a very good guess - what are the chances that you happened to see the locomotive with the largest number?
+- Another approach is to take the mean of the posterior distribution, `\(\sum posterior * hypothesis\)` = 333
 
 ---
 # Priors
@@ -326,6 +328,8 @@ Rather than provide a single point estimate, we can provide a range of credible 
 probs &lt;- cumsum(df$power)
 ```
 
+Take the 5th and 95th percentiles:
+
 (63, 600).
 
 its pretty wide, indicating how uncertain we are.
@@ -333,11 +337,11 @@ its pretty wide, indicating how uncertain we are.
 ---
 # A success story
 
-*During World War II, the Economic Warfare Division of the American Em- bassy in London used statistical analysis to estimate German production of tanks and other equipment.*
+*During World War II, the Economic Warfare Division of the American Embassy in London used statistical analysis to estimate German production of tanks and other equipment.*
 
 *The Western Allies had captured log books, inventories, and repair records that included chassis and engine serial numbers for individual tanks.*
 
-*Analysis of these records indicated that serial numbers were allocated by manufacturer and tank type in blocks of 100 numbers, that numbers in each block were used sequentially, and that not all numbers in each block were used. So the problem of estimating German tank production could be re- duced, within each block of 100 numbers, to a form of the locomotive prob- lem.*
+*Analysis of these records indicated that serial numbers were allocated by manufacturer and tank type in blocks of 100 numbers, that numbers in each block were used sequentially, and that not all numbers in each block were used. So the problem of estimating German tank production could be reduced, within each block of 100 numbers, to a form of the locomotive prob- lem.*
 
 *Based on this insight, American and British analysts produced estimates substantially lower than estimates from other forms of intelligence. And after the war, records indicated that they were substantially more accurate.*
 
@@ -363,7 +367,7 @@ where `\(f(x) = \int_\theta f(x|\theta)\pi(\theta)d\theta\)` (its a constant).
 ---
 # Example
 
-Suppose that `\(X_1, \dots, X_n \sim N(\mu, \sigma_0)\)` where `\(\sigma_0\)` is a known value, and `\(\pi(\theta) \sim N(\mu, \tau)\)`. We need to find the posterior distribution `\(\pi(\theta|x_1, \dots, x_n)\)`. 
+Suppose that `\(X_1, \dots, X_n \sim N(\theta, \sigma_0)\)` where `\(\sigma_0\)` is a known value, and `\(\pi(\theta) \sim N(\mu, \tau)\)`. We need to find the posterior distribution `\(\pi(\theta|x_1, \dots, x_n)\)`. 
 
 The likelihood is
 
@@ -394,6 +398,13 @@ which are the posterior mean and variance.
 For some combinations of priors and data distributions, it is possible to algebraicly determine the posterior distribution. When the posterior is in the same family as the prior distribution they are called *conjugate distributions*, and the prior is called a conjugate prior for the likelihood function.
 
 Mostly, the posterior distribution has to be calculated computationally.
+
+---
+# Bayesian regression
+
+- places prior probability distributions on the parameters, `\(\beta_0, \dots, \beta_p\)`. 
+- instead of maximising the likelihood alone, it maximises the likelihood x prior
+- choosing a conjugate prior will make it possible to algebraicly solve, but most prior choices require numerical maximisation
 
 ---
 # Resources
