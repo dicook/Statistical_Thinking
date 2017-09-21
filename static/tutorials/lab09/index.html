@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bayesian Statistics</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Nathaniel Tomasetti" />
+    <link href="libs/remark-css/example.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Bayesian Statistics
+### Nathaniel Tomasetti
+
+---
+
+
+
+
+
+
+class: center
+### Classical Statistics
+
+.left[
+**Estimation:** Least Squares, Maximum Likelihood, Method of Moments, and many more
+
+**Result:** Point Estimate
+
+**Inference:** P-Values and Confidence Intervals 
+
+**Assumptions:** Varies widely with the method
+
+]
+
+--
+&lt;hr&gt;
+
+&lt;h3&gt;Bayesian Statistics&lt;/h3&gt;
+
+.left[
+**Estimation:** Bayes Rule
+
+**Result:** Range of values with probabilities
+
+**Inference:** Bayes Factors and Credibility Intervals
+
+**Assumptions:** Likelihood and prior distributions
+
+]
+
+---
+
+class: center
+
+### Bayes Rule
+
+.left[
+
+We know that
+
+`$$p(y, \theta) =p (\theta | y)p(y)$$`
+
+and
+
+`$$p(y, \theta) = p(y | \theta)p(\theta) .$$`
+
+Put these together and we get Bayes Rule:
+
+`$$p(\theta | y) = \frac{p(y | \theta) p (\theta)}{p(y)}.$$`
+
+Bayesian Statistics follows three steps:
+
+1. Start with your prior distribution `\(p(\theta)\)`.
+
+2. Observe related data `\(y\)`.
+
+3. Update to the posterior distribution `\(p(\theta | y)\)`.]
+
+
+---
+class: center
+
+### Bayes Rule
+.left[
+
+`$$p(\theta | y) = \frac{p(y | \theta) p(\theta)}{p(y)}$$`
+
+What do we know about `\(p(y)\)`?
+
+`\(p(\theta | y)\)` is a probability distribution, so
+
+`$$\int_{\theta}p(\theta | y) d\theta =  \frac{1}{p(y)} \int_{\theta}p(y | \theta) p(\theta) d\theta= 1.$$`
+If `\(\theta\)` is continuous:
+
+`$$p(y) = \int_{\theta} p(y | \theta) p(\theta) d\theta.$$`
+
+Or, if `\(\theta\)` is discrete:
+
+$$p(y) = \sum_{\theta} p(y | \theta_i) p(\theta_i). $$
+]
+---
+
+class: center, inverse, middle
+#The Spam Filter
+---
+
+class: center
+### This is a discrete theta.
+
+.left[
+
+Apply Bayes Rule:
+
+`$$p(A_j | B) = \frac{p(B_{obs} | A_j) p(A_j)}{\sum_i p(B_{obs} | A_i) p(A_i)}$$`
+
+In this case, `\(\theta\)` is A, the type of email. It has two values: Spam and not Spam.
+
+`\(y\)` is B, the content of the email. It has two possibilities: Contains 'easy' or does not contain 'easy'.
+
+The likelihood is any conditional statement, eg.
+
+* "8% of emails that are spam contain easy" `\(\iff p(y = easy | \theta = spam ) = 0.08\)`.
+
+The prior is any unconditional statement, eg. 
+
+* "95% of emails are spam" `\(\iff p(\theta = spam) = 0.95\)`.
+
+Remember that probabilities must sum to one!
+]
+
+---
+
+class: center, inverse, middle
+
+# The Dice Problem
+
+---
+
+### From the lecture notes
+
+Suppose we have a box of dice that contains a 4-sided die, a 6-sided die, an 8-sided die, a 12-sided die, and a 20-sided die.
+
+Suppose I select a die from the box at random, roll it, and get a 6. What is the probability that the die is the 4, 6, 8, 12 or 20-sided one?
+
+--
+
+&lt;hr&gt;
+
+H: The range of dice to choose from. Either 4, 6, 8, 12 or 20 sided.
+
+D: The range of numbers the chosen die could roll. `\(1, 2, \dots, 20\)`. 
+
+--
+
+&lt;hr&gt;
+
+The Prior: Each dice is equally likely to be selected. P(H) should be uniform.
+
+The Likelihood: The dice are fair, so P(D | H) should be uniform over the range of values the dice could roll. Remember a 6-sided die cannot roll a seven, but a 20-sided die can!
+
+
+
+---
+
+### Implementing your results.
+
+```r
+dice &lt;- c(4, 6, 8, 12, 20)
+dice_likelihood &lt;- function(x, dice) {
+  if (x&gt;dice)
+    l &lt;- # The roll was greater than the number of sides!
+  else 
+    l &lt;- # The roll was less than the number of sides.
+  return(l)
+}
+
+prior &lt;-  # Make a vector of probabilities
+dice_posterior &lt;- function(x, dice) {
+  post &lt;- numeric(length(dice))
+  for(i in 1:length(dice)){
+    post[i] &lt;- #The posterior numerator for dice[i]
+  }
+  PD &lt;- #The posterior denominator
+  post &lt;- post / PD
+  data.frame(dice, post)
+}
+```
+
+---
+
+class: center, inverse, middle
+
+# The Locomotive Problem
+
+---
+
+"A railroad numbers its locomotives in order 1..N. One day you see a locomotive with the number 60. Estimate how many locomotives the railroad has."
+
+
+```r
+library(tidyverse)
+loco_likelihood &lt;- function(x, N){
+  if(x &gt; N){
+    l &lt;- # This is similar to the dice problem
+  } else {
+    l &lt;- 
+  }
+  l
+}
+loco_posterior &lt;- function(x, mu, maxN){
+  support &lt;- 1:maxN
+  prior &lt;- # What is this? 
+  likelihood &lt;- numeric(maxN)
+  for(i in 1:maxN){
+    likelihood[i] &lt;- # Use the function above
+  }
+  post &lt;- # Get the numerator of the posterior using Bayes' Rule
+  pN &lt;- # The denominator of the posterior
+  post &lt;- post / pN
+  plot &lt;- # Make a ggplot geom_line object
+  print(plot)
+}
+```
+
+---
+
+class:center, inverse, middle
+# Conjugate Priors
+---
+### The Normal / Normal Problem
+
+Let `\(x_i \sim \mathcal{N}(\theta, 9)\)`.
+
+We can estimate the value of `\(\theta\)` that maximises the probability of observing `\(x_i\)` with Maximum Likelihood Estimation.
+
+Or, if `\(\theta \sim \mathcal{N}(\mu, \tau^2)\)`, we can get a range of possible values for `\(\theta\)`
+
+`$$p(\theta | x) = \frac{\prod_{i=1}^N \mathcal{N}(x_i | \theta, 9) \mathcal{N}(\theta | \mu, \tau^2)}{\int_{\theta}\prod_{i=1}^N \mathcal{N}(x_i | \theta, 9) \mathcal{N}(\theta | \mu, \tau^2)d\theta}$$`
+
+which simplifies to
+
+`$$p(\theta | x) = \sqrt{\frac{N\tau^2 + 9}{18 \pi \tau^2}} \exp\left\{ \frac{-(N \tau^2 + 9)}{18 \tau^2} \left(\theta - \frac{\tau^2 \sum_i x_i + 9 \mu}{N \tau^2 + 9} \right)^2 \right\}$$`
+
+[Use this link to plot some posteriors](https://ebsmonash.shinyapps.io/etc2420bayes/)
+
+---
+### The Beta / Binomial Problem
+
+Let `\(y_i \sim Bernoulli(\theta)\)` and `\(\theta \sim Beta(\alpha, \beta)\)`.
+
+Then the likelihood is
+  
+`$$p(y_1, \dots, y_N | \theta) = \prod_{i=1}^N \theta^{y_i} (1 - \theta)^{1 - y_i} = \theta^{\sum y_i} (1-\theta)^{N - \sum y_i},$$`
+
+the prior is
+
+`$$p(\theta) = \frac{1}{ B(\alpha, \beta)}\theta^{\alpha - 1} (1-\theta)^{\beta - 1}$$`
+and the posterior is
+
+`$$p(\theta | y) = \frac{1}{ B(\alpha + \sum y_i, \beta + N - \sum y_i)}  \theta^{\sum y_i + \alpha - 1} (1-\theta)^{N - \sum y_i + \beta - 1}$$`
+
+---
+
+class: centre, inverse, middle
+
+# Extra Material: Deriving the Beta Posterior
+---
+
+### The posterior distribution is
+
+`$$p(\theta | y) = \frac{  \frac{1}{ B(\alpha, \beta)} \theta^{\sum y_i} (1-\theta)^{N - \sum y_i}\theta^{\alpha - 1} (1-\theta)^{\beta - 1}}
+{ \frac{1}{ B(\alpha, \beta)} \int_0^1 \theta^{\sum y_i} (1-\theta)^{N - \sum y_i} \theta^{\alpha - 1} (1-\theta)^{\beta - 1} d\theta}.$$`
+
+
+First, we usually cannot solve the integral analytically. So ignore it.
+
+`$$p(\theta |  y) = C \times \theta^{\sum y_i} (1-\theta)^{N - \sum y_i}\theta^{\alpha - 1} (1-\theta)^{\beta - 1}.$$`
+
+Second: Simplify the remaining terms.
+
+`$$p(\theta | y) = C \times \theta^{\sum y_i + \alpha - 1} (1-\theta)^{N - \sum y_i + \beta - 1}.$$`
+
+Third: Remember this is a probability distribution, so
+
+`$$\int_0^1 C  \theta^{\sum y_i + \alpha - 1} (1-\theta)^{N - \sum y_i + \beta - 1} d\theta = 1$$`
+
+hence
+
+`$$C^{-1} = \int_0^1\theta^{\sum y_i + \alpha - 1} (1-\theta)^{N - \sum y_i + \beta - 1} d\theta$$` 
+---
+
+###What do we know about this integral?
+
+For any positive `\(\delta\)` and `\(\lambda\)` the `\(B(\delta, \lambda)\)` distribution has this probability density function:
+
+$$ \frac{1}{B(\delta + \lambda)} \theta^{\delta - 1}(1 - \theta)^{\lambda - 1},$$
+with the integral
+
+`$$\int_0^1\theta^{\delta - 1}(1 - \theta)^{\lambda - 1}d\theta = B(\delta + \lambda).$$`
+
+Compare this to the last slide and we get `$$C = B\left(\alpha + \sum y_i, \beta + N - \sum y_i\right),$$`
+
+and therefore
+
+`$$p(\theta | y) = \frac{1}{ B(\alpha + \sum y_i, \beta + N - \sum y_i)}  \theta^{\sum y_i + \alpha - 1} (1-\theta)^{N - \sum y_i + \beta - 1},$$`
+
+another Beta distribution with parameters `\(\alpha + \sum y_i\)` and  `\(\beta + N - \sum y_i.\)`
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
