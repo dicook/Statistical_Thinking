@@ -1,0 +1,320 @@
+---
+title: 'Statistical Thinking using Randomisation and Simulation'
+subtitle: 'Generalised Linear Models'
+author: Di Cook 
+  University
+date: "W6.C2"
+output:
+  xaringan::moon_reader:
+    css: ["default", "myremark.css"]
+    self_contained: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE,
+  echo=FALSE,
+  fig.height = 2,
+  fig.width = 5,
+  collapse = TRUE,
+  comment = "#>"
+)
+options(digits=2)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readr)
+library(gridExtra)
+library(broom)
+```
+
+# Generalised linear models
+
+- Overview
+- Types
+- Assumptions
+- Fitting
+- Examples
+
+
+---
+# Overview
+
+- GLMs are a broad class of models for fitting different types of response variables distributions. 
+- The multiple linear regression model is a special case.
+
+---
+# Three components
+
+- Random Component: probability distribution of the response variable
+- Systematic Component: explanatory variables
+- Link function: describes the relaionship between the random and systematic components
+
+---
+# Multiple linear regression
+
+$$y_i = \beta_0+\beta_1x_1 + \beta_2x_2 + \varepsilon ~~~ or ~~~ E(Y_i)=\beta_0+\beta_1x_1+\beta_2x_2$$
+
+- Random component: $y_i$ has a normal distribution, and so $e_i \sim N(0,\sigma^2)$
+- Systematic component: $\beta_0+\beta_1x_1 + \beta_2x_2$
+- Link function: identity, just the systematic component
+
+---
+# Poisson regression
+
+$$y_i = exp(\beta_0+\beta_1x_1+\beta_2x_2) + \varepsilon$$
+
+- $y_i$ takes integer values, 0, 1, 2, ...
+- Link function: $ln(\mu)$, name=`log`. (Think of $\mu$ as $\hat{y}$.)
+
+---
+# Bernouilli, binomial regression
+
+$$y_i = \frac{exp(\beta_0+\beta_1x_1+\beta_2x_2)}{1+exp(\beta_0+\beta_1x_1+\beta_2x_2)} + \varepsilon$$
+
+- $y_i$ takes integer values, $\{ 0, 1\}$ (bernouilli), $\{ 0, 1, ..., n\}$ (binomial)
+- Let $\mu=\frac{exp(\beta_0+\beta_1x_1+\beta_2x_2)}{1+exp(\beta_0+\beta_1x_1+\beta_2x_2)}$, link function is $ln\frac{\mu}{1-\mu}$, name=`logit`
+
+---
+# Assumptions
+
+- The data $y_1, y_2, ..., y_n$ are independently distributed, i.e., cases are independent.
+- The dependent variable $y_i$ does NOT need to be normally distributed, but it typically assumes a distribution from an exponential family (e.g. binomial, Poisson, multinomial, normal,...)
+- Linear relationship between the transformed response (see examples below)
+- Explanatory variables can be transformations of original variables
+- Homogeneity of variance does NOT need to be satisfied for original units, but it should be still true on the transformed response scale
+- Uses maximum likelihood estimation (MLE) to estimate the parameters
+- Goodness-of-fit measures rely on sufficiently large samples
+
+---
+# Example: Olympics medal tally
+
+- Model medal counts on log_GDP
+- Medal counts = integer, which suggests using a Poisson model. 
+
+```{r fig.align='center', fig.width=6, fig.height=4}
+oly_gdp2012 <- read.csv("../data/olympics_gdp_all.csv")
+oly_gdp2012 <- oly_gdp2012 %>% 
+  mutate(GDP_log=log10(GDP))
+rownames(oly_gdp2012) <- oly_gdp2012$Country
+
+ggplot(oly_gdp2012, aes(x=GDP_log, y=M2012)) + geom_point()
+```
+
+---
+# Model fit and what it looks like
+
+
+```{r echo=TRUE}
+oly_glm <- glm(M2012~GDP_log, data=oly_gdp2012,
+               family=poisson(link=log))
+summary(oly_glm)$coefficients
+```
+
+
+```{r fig.align='center', fig.width=8, fig.height=3.5}
+oly_augment <- augment(oly_glm) 
+rownames(oly_augment) <- oly_gdp2012$Country
+oly_augment <-  oly_augment %>%
+  mutate(.fitted_exp = exp(.fitted)) %>% 
+  arrange(GDP_log)
+p1 <- ggplot(oly_gdp2012, aes(x=GDP_log, y=M2012)) + 
+  geom_point() +
+  geom_line(data=oly_augment, aes(x=GDP_log, y=.fitted_exp),
+            colour="red")
+p2 <- ggplot(oly_gdp2012, aes(x=GDP_log, y=log(M2012))) + 
+  geom_point() +
+  geom_line(data=oly_augment, aes(x=GDP_log, y=.fitted),
+            colour="red")
+grid.arrange(p1, p2, ncol=2)
+```
+
+---
+class: inverse middle 
+# Your turn
+
+Write down the formula of the fitted model.
+
+--
+$$\hat{log(M2012)} = -13.2 +1.3 GDP.log$$
+
+---
+# Model fit
+
+```{r}
+summary(oly_glm)
+```
+
+The difference between the null and residual deviance is substantial, suggesting a good fit.  
+
+---
+# Residual plots
+
+```{r fig.width=10, fig.height=5}
+p1 <- ggplot(oly_augment, aes(x=GDP_log, y=.resid)) + 
+  geom_point() + ylab("Residuals") +
+  theme(aspect.ratio=1)
+p2 <- ggplot(oly_augment, aes(x=.resid)) + 
+  geom_histogram(binwidth=1) + xlab("Residuals")
+grid.arrange(p1, p2, ncol=2)
+```
+
+Heteroskedasticity in residuals. One fairly large residual.
+
+---
+# Influence statistics
+
+```{r}
+oly_augment %>% arrange(desc(.cooksd)) %>% 
+  select(.rownames, .cooksd, .resid)
+```
+
+Largest Cooks D values enough to have some concerns about the influence that Russian Federation and China have on the model fit. Should re-fit without these two cases.
+
+---
+# Prediction from the model
+
+```{r echo=TRUE}
+aus <- oly_gdp2012 %>% filter(Code == "AUS")
+predict(oly_glm, aus)
+```
+
+WAIT! What??? Australia earned more than 3 medals in 2012. Either the model is terrible, or we've made a mistake!
+
+--
+```{r echo=TRUE}
+aus <- oly_gdp2012 %>% filter(Code == "AUS")
+predict(oly_glm, aus, type="response")
+```
+
+--
+Need to transform predictions into original units.
+
+---
+# Example: winning tennis matches
+
+We have data scraped from the web sites of the 2012 Grand Slam tennis tournaments. There are a lot of statistics on matches. Below we have the number of receiving points won, and whether the match was won or not. 
+
+```{r fig.align='center', fig.width=8, fig.height=4}
+tennis <- read_csv("../data/tennis_2012_wta.csv")
+p1 <- ggplot(tennis, aes(x=Receiving.Points.Won, y=won)) + geom_point()
+p2 <- ggplot(tennis, aes(x=Receiving.Points.Won, y=won)) + geom_jitter()
+grid.arrange(p1, p2, ncol=2)
+```
+
+---
+class: inverse middle 
+# Your turn
+
+The response variable is binary. What type of GLM should be fit?  
+
+--
+*bernouilli/binomial*
+
+---
+# Model
+
+```{r echo=TRUE}
+tennis_glm <- glm(won~Receiving.Points.Won, data=tennis,
+                  family=binomial(link='logit'))
+```
+
+```{r}
+summary(tennis_glm)$coefficients
+```
+
+
+```{r fig.align='center', fig.width=6, fig.height=4}
+tennis_augment <- augment(tennis_glm) %>% 
+  mutate(.fitted_ln=exp(.fitted)/(1+exp(.fitted))) %>%
+  arrange(Receiving.Points.Won)
+ggplot(tennis, aes(x=Receiving.Points.Won, y=won)) + geom_point() +
+  geom_line(data=tennis_augment, aes(x=Receiving.Points.Won, 
+                                y=.fitted_ln), colour="red")
+```
+
+---
+class: inverse middle 
+# Your turn
+
+Write down the fitted model
+--
+
+*Let* 
+
+$$u=exp(-2.91+0.11RPW)$$ 
+*then*
+
+$$ \hat{won}=\frac{u}{1+u} $$
+
+
+
+---
+# Model fit
+
+```{r}
+summary(tennis_glm)
+```
+
+Not much difference between null and residual deviance, suggests return points won does not explain much of the match result. 
+
+---
+# Residuals
+
+```{r fig.width=10, fig.height=6}
+p1 <- ggplot(tennis_augment, aes(x=Receiving.Points.Won, y=.resid)) +
+               geom_point()
+p2 <- ggplot(tennis_augment, aes(x=.resid)) +
+               geom_histogram()
+grid.arrange(p1, p2, ncol=2)
+```
+
+Model is just not capturing the data very well. There are two groups of residuals, its overfitting a chunk and underfitting chunks of data. 
+
+---
+# Influence statistics
+
+```{r}
+tennis_augment %>% arrange(desc(.cooksd)) %>% 
+  select(.cooksd, .resid)
+```
+
+No influential observations.
+
+---
+# Prediction from the model
+
+```{r echo=TRUE}
+newdata <- data.frame(Receiving.Points.Won=c(20, 50), won=c(NA, NA))
+predict(tennis_glm, newdata, type="response")
+```
+
+Interpret the response as the probability of winning if your receiving points was 20, 50. 
+
+---
+# Summary
+
+Generalised linear models are a systematic way to fit different types of response distributions. 
+
+---
+# Resources
+
+- [Beginners guide](https://www.analyticsvidhya.com/blog/2015/11/beginners-guide-on-logistic-regression-in-r/)
+- [Introduction to GLMs](https://onlinecourses.science.psu.edu/stat504/node/216)
+- [Quick-R GLMs](http://www.statmethods.net/advstats/glm.html)
+- [The Analysis Factor, Generalized Linear Models Parts 1-4](http://www.theanalysisfactor.com/resources/by-topic/r/)
+- [wikipedia](https://en.wikipedia.org/wiki/Generalized_linear_model)
+- [Do Smashes Win Matches?](http://onlinelibrary.wiley.com/doi/10.1111/j.1740-9713.2013.00665.x/full)
+
+---
+class: inverse middle 
+# Share and share alike
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
