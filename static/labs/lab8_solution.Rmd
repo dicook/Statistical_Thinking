@@ -1,0 +1,274 @@
+---
+title: "ETC 2420/5242 Lab 8 2017"
+author: "SOLUTION"
+date: "Week 8"
+output: pdf_document
+---
+
+```{r echo = FALSE, message = FALSE, warning = FALSE, warning = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  error = FALSE, 
+  echo = FALSE, 
+  collapse = TRUE,
+  comment = "#",
+  fig.height = 4,
+  fig.width = 8,
+  fig.align = "center",
+  cache = FALSE
+)
+library(knitr)
+```
+
+```{r}
+library(tidyverse)
+```
+
+## Purpose
+
+For this lab we are going to build models based on partitioning, and combine models built on bootstrap samples, using regression trees and forests.
+
+## Reading
+
+Read the code in the lecture notes on regression trees and forests from weeks 7 and 8. We will work with data scraped from property auction reports, collected over the last couple of years. Dr Julia Polak collected the reports, and together we used the `pdftools` package in R to extract information about each property. We will compare the results from trees and forests with the multiple regression model.
+
+## Warmup
+
+This is a description of the variables:
+
+\begin{tabular}{l|p{4in}}
+Variable & Description \\\hline
+id  & unique id for property \\
+ suburb  & suburb location of property \\
+ price  & Price house sold for in AUD dollars, divided by 100,000\\
+ result   & S indicates property sold; SP - property sold prior; PI - property passed in; PN - sold prior not disclosed; SN - sold not disclosed; NB - no bid; VB - vendor bid; o res - other residential; w - withdrawn prior to auction \\
+ agent  & realtor in charge of sale\\
+ nbeds  & Number of bedrooms\\
+ property type  &  h =house,  t =townhouse,  u =unit/apartment \\
+ day  & day of the month of auction\\
+ month  & month of auction \\
+ year  & year of auction\\
+ nvisits  & How many people came to open houses\\
+ ncars  & Number of parking places \\
+ nbaths  & Number of bathrooms\\
+ land size  & Size of the lot, in sq m, units will be 0\\
+ house size   & Internal size of property in sq m\\
+\end{tabular}
+
+We have subsetted the data to only use two suburbs, Clayton and South Yarra. 
+
+Take a quick glimpse of the data, by making some numerical and visual summaries. What is the average sale price for Clayton and South Yarra, over this period? Is there an increase in price over the four years?
+
+```{r}
+melb_auctions <- read_csv("melb_auctions.csv")
+summary(melb_auctions)
+ggplot(melb_auctions, aes(x=factor(year), y=price)) +
+  geom_boxplot() +
+  facet_grid(property_type~suburb)
+```
+
+Model building will be done using:
+
+- Response: `price` 
+- Explanatory variables: `suburb, result, nbeds and property type`.
+
+Subset the data to contain just these variables.
+
+```{r}
+melb_auctions <- melb_auctions %>%
+  select(price, suburb, result, nbeds, property_type) %>%
+  filter(result != "SA")
+```
+
+
+Now to correctly evaluate a tree model, you should fit the model to half of the data, and calculate the error on the predictions of the other half. We are going to make the split equally for the two suburbs, so that both are reqpresented
+
+```{r}
+library(caret)
+set.seed(10)
+indx <- createDataPartition(melb_auctions$suburb, list=FALSE)
+train <- melb_auctions[indx,]
+test <- melb_auctions[-indx,]
+```
+
+To compare models we will compute the mean square error (MSE): 
+
+$$\frac{1}{n}\sum_{i=1}^n (y_i-\hat{y})^2$$
+
+Write a function to compute the MSE.
+
+```{r}
+MSE <- function(model, data) {
+  pred <- predict(model, data)
+  e <- data$price - pred
+  mse <- sum(e^2)/length(e)
+  return(mse)
+}
+```
+
+## Question 1
+
+a. (2pts) Fit a regression tree, to the training data, with the default parameters to the data.
+
+```{r}
+library(rpart)
+train_rp <- rpart(price~suburb+result+nbeds+property_type,
+                  data=train)
+train_rp
+```
+
+b. (4pts) Plot the tree. How many terminal nodes? What variables are used?
+
+`7 terminal nodes`
+
+`property type, nbeds, suburb`
+
+```{r}
+library(rpart.plot)
+rpart.plot(train_rp)
+```
+
+c. (2pts) Compute the MSE of the test data.
+
+```{r}
+MSE(train_rp, test)
+```
+
+d. (3pts) Change the `cp` input parameter, try several different values. What cp value gives the best model, as measured by the smallest test MSE? 
+
+`Several smallest cp values (0.001, 0.002, 0.003) give lowest MSE.`
+
+```{r}
+cp <- seq(0.001, 0.1, 0.001)
+m <- NULL
+for (i in 1:length(cp)) {
+  train_rp <- rpart(price~suburb+result+nbeds+property_type, data=train, 
+                    control=rpart.control(cp=cp[i]))
+  m <- c(m, MSE(train_rp, test))
+}
+df <- data.frame(cp, m)
+ggplot(df, aes(x=cp, y=m)) + geom_line()
+train_rp <- rpart(price~suburb+result+nbeds+property_type, data=train, 
+                    control=rpart.control(cp=0.005))
+```
+
+## Question 2
+
+a. (2pts) Fit a generalised linear model to the same set of variables.
+
+```{r}
+train_glm <- glm(price~suburb+result+nbeds+property_type, data=train)
+train_glm
+```
+
+b. (3pts) Summarise the variable importance.
+
+`Based on the p-value suburb, nbeds and property type are very important. Result is not important.`
+
+```{r}
+summary(train_glm)$coefficients
+```
+
+c. (2pts) Compute the MSE of the test data.
+
+```{r}
+MSE(train_glm, test)
+```
+
+d. (3pts) Try including some interaction terms to improve the model, by reducing the test MSE.
+
+`This is the most complicated interaction model. It reduces the MSE a little, to beat the default tree model.`
+
+```{r}
+train_glm <- glm(price~suburb*nbeds*property_type, data=train)
+train_glm
+summary(train_glm)$coefficients
+MSE(train_glm, test)
+```
+
+
+## Question 3
+
+a. (2pts) Build a random forest model, using the default parameters. what is the reported MSE? (This is the training set MSE.)
+
+`MSE=18.76`
+
+```{r}
+# randomForest function crashes if character variables are not factors
+train_sub <- train
+train_sub$suburb <- factor(train_sub$suburb)
+train_sub$result <- factor(train_sub$result)
+train_sub$property_type <- factor(train_sub$property_type)
+test_sub <- test
+test_sub$suburb <- factor(test_sub$suburb)
+test_sub$result <- factor(test_sub$result)
+test_sub$property_type <- factor(test_sub$property_type)
+
+library(randomForest)
+train_rf <- randomForest(price~suburb+result+nbeds+property_type, 
+             data=train_sub, importance=TRUE)
+train_rf
+```
+
+b. (3pts) Summarise the variable importance. Which variable is the most important?
+
+`property type, nbeds and suburb are all important, but result is not.`
+
+```{r}
+train_rf$importance
+```
+
+c. (2pts) Compute the MSE of the test data.
+
+```{r}
+MSE(train_rf, test_sub)
+```
+
+d. (3pts) Explore the effect of `mtry` and `ntree` parameters, on the MSE.
+
+`Its not easy to get a better fit than the single tree!`
+
+```{r}
+train_rf <- randomForest(price~suburb+result+nbeds+property_type, 
+             data=train_sub, importance=TRUE, mtry=2)
+train_rf
+MSE(train_rf, test_sub)
+train_rf <- randomForest(price~suburb+result+nbeds+property_type, 
+             data=train_sub, importance=TRUE, mtry=2, ntree=10000)
+train_rf
+MSE(train_rf, test_sub)
+```
+
+## Question 4
+
+(3pts) How do the predicted values compare for the different models? (Use the best model for each method.)
+
+`There is positive linear association between the predictions from each method. The single tree model, and a fixed set of predicted values - see the stripes in the plots - but the forest produces more continuous predctions like the glm.`
+
+```{r}
+pred1 <- predict(train_rp, test, type="vector")
+pred2 <- predict(train_glm, test)
+pred3 <- predict(train_rf, test_sub)
+df <- data.frame(pred1, pred2, pred3)
+p1 <- ggplot(df, aes(x=pred1, y=pred2)) + 
+  geom_point() + theme(aspect.ratio=1) +
+  xlab("tree") + ylab("glm")
+p2 <- ggplot(df, aes(x=pred1, y=pred3)) + 
+  geom_point() + theme(aspect.ratio=1) +
+  xlab("tree") + ylab("forest")
+p3 <- ggplot(df, aes(x=pred2, y=pred3)) + 
+  geom_point() + theme(aspect.ratio=1) +
+  xlab("glm") + ylab("forest")
+library(gridExtra)
+grid.arrange(p1, p2, p3, ncol=3)
+```
+
+## TURN IN 
+
+- Your `.Rmd` file
+- Your `html` file that results from knitting the Rmd.
+
+
+
+
