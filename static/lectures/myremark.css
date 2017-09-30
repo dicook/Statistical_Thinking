@@ -44,6 +44,12 @@ ul li li:before {
   margin-right: 10px;
 }
 ol li:before {
+  font-family: "FontAwesome";
+  margin-right: 10px;
+  color: #D95F02;
+}
+ol li li:before {
+  font-family: "FontAwesome";
   margin-right: 10px;
   color: #D95F02;
 }

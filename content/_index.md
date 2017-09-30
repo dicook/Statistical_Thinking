@@ -39,8 +39,8 @@ title: Home
 - Week 7: [Mixed effects models](lectures/week7.class1.html) ([Rmd](lectures/week7.class1.Rmd)), [Models by partitioning](lectures/week7.class2.html) ([Rmd](lectures/week7.class2.Rmd)); Reading: [Fitting linear mixed effects models](https://www.jstatsoft.org/article/view/v067i01/v67i01.pdf) sections 1, 2 and 5
 - Week 8: Ensemble models with [bootstrapping](lectures/week8.class1.html)([Rmd](lectures/week8.class1.Rmd)) and [boosting](lectures/week8.class2.html)([Rmd](lectures/week8.class2.Rmd)); Reading: [Introduction to Recursive Partitioning](https://cran.r-project.org/web/packages/rpart/vignettes/longintro.pdf), [Gentle intro to boosting](https://www.analyticsvidhya.com/blog/2015/11/quick-introduction-boosting-algorithms-machine-learning/);  [tennis_2012_wta_fixed.csv](data/tennis_2012_wta_fixed.csv)
 - Week 9: [Bayesian inference](lectures/week9.class1.html)([Rmd](lectures/week9.class1.Rmd))); Reading: [Conditional probability and Bayesian methods](https://www.analyticsvidhya.com/blog/2017/03/conditional-probability-bayes-theorem/), [Intro to Bayesian methods](https://www.analyticsvidhya.com/blog/2016/06/bayesian-statistics-beginners-simple-english/), [A visual guide to Bayesian thinking](https://www.youtube.com/watch?v=BrK7X_XlGB8), [The Odds, Continually Updated](https://www.nytimes.com/2014/09/30/science/the-odds-continually-updated.html?mcubz=3), [Think Bayes](http://www.greenteapress.com/thinkbayes/thinkbayes.pdf)
-- Week 10: Modelling risk and loss
-- Week 11: Data wrangling
+- Week 10: [Data wrangling](lectures/week10.class1.html)([Rmd](lectures/week10.class1.Rmd)); Reading: 
+- Week 11: Modelling risk and loss
 - Week 12: Project presentations
 
 ## Tutorials
