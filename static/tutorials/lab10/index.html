@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Melbourne Pedestrian Traffic</title>
+    <meta charset="utf-8">
+    <link href="libs/remark-css/example.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Melbourne Pedestrian Traffic
+
+---
+
+
+
+
+### What do we want to do?
+
+* Investigate how weather impacts foot traffic around Melbourne.
+
+### How are we doing this?
+
+* Collect and combine data from pedestrian sensors and weather stations
+* Explore the data a little bit
+* Build and evalute a Poisson regression model
+
+We'll need a few packages to help us out
+
+```r
+library(tidyverse)
+library(ggmap)
+library(gridExtra)
+library(readr)
+library(knitr)
+```
+---
+
+class:center
+
+### A Map of Melbourne
+![](lab10_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+
+---
+
+A subset of the data is contained in 'melb_ghcn.csv' and 'pedestrian_counts_sub.csv'.
+
+
+```r
+melb_ghcn &lt;- read_csv("melb_ghcn.csv")
+melb_ghcn %&gt;% 
+  select(stn_id, date, variable, value) %&gt;%
+  head(4)
+```
+
+```
+## # A tibble: 4 x 4
+##        stn_id     date variable value
+##         &lt;chr&gt;    &lt;int&gt;    &lt;chr&gt; &lt;int&gt;
+## 1 ASN00086071 20130101     TMAX   253
+## 2 ASN00086071 20130101     TMIN   154
+## 3 ASN00086071 20130101     PRCP     0
+## 4 ASN00086071 20130102     TMAX   222
+```
+What do the variables and values mean?
+
+The data is manipulated, here's a few important lines:
+
+```r
+mutate(value = value/10,
+       high_prcp = ifelse(PRCP&gt;5, "rain", "none"), 
+       high_tmp = ifelse(TMAX&gt;33, "hot", "not"), 
+       low_tmp = ifelse(TMIN&lt;6, "cold", "not"))
+```
+
+
+---
+### Temperature and Traffic
+
+![](lab10_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+
+---
+### Each group is given one sensor.
+
+```r
+# Read sensor counts
+ped_sub &lt;- read_csv("pedestrian_counts_sub.csv")
+ped_sub &lt;- ped_sub %&gt;% 
+  filter(year &lt; 2015) %&gt;%
+  dplyr::arrange(sensor_id, date, time)
+unique(ped_sub$sensor_name)
+```
+
+```
+##  [1] "Bourke Street Mall (South)"       
+##  [2] "Melbourne Central"                
+##  [3] "Town Hall (West)"                 
+##  [4] "Princes Bridge"                   
+##  [5] "Flinders Street Station Underpass"
+##  [6] "Webb Bridge"                      
+##  [7] "Southern Cross Station"           
+##  [8] "Victoria Point"                   
+##  [9] "Waterfront City"                  
+## [10] "Flagstaff Station"                
+## [11] "Sandridge Bridge"
+```
+
+
+
+
+
+
+```r
+ped_weather_bsm &lt;- ped_weather %&gt;% 
+  filter(sensor_name == "Bourke Street Mall (South)")
+```
+
+
+---
+
+### Poisson Regression
+
+`$$\log(\mu_i) = \beta_0 + \sum_{j=1}^K \beta_j x_{i, j}$$`
+`$$y_i = \mu_i + e_i$$`
+
+The dependent variable has a *poisson* distribution with mean `\(\mu_i\)`.
+
+We want three way interactions between day of the week, month of the year, and hour of the day:
+`$$\log(\mu_i) = \beta_0 + (\mbox{Normal Variables}) + \beta_{44}(\mbox{Day = Monday AND Time = 00:00}) + \dots$$` 
+`$$+ \beta_{66}(\mbox{Day = Monday AND Time = 22:00}) + \dots$$`
+`$$+ \beta_{??} (\mbox{Day = Thursday AND Time = 14:00 AND Month = June}) + \dots$$`
+
+In R:
+
+```r
+glm(count~day*time*month+high_tmp+low_tmp+high_prcp,
+    data=ped_weather_bsm, family=poisson(link="log"))
+```
+
+
+---
+### Predictions for the Poisson Regression
+
+Many of the variables are factors, make sure to convert your prediction set to the right format.
+
+
+```r
+newdat &lt;- data.frame() #Something needs to go here 
+newdat$time &lt;- factor(newdat$time, levels=0:23)
+newdat$high_tmp &lt;- factor(newdat$high_tmp, levels=c("not", "hot"))
+newdat$low_tmp &lt;- factor(newdat$low_tmp, levels=c("not", "cold"))
+newdat$high_prcp &lt;- factor(newdat$high_prcp,
+                           levels=c("none", "rain"))
+newdat$day &lt;- factor(newdat$day,
+                levels=c("Mon", "Tue", "Wed", "Thu", 
+                         "Fri", "Sat", "Sun"))
+newdat$month &lt;- factor(newdat$month,
+                levels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+```
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
