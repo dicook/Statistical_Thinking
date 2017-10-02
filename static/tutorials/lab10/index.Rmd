@@ -1,0 +1,178 @@
+---
+title: "Melbourne Pedestrian Traffic"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+### What do we want to do?
+
+* Investigate how weather impacts foot traffic around Melbourne.
+
+### How are we doing this?
+
+* Collect and combine data from pedestrian sensors and weather stations
+* Explore the data a little bit
+* Build and evalute a Poisson regression model
+
+We'll need a few packages to help us out
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(ggmap)
+library(gridExtra)
+library(readr)
+library(knitr)
+```
+---
+
+class:center
+
+### A Map of Melbourne
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+ped_loc <- read_csv("Pedestrian_Sensor_Locations.csv")
+melb <- get_map(location=c(mean(range(ped_loc$Longitude)),
+                           mean(range(ped_loc$Latitude))), zoom=14)
+stations <- read_table("ghcnd-stations.txt", 
+  col_names=c("ID", "lat", "lon", "elev", "state", "name", 
+              "v1", "v2", "v3"), skip=353, n_max=17081)
+melb_stns <- stations %>% filter(lon > min(ped_loc$Longitude), 
+                                 lon < max(ped_loc$Longitude), 
+                                 lat > min(ped_loc$Latitude),
+                                 lat < max(ped_loc$Latitude))
+ggmap(melb) + geom_point(data=ped_loc, 
+                         aes(x=Longitude, y=Latitude), 
+                         colour="#c51b7d", alpha=0.5, size=3) +
+  geom_point(data=melb_stns, aes(x=lon, y=lat), 
+             colour="#542788", size=6, shape=18)
+```
+
+---
+
+A subset of the data is contained in 'melb_ghcn.csv' and 'pedestrian_counts_sub.csv'.
+
+```{r, message=FALSE, warning=FALSE}
+melb_ghcn <- read_csv("melb_ghcn.csv")
+melb_ghcn %>% 
+  select(stn_id, date, variable, value) %>%
+  head(4)
+```
+What do the variables and values mean?
+
+The data is manipulated, here's a few important lines:
+```{r, eval=FALSE}
+mutate(value = value/10,
+       high_prcp = ifelse(PRCP>5, "rain", "none"), 
+       high_tmp = ifelse(TMAX>33, "hot", "not"), 
+       low_tmp = ifelse(TMIN<6, "cold", "not"))
+```
+
+
+---
+### Temperature and Traffic
+
+```{r fig.width=12, echo=FALSE, warning=FALSE, message=FALSE}
+# Read temp data
+melb_ghcn <- read_csv("melb_ghcn.csv")
+melb_ghcn <- melb_ghcn %>% 
+  select(stn_id, date, variable, value) %>%
+  filter(variable %in% c("TMAX", "TMIN", "PRCP")) %>%
+  mutate(year=substr(date, 1, 4), month_num=substr(date, 5, 6),
+         mday=substr(date, 7, 8)) %>%
+  mutate(date=as.Date(paste(mday, month_num, year, sep="-"),
+                      format="%d-%m-%Y")) %>%
+  mutate(mday=as.numeric(mday), month_num=as.numeric(month_num), 
+         year=as.numeric(year), value = value/10)
+melb_ghcn_wide <- melb_ghcn %>% spread(variable, value)
+melb_ghcn_wide$PRCP[is.na(melb_ghcn_wide$PRCP)] <- 0
+melb_ghcn_wide <- melb_ghcn_wide %>%
+  mutate(high_prcp = ifelse(PRCP>5, "rain", "none"), 
+         high_tmp = ifelse(TMAX>33, "hot", "not"), 
+         low_tmp = ifelse(TMIN<6, "cold", "not"))
+ggplot(melb_ghcn, aes(x=date, y=value)) + geom_point() + facet_wrap(~variable)
+```
+
+---
+### Each group is given one sensor.
+```{r, warning=FALSE, message=FALSE}
+# Read sensor counts
+ped_sub <- read_csv("pedestrian_counts_sub.csv")
+ped_sub <- ped_sub %>% 
+  filter(year < 2015) %>%
+  dplyr::arrange(sensor_id, date, time)
+unique(ped_sub$sensor_name)
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# Combine data
+ped_weather <- left_join(ped_sub, melb_ghcn_wide, by="date")
+ped_weather <- ped_weather %>% 
+  mutate(time = factor(ped_weather$time), 
+         high_prcp = factor(ped_weather$high_prcp, levels=c("none", "rain")), 
+         high_tmp <- factor(ped_weather$high_tmp, levels=c("not", "hot")),
+         low_tmp <- factor(ped_weather$low_tmp, levels=c("not", "cold")),
+         day = factor(day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", 
+                                    "Friday", "Saturday", "Sunday"), 
+                      labels=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")), 
+         month = factor(month, levels=c("January", "February", "March", "April", 
+                                     "May", "June", "July", "August", "September",
+                                     "October", "November", "December"), 
+                 labels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
+                          "Oct", "Nov", "Dec")))
+```
+
+
+```{r}
+ped_weather_bsm <- ped_weather %>% 
+  filter(sensor_name == "Bourke Street Mall (South)")
+```
+
+
+---
+
+### Poisson Regression
+
+$$\log(\mu_i) = \beta_0 + \sum_{j=1}^K \beta_j x_{i, j}$$
+$$y_i = \mu_i + e_i$$
+
+The dependent variable has a *poisson* distribution with mean $\mu_i$.
+
+We want three way interactions between day of the week, month of the year, and hour of the day:
+$$\log(\mu_i) = \beta_0 + (\mbox{Normal Variables}) + \beta_{44}(\mbox{Day = Monday AND Time = 00:00}) + \dots$$ 
+$$+ \beta_{66}(\mbox{Day = Monday AND Time = 22:00}) + \dots$$
+$$+ \beta_{??} (\mbox{Day = Thursday AND Time = 14:00 AND Month = June}) + \dots$$
+
+In R:
+```{r, eval=FALSE}
+glm(count~day*time*month+high_tmp+low_tmp+high_prcp,
+    data=ped_weather_bsm, family=poisson(link="log"))
+```
+
+
+---
+### Predictions for the Poisson Regression
+
+Many of the variables are factors, make sure to convert your prediction set to the right format.
+
+```{r, eval = FALSE}
+newdat <- data.frame() #Something needs to go here 
+newdat$time <- factor(newdat$time, levels=0:23)
+newdat$high_tmp <- factor(newdat$high_tmp, levels=c("not", "hot"))
+newdat$low_tmp <- factor(newdat$low_tmp, levels=c("not", "cold"))
+newdat$high_prcp <- factor(newdat$high_prcp,
+                           levels=c("none", "rain"))
+newdat$day <- factor(newdat$day,
+                levels=c("Mon", "Tue", "Wed", "Thu", 
+                         "Fri", "Sat", "Sun"))
+newdat$month <- factor(newdat$month,
+                levels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+```
