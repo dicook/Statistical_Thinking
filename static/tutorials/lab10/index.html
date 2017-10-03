@@ -35,6 +35,7 @@ library(gridExtra)
 library(readr)
 library(knitr)
 library(broom)
+library(rwalkr)
 ```
 ---
 
@@ -75,7 +76,14 @@ mutate(value = value/10,
 melb_ghcn_wide$PRCP[is.na(melb_ghcn_wide$PRCP)] &lt;- 0
 ```
 ---
-### Each group is given one sensor.
+
+### Temperature over Time
+
+![](index_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+
+---
+
+### Choose a sensor for your group.
 
 ```r
 # Read sensor counts
@@ -101,35 +109,27 @@ unique(ped_sub$sensor_name)
 ```
 
 ---
-### Only download your group's sensor
+### We have to make a few changes to the code
 
 
 ```r
-url &lt;- "http://www.pedestrian.melbourne.vic.gov.au/datadownload/"
-year &lt;- c("2013", "2014")
-month &lt;- c("January", "February", "March", "April", "May", 
-"June", "July", "August", "September", "October", 
-"November", "December")
-ped &lt;- NULL
-for (j in 1:2) {
-  for (i in 1:12) {
-    fname &lt;- paste0(url, month[i], "_", year[j], ".csv")
-    d &lt;- read_csv(fname)
-    d &lt;- d %&gt;% gather(sensor, count, -Date, -Hour)
-    ds &lt;- d %&gt;% 
-      filter(sensor == "Bourke Street Mall (North)") %&gt;%
-      mutate(count = as.numeric(count))
-    ped &lt;- bind_rows(ped, ds)
-  }
-}
-ped &lt;- ped %&gt;% mutate(Date = dmy(Date))
+ped_run &lt;- run_melb(year = 2013:2014,
+                    sensor = "Bourke Street Mall (North)")
+ped_run &lt;- ped_run %&gt;%
+  rename(count = Count, time = Time, date = Date) %&gt;%
+  mutate(day = wday(date, label=TRUE),
+         month = month(date, label=TRUE))
+
+ped_weather &lt;- left_join(ped_run, melb_ghcn_wide, by="date")
+ped_weather &lt;- ped_weather %&gt;% 
+  mutate(time = factor(ped_weather$time), 
+         high_prcp = factor(ped_weather$high_prcp,
+                            levels=c("none", "rain")), 
+         high_tmp = factor(ped_weather$high_tmp,
+                           levels=c("not", "hot")),
+         low_tmp = factor(ped_weather$low_tmp,
+                          levels=c("not", "cold")))
 ```
-
----
-
-### Temperature and Traffic
-
-![](index_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -149,9 +149,9 @@ In R:
 
 ```r
 glm(count~day*time*month+high_tmp+low_tmp+high_prcp,
-    data=ped_weather_bsm, family=poisson(link="log"))
+    data=ped_weather, family=poisson(link="log"))
 ```
-
+There are 2019 coefficients to estimate, be patient.
 
 ---
 ### Predictions for the Poisson Regression
@@ -167,7 +167,7 @@ newdat$low_tmp &lt;- factor(newdat$low_tmp, levels=c("not", "cold"))
 newdat$high_prcp &lt;- factor(newdat$high_prcp,
                            levels=c("none", "rain"))
 newdat$day &lt;- factor(newdat$day,
-                levels=c("Mon", "Tue", "Wed", "Thu", 
+                levels=c("Mon", "Tues", "Wed", "Thurs", 
                          "Fri", "Sat", "Sun"))
 newdat$month &lt;- factor(newdat$month,
                 levels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
