@@ -34,17 +34,17 @@ library(ggmap)
 library(gridExtra)
 library(readr)
 library(knitr)
+library(broom)
 ```
 ---
 
 class:center
 
 ### A Map of Melbourne
-![](lab10_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+![](index_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
 
 ---
-
-A subset of the data is contained in 'melb_ghcn.csv' and 'pedestrian_counts_sub.csv'.
+### A subset of the weather data is contained in 'melb_ghcn.csv'.
 
 
 ```r
@@ -63,7 +63,7 @@ melb_ghcn %&gt;%
 ## 3 ASN00086071 20130101     PRCP     0
 ## 4 ASN00086071 20130102     TMAX   222
 ```
-What do the variables and values mean?
+What do the variable and value columns mean?
 
 The data is manipulated, here's a few important lines:
 
@@ -72,14 +72,8 @@ mutate(value = value/10,
        high_prcp = ifelse(PRCP&gt;5, "rain", "none"), 
        high_tmp = ifelse(TMAX&gt;33, "hot", "not"), 
        low_tmp = ifelse(TMIN&lt;6, "cold", "not"))
+melb_ghcn_wide$PRCP[is.na(melb_ghcn_wide$PRCP)] &lt;- 0
 ```
-
-
----
-### Temperature and Traffic
-
-![](lab10_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
-
 ---
 ### Each group is given one sensor.
 
@@ -106,18 +100,39 @@ unique(ped_sub$sensor_name)
 ## [11] "Sandridge Bridge"
 ```
 
-
-
-
+---
+### Only download your group's sensor
 
 
 ```r
-ped_weather_bsm &lt;- ped_weather %&gt;% 
-  filter(sensor_name == "Bourke Street Mall (South)")
+url &lt;- "http://www.pedestrian.melbourne.vic.gov.au/datadownload/"
+year &lt;- c("2013", "2014")
+month &lt;- c("January", "February", "March", "April", "May", 
+"June", "July", "August", "September", "October", 
+"November", "December")
+ped &lt;- NULL
+for (j in 1:2) {
+  for (i in 1:12) {
+    fname &lt;- paste0(url, month[i], "_", year[j], ".csv")
+    d &lt;- read_csv(fname)
+    d &lt;- d %&gt;% gather(sensor, count, -Date, -Hour)
+    ds &lt;- d %&gt;% 
+      filter(sensor == "Bourke Street Mall (North)") %&gt;%
+      mutate(count = as.numeric(count))
+    ped &lt;- bind_rows(ped, ds)
+  }
+}
+ped &lt;- ped %&gt;% mutate(Date = dmy(Date))
 ```
 
+---
+
+### Temperature and Traffic
+
+![](index_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
 
 ---
+
 
 ### Poisson Regression
 
@@ -127,8 +142,7 @@ ped_weather_bsm &lt;- ped_weather %&gt;%
 The dependent variable has a *poisson* distribution with mean `\(\mu_i\)`.
 
 We want three way interactions between day of the week, month of the year, and hour of the day:
-`$$\log(\mu_i) = \beta_0 + (\mbox{Normal Variables}) + \beta_{44}(\mbox{Day = Monday AND Time = 00:00}) + \dots$$` 
-`$$+ \beta_{66}(\mbox{Day = Monday AND Time = 22:00}) + \dots$$`
+`$$\log(\mu_i) = \mbox{Standard Variables} + \beta_{44}(\mbox{Day = Monday AND Time = 00:00}) + \dots$$` 
 `$$+ \beta_{??} (\mbox{Day = Thursday AND Time = 14:00 AND Month = June}) + \dots$$`
 
 In R:
