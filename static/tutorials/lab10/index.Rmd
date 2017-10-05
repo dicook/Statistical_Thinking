@@ -31,6 +31,7 @@ library(gridExtra)
 library(readr)
 library(knitr)
 library(broom)
+library(rwalkr)
 ```
 ---
 
@@ -84,43 +85,8 @@ mutate(value = value/10,
 melb_ghcn_wide$PRCP[is.na(melb_ghcn_wide$PRCP)] <- 0
 ```
 ---
-### Each group is given one sensor.
-```{r, warning=FALSE, message=FALSE}
-# Read sensor counts
-ped_sub <- read_csv("pedestrian_counts_sub.csv")
-ped_sub <- ped_sub %>% 
-  filter(year < 2015) %>%
-  dplyr::arrange(sensor_id, date, time)
-unique(ped_sub$sensor_name)
-```
 
----
-### Only download your group's sensor
-
-```{r, eval=FALSE}
-url <- "http://www.pedestrian.melbourne.vic.gov.au/datadownload/"
-year <- c("2013", "2014")
-month <- c("January", "February", "March", "April", "May", 
-"June", "July", "August", "September", "October", 
-"November", "December")
-ped <- NULL
-for (j in 1:2) {
-  for (i in 1:12) {
-    fname <- paste0(url, month[i], "_", year[j], ".csv")
-    d <- read_csv(fname)
-    d <- d %>% gather(sensor, count, -Date, -Hour)
-    ds <- d %>% 
-      filter(sensor == "Bourke Street Mall (North)") %>%
-      mutate(count = as.numeric(count))
-    ped <- bind_rows(ped, ds)
-  }
-}
-ped <- ped %>% mutate(Date = dmy(Date))
-```
-
----
-
-### Temperature and Traffic
+### Temperature over Time
 
 ```{r fig.width=12, echo=FALSE, warning=FALSE, message=FALSE}
 melb_ghcn <- melb_ghcn %>% 
@@ -143,6 +109,40 @@ ggplot(melb_ghcn, aes(x=date, y=value)) + geom_point() + facet_wrap(~variable)
 
 ---
 
+### Choose a sensor for your group.
+```{r, warning=FALSE, message=FALSE}
+# Read sensor counts
+ped_sub <- read_csv("pedestrian_counts_sub.csv")
+ped_sub <- ped_sub %>% 
+  filter(year < 2015) %>%
+  dplyr::arrange(sensor_id, date, time)
+unique(ped_sub$sensor_name)
+```
+
+---
+### We have to make a few changes to the code
+
+```{r, eval=FALSE}
+ped_run <- run_melb(year = 2013:2014,
+                    sensor = "Bourke Street Mall (North)")
+ped_run <- ped_run %>%
+  rename(count = Count, time = Time, date = Date) %>%
+  mutate(day = wday(date, label=TRUE),
+         month = month(date, label=TRUE))
+
+ped_weather <- left_join(ped_run, melb_ghcn_wide, by="date")
+ped_weather <- ped_weather %>% 
+  mutate(time = factor(ped_weather$time), 
+         high_prcp = factor(ped_weather$high_prcp,
+                            levels=c("none", "rain")), 
+         high_tmp = factor(ped_weather$high_tmp,
+                           levels=c("not", "hot")),
+         low_tmp = factor(ped_weather$low_tmp,
+                          levels=c("not", "cold")))
+```
+
+---
+
 
 ### Poisson Regression
 
@@ -158,9 +158,9 @@ $$+ \beta_{??} (\mbox{Day = Thursday AND Time = 14:00 AND Month = June}) + \dots
 In R:
 ```{r, eval=FALSE}
 glm(count~day*time*month+high_tmp+low_tmp+high_prcp,
-    data=ped_weather_bsm, family=poisson(link="log"))
+    data=ped_weather, family=poisson(link="log"))
 ```
-
+There are 2019 coefficients to estimate, be patient.
 
 ---
 ### Predictions for the Poisson Regression
@@ -175,7 +175,7 @@ newdat$low_tmp <- factor(newdat$low_tmp, levels=c("not", "cold"))
 newdat$high_prcp <- factor(newdat$high_prcp,
                            levels=c("none", "rain"))
 newdat$day <- factor(newdat$day,
-                levels=c("Mon", "Tue", "Wed", "Thu", 
+                levels=c("Mon", "Tues", "Wed", "Thurs", 
                          "Fri", "Sat", "Sun"))
 newdat$month <- factor(newdat$month,
                 levels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun",

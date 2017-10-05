@@ -60,12 +60,13 @@ ggplot(oz, aes(x=long, y=lat)) +
              colour="red", alpha=0.5)
 ```
 
-We are next going to get the sensor locations, and plot these on a google map of Melbourne. You need to go to the [Melbourne Open Data Portal site](https://data.melbourne.vic.gov.au/Transport-Movement/Pedestrian-Sensor-Locations/ygaw-6rzq) and export the locations as a csv file.
+We are next going to get the sensor locations, and plot these on a google map of Melbourne. We are going to use the `rwalkr` package to scrape the sensor locations and hourly counts.
 
 
 ```{r echo=TRUE}
 # Get pedestrian sensor locations
-ped_loc <- read_csv("Pedestrian_Sensor_Locations.csv")
+library(rwalkr)
+ped_loc <- pull_sensor()
 qmplot(Longitude, Latitude, data=ped_loc, colour=I("red"), size=I(3))
 ```
 
@@ -95,13 +96,17 @@ qmplot(lon, lat, data=ped_loc_weather_stn,
 
 Only a selection of sensors are used, ones that have complete records for 2013 and 2014. And only weather records for these years are used, partly because that weather station values for 2015 are mostly missing. We would need to pull weather data from the next nearest station to examine 2015 data.
 
-Earo Wang's `rwalkr` package can be used to get the pedestrian counts, as follows:
+The following snippet uses "Bourke Street Mall (South)" as an example:
 
 ```{r echo=TRUE}
-# devtools::install_github("earowang/rwalkr")
-library(rwalkr)
-ped_run <- run_melb(year = 2013:2014, sensor = "Bourke Street Mall (North)")
+ped_run <- run_melb(year = 2013:2014, sensor = "Bourke Street Mall (South)")
+ped_sub <- ped_run %>%
+  rename(count = Count, time = Time, date = Date) %>%
+  mutate(day = wday(date, label=TRUE),
+         month = month(date, label=TRUE))
 ```
+
+You are going 
 
 The weather data was extracted from the yearly gzipped, csv files, using code like this:
 
@@ -136,31 +141,37 @@ melb_ghcn_wide <- melb_ghcn_wide %>%
          low_tmp = ifelse(TMIN<6, "cold", "not"))
 ggplot(melb_ghcn, aes(x=date, y=value)) + geom_point() + facet_wrap(~variable)
 
-# Read sensor counts
-ped_sub <- read_csv("../data/pedestrian_counts_sub.csv")
-ped_sub <- ped_sub %>% 
-  filter(year < 2015) %>%
-  dplyr::arrange(sensor_id, date, time) 
-unique(ped_sub$sensor_name)
-
 # Combine data
 ped_weather <- left_join(ped_sub, melb_ghcn_wide, by="date")
 ped_weather <- ped_weather %>% 
-  mutate(time = factor(ped_weather$time), 
-         high_prcp = factor(ped_weather$high_prcp, levels=c("none", "rain")), 
-         high_tmp <- factor(ped_weather$high_tmp, levels=c("not", "hot")),
-         low_tmp <- factor(ped_weather$low_tmp, levels=c("not", "cold")),
-         day = factor(day, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", 
-                                    "Friday", "Saturday", "Sunday"), 
-                      labels=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")), 
-         month = factor(month, levels=c("January", "February", "March", "April", 
-                                     "May", "June", "July", "August", "September",
-                                     "October", "November", "December"), 
+  mutate(time = factor(time), 
+         high_prcp = factor(high_prcp, levels=c("none", "rain")), 
+         high_tmp = factor(high_tmp, levels=c("not", "hot")),
+         low_tmp = factor(low_tmp, levels=c("not", "cold")),
+         day = factor(day, levels=c("Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"), 
+                      labels=c("Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun")), 
+         month = factor(month, levels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
+                                        "Oct", "Nov", "Dec"), 
                  labels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",
                           "Oct", "Nov", "Dec")))
 ```
 
-Your group will be assigned one sensor to work with. Subset your data to have only the records for this one sensor, in order to do the questions for the lab. (My example code uses Bourke Street Mall (North).)
+Your group will be assigned one sensor to work with. Subset your data to have only the records for this one sensor, in order to do the questions for the lab. (My example code uses Bourke Street Mall (South).)
+
+|Sensor|
+|------|
+|"Bourke Street Mall (South)"|
+|"Melbourne Central"|
+|"Town Hall (West)"|
+|"Princes Bridge"|
+|"Flinders Street Station Underpass"|
+|"Webb Bridge"|
+|"Southern Cross Station"|
+|"Victoria Point"|
+|"Waterfront City"|
+|"Flagstaff Station"|
+|"Sandridge Bridge"|
+
 
 ## Question 1
 
@@ -170,10 +181,6 @@ c. Replacing missing values with 0 is generally a REALLY BAD idea. Why is it rea
 d. Three new variables were created, `high_prcp`, `high_tmp`, `low_tmp`. Explain why you think Dr Cook did this? And why these variables rather than the original will be used in the forthcoming model.
 e. Make a plot of 3pm each day in January, and pedestrian `count` by `high_tmp`. You choose what you think is the best plot to make. What do you learn from the plot?
 f. Make a time series plot of pedestrian counts, faceted by month and day. What do you learn about the pedestrian traffic at your sensor location?
-
-```{r eval=FALSE}
-ped_weather_bsm <- ped_weather %>% filter(sensor_name == "Bourke Street Mall (South)")
-```
 
 ## Question 2
 
@@ -188,14 +195,14 @@ HEADS UP: The model will take a few minutes to fit, and to compute the predicted
 
 ```{r fig.height=6, fig.width=6, fig.align='center', cache=TRUE, results='hide', eval=FALSE}
 # Fit model
-ped_weath_bsm_glm <- glm(count~day*time*month+high_tmp+low_tmp+high_prcp,
-                     data=ped_weather_bsm, family=poisson(link="log"))
-#summary(ped_weath_bsm_glm)
-ped_weath_bsm_aug <- augment(ped_weath_bsm_glm, ped_weather_bsm)
-ped_weath_bsm_aug <- ped_weath_bsm_aug %>% mutate(.fitted_exp = exp(.fitted))
-ped_weath_bsm_aug <- ped_weath_bsm_aug %>% mutate(time = as.numeric(time))
+ped_weather_glm <- glm(count~day*time*month+high_tmp+low_tmp+high_prcp,
+                     data=ped_weather, family=poisson(link="log"))
+#summary(ped_weather_glm)
+ped_weather_aug <- augment(ped_weather_glm, ped_weather)
+ped_weather_aug <- ped_weather_aug %>% mutate(.fitted_exp = exp(.fitted))
+ped_weather_aug <- ped_weather_aug %>% mutate(time = as.numeric(time))
 
-coef_bsm <- summary(ped_weath_bsm_glm)$coefficients
+coef_bsm <- summary(ped_weather_glm)$coefficients
 grep("prcp", rownames(coef_bsm))
 grep("tmp", rownames(coef_bsm))
 coef_bsm[42:44,]
@@ -216,7 +223,7 @@ c. Explore reasons for these misfits, using the internet, or what you know about
 
 ```
 library(plotly)
-p <- ggplot(ped_weath_bsm_aug, aes(x=.fitted_exp, y=.resid, 
+p <- ggplot(ped_weath_aug, aes(x=.fitted_exp, y=.resid, 
   label=paste(month, day, mday, year.x, "-", time))) + 
   geom_point()
 ggplotly(p)
