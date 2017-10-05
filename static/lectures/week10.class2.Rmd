@@ -1,0 +1,471 @@
+---
+title: 'Statistical Thinking using Randomisation and Simulation'
+subtitle:  'Compiling data for problem solving'
+author: Di Cook (dicook@monash.edu, @visnut)
+date: "W10.C2"
+output:
+  xaringan::moon_reader:
+    css: ["default", "myremark.css"]
+    self_contained: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE,
+  echo=FALSE,
+  fig.align='center', 
+  fig.height = 4,
+  fig.width = 4,
+  collapse = TRUE,
+  comment = "#>"
+)
+library(tidyverse)
+library(gridExtra)
+library(ggthemes)
+```
+
+
+# Overview of this class
+
+- Reading different `data formats`
+- Handling missing data
+- String operations, working with `text`
+- Grammar of graphics
+- Randomisation to assess structure perceived in plots
+
+---
+# Reading different file formats: shapefiles
+
+The Australian Electorate Commission publishes the boundaries of the electorates on their website at [http://www.aec.gov.au/Electorates/gis/gis_datadownload.htm](http://www.aec.gov.au/Electorates/gis/gis_datadownload.htm).
+
+Once the files (preferably the national files) are downloaded, unzip the file (it will build a folder with a set of files). We want to read the shapes contained in the `shp` file into R.
+
+---
+
+```{r echo=TRUE, message=FALSE}
+library(maptools)
+
+# shapeFile contains the path to the shp file:
+shapeFile <- "../data/vic-esri-24122010/vic 24122010.shp"
+sF <- readShapeSpatial(shapeFile)
+class(sF)
+```
+
+---
+
+`sF` is a spatial data frame containing all of the polygons. 
+We use the `rmapshaper` package available from ateucher's github page to thin the polygons while preserving the geography:
+
+```{r echo=TRUE, message=FALSE}
+library(rmapshaper)
+```
+
+```{r echo=TRUE, message=FALSE}
+sFsmall <- ms_simplify(sF, keep=0.05) # use instead of thinnedSpatialPoly
+```
+
+---
+
+`keep` indicates the percentage of points we want to keep in the polygons. 5% makes the electorate boundary still quite recognizable, but reduce the overall size of the map considerably, making it faster to plot.
+
+---
+
+We can use base graphics to plot this map:
+
+```{r echo=TRUE, cache=TRUE, message=FALSE, fig.width=6, fig.height=4}
+plot(sFsmall)
+```
+
+---
+# Extracting the electorate information 
+
+A spatial polygons data frame consists of both a data set with information on each of the entities (in this case, electorates), and a set of polygons for each electorate (sometimes multiple polygons are needed, e.g. if the electorate has islands). We want to extract both of these parts.
+
+---
+
+```{r echo=TRUE, message=FALSE}
+nat_data <- sF@data
+head(nat_data)
+```
+
+---
+
+The row names of the data file are identifiers corresponding to the polygons - we want to make them a separate variable:
+
+```{r echo=TRUE, message=FALSE}
+nat_data$id <- row.names(nat_data)
+```
+
+---
+# Extracting the polygon information 
+
+The `fortify` function in the `ggplot2` package extracts the polygons into a data frame. 
+```{r echo=TRUE}
+nat_map <- ggplot2::fortify(sFsmall)
+head(nat_map)
+```
+
+---
+
+We need to make sure that `group` and `piece` are kept as factor variables - if they are allowed to be converted to numeric values, it messes things up, because as factor levels `9` and `9.0` are distinct, whereas they are not when interpreted as numbers ...
+
+```{r echo=TRUE}
+nat_map$group <- paste("g",nat_map$group,sep=".")
+nat_map$piece <- paste("p",nat_map$piece,sep=".")
+head(nat_map)
+```
+
+---
+# Plot it
+
+```{r echo=TRUE, fig.width=4, fig.height=3}
+ggplot(nat_map, aes(x=long, y=lat, group=group)) + 
+  geom_polygon(fill="white", colour="black") 
+```
+
+---
+# Add measured variables
+
+```{r echo=TRUE, fig.width=8, fig.height=5}
+ggplot(nat_data, aes(fill=AREA_SQKM)) + 
+  geom_map(aes(map_id=id), map=nat_map) +
+  expand_limits(x=nat_map$long, y=nat_map$lat) + 
+  theme_map()
+```
+
+---
+# Handling missing values
+
+- Need to know how the missings are coded, hopefully clearly missing, treated as $NA$ in R, not $0$, or $-9$, or $-9999$, or $.$ Recode as need be.
+- Study the distribution of missing vs not missing, which will help determine how to handle them.
+
+---
+# What ways can these affect analysis?
+
+- If missings happen when conditions are special, eg sensor tends to stop when temperature drops below 3 degrees Celsius, estimation of model parameters may not reflect the population parameters
+- Some techniques, particularly multivariate methods like many used in data mining require complete records over many variables. Just a few missing numbers can mean a lot of cases that cannot be used. 
+
+---
+# Making it Easy - MissingDataGUI
+
+- Methods for summarising missings in a data set
+- Ways to plot to examine dependence between missing vs not missing
+- Imputation methods to substitute missings
+
+```
+library(naniar)
+vis_miss(tao, sort_miss=TRUE) + theme(aspect.ratio=1)
+```
+
+```{r fig.width=10, fig.height=5}
+library(naniar)
+tao <- read_csv("http://www.ggobi.org/book/data/tao.csv")
+world <- map_data("world")
+p1 <- ggplot() + 
+  geom_polygon(data=world, aes(x=long, y=lat, group = group), fill="grey90", colour="white") + 
+  geom_point(data=tao, aes(x=longitude, y=latitude, group=1), colour="orange", alpha=0.5) +
+  theme_map() + theme(aspect.ratio=0.67)
+p2 <- vis_miss(tao, sort_miss=TRUE) + theme(aspect.ratio=1)
+grid.arrange(p1, p2, ncol=2)
+```
+
+---
+# Numerical summaries
+
+Proportion of observations missing:
+
+```{r}
+s_miss <- miss_summary(tao)
+s_miss$miss_df_prop
+```
+
+Proportion of variables missing:
+
+```{r}
+s_miss$miss_var_prop
+```
+
+How many observations have $k$ missings?
+
+```{r}
+s_miss$miss_case_table
+```
+
+---
+# By group
+
+```{r}
+s_miss_group <- tao %>% 
+  group_by(year) %>% miss_summary()
+s_miss_group$miss_case_table
+```
+
+---
+# Missings shouldn't be ignored
+
+but most software will simply drop them!
+
+```{r warning=TRUE}
+ggplot(tao,
+       aes(x = sea.surface.temp,
+           y = humidity)) +
+  geom_point() + theme(aspect.ratio=1)
+```
+
+---
+# Keep them in the plot
+
+```{r fig.width=8, fig.height=6}
+ggplot(tao,
+       aes(x = sea.surface.temp,
+           y = humidity)) +
+  scale_colour_brewer(palette="Dark2") +
+  geom_miss_point() + theme(aspect.ratio=1)
+```
+
+---
+# by year
+
+```{r fig.width=10, fig.height=6}
+ggplot(tao,
+       aes(x = sea.surface.temp,
+           y = humidity)) +
+  geom_miss_point() + 
+  scale_colour_brewer(palette="Dark2") +
+  facet_wrap(~year) + 
+  theme(aspect.ratio=1) 
+```
+
+---
+# Understanding missing dependencies
+
+```{r fig.width=10, fig.height=6}
+ggplot(tao,
+       aes(x = sea.surface.temp,
+           y = air.temp)) +
+  geom_miss_point() + 
+  scale_colour_brewer(palette="Dark2") +
+  facet_wrap(~year) + 
+  theme(aspect.ratio=1)
+```
+
+Year needs to be accounted for in finding good substu=itute values.
+
+---
+# Relationship with other variables
+
+```{r fig.width=8, fig.height=6}
+tao_shadow <- bind_shadow(tao)
+ggplot(data = tao_shadow,
+       aes(x = uwind, y=vwind, colour=air.temp_NA)) +
+       scale_colour_brewer(palette="Dark2") +
+       geom_point() + theme(aspect.ratio=1) 
+```
+
+---
+# Handling missings
+
+- An small fraction of cases have several missings, drop the cases
+- A variable or two, out of many, have a lot of missings, drop the variables
+- If missings are small in number, but located in many cases and variables, you need to impute these values, to do most analyses
+- Designing the imputation should take into account dependencies that you have seen between missingness and existing variables.
+- For the ocean buoys data this means imputation needs to be done separately by year
+
+---
+# Common ways to impute values
+
+- Simple parametric: use the mean or median of the complete cases for each variable
+- Simple non-parametric: find the $k$ nearest neighbours with a complete value and average these
+- Multiple imputation: Use a statistical distribution, e.g. normal model and simulate a value (or set of values, hot deck imputation) for the missings
+
+---
+# Examples - using the mean
+
+and ignoring year.
+
+```{r fig.width=10, fig.height=6}
+tao_shadow <- tao_shadow %>%
+  mutate(sea.surface.temp = ifelse(is.na(sea.surface.temp), 
+                             mean(sea.surface.temp, na.rm=TRUE),
+                             sea.surface.temp),
+         air.temp = ifelse(is.na(air.temp), 
+                             mean(air.temp, na.rm=TRUE),
+                             air.temp))
+ggplot(tao_shadow,
+       aes(x = sea.surface.temp,
+           y = air.temp, 
+           colour=air.temp_NA)) +
+  geom_point(alpha=0.7) + 
+  facet_wrap(~year) + 
+  scale_colour_brewer(palette="Dark2") +
+  theme(aspect.ratio=1)
+```
+
+POOR MATCH!
+
+---
+# by year
+
+```{r fig.width=10, fig.height=6}
+t93 <- bind_shadow(tao) %>% 
+  filter(year=="1993") %>%
+  mutate(sea.surface.temp = ifelse(is.na(sea.surface.temp), 
+                             mean(sea.surface.temp, na.rm=TRUE),
+                             sea.surface.temp),
+         air.temp = ifelse(is.na(air.temp), 
+                             mean(air.temp, na.rm=TRUE),
+                             air.temp)) 
+t97 <- bind_shadow(tao) %>% 
+  filter(year=="1997") %>%
+  mutate(sea.surface.temp = ifelse(is.na(sea.surface.temp), 
+                             mean(sea.surface.temp, na.rm=TRUE),
+                             sea.surface.temp),
+         air.temp = ifelse(is.na(air.temp), 
+                             mean(air.temp, na.rm=TRUE),
+                             air.temp))
+ 
+tao_shadow <- bind_rows(t93, t97)  
+
+ggplot(tao_shadow,
+       aes(x = sea.surface.temp,
+           y = air.temp, 
+           colour=air.temp_NA)) +
+  geom_point(alpha=0.7) + 
+  facet_wrap(~year) + 
+  scale_colour_brewer(palette="Dark2") +
+  theme(aspect.ratio=1)
+```
+
+Better, but still a bit weird!
+
+---
+# Nearest neighbors imputation
+
+```{r fig.width=10, fig.height=6}
+#source("https://bioconductor.org/biocLite.R")
+#biocLite("impute")
+library(impute)
+tao_impute <- bind_shadow(tao) %>%
+  arrange(year, sea.surface.temp, air.temp) %>%
+  select(sea.surface.temp, air.temp) 
+tao_impute <- impute.knn(as.matrix(tao_impute), 5)
+tao_shadow <- bind_shadow(tao) %>%
+  arrange(year, sea.surface.temp, air.temp) %>%
+  mutate(sea.surface.temp = tao_impute$data[,1],
+         air.temp = tao_impute$data[,2])
+ggplot(tao_shadow,
+       aes(x = sea.surface.temp,
+           y = air.temp, 
+           colour=air.temp_NA)) +
+  geom_point(alpha=0.7) + 
+  facet_wrap(~year) + 
+  scale_colour_brewer(palette="Dark2") +
+  theme(aspect.ratio=1)
+```
+
+A LITTLE BETTER!
+
+---
+# by year
+
+```{r fig.width=10, fig.height=6}
+tao_impute_93 <- bind_shadow(tao) %>%
+  arrange(year, sea.surface.temp, air.temp) %>%
+  filter(year=="1993") %>%
+  select(sea.surface.temp, air.temp) 
+tao_impute_93 <- impute.knn(as.matrix(tao_impute_93), 5)
+tao_impute_97 <- bind_shadow(tao) %>%
+  arrange(year, sea.surface.temp, air.temp) %>%
+  filter(year=="1997") %>%
+  select(sea.surface.temp, air.temp)
+tao_impute_97 <- impute.knn(as.matrix(tao_impute_97), 5)
+tao_impute <- rbind(tao_impute_93$data, tao_impute_97$data)
+tao_shadow <- bind_shadow(tao) %>%
+  arrange(year, sea.surface.temp, air.temp) %>%
+  mutate(sea.surface.temp = tao_impute[,1],
+         air.temp = tao_impute[,2])
+ggplot(tao_shadow,
+       aes(x = sea.surface.temp,
+           y = air.temp, 
+           colour=air.temp_NA)) +
+  geom_point(alpha=0.5) + 
+  facet_wrap(~year) + 
+  scale_colour_brewer(palette="Dark2") +
+  theme(aspect.ratio=1)
+```
+
+MUCH BETTER!
+
+---
+# Famous example of ignoring missings
+
+- Subsequent investigation determined that the cause was failure of the O-ring seals used to isolate the fuel supply from burning gases.
+- NASA staff ignored observations where no O-rings failed.
+
+![](challenger.png)
+![](challenger_plot.gif)
+
+[http://www.asktog.com/books/challengerExerpt.html](http://www.asktog.com/books/challengerExerpt.html)
+
+
+---
+# Working with text
+
+```{r echo=TRUE}
+tb <- read_csv("../data/tb.csv")
+tb[7:10,1:10]
+```
+
+---
+# Convert to long form
+
+```{r echo=TRUE}
+tb_long <- tb %>% gather(variable, count, m_04:f_u)
+head(tb_long)
+```
+
+---
+# String split
+
+```{r echo=TRUE}
+tb_long <- tb_long %>% separate(variable, c("gender", "age"))
+head(tb_long)
+```
+
+---
+# Take a look
+
+```{r echo=TRUE, fig.align='center', fig.width=10, fig.height=5}
+tb_long %>% filter(iso2 == "CO", age!="u", year>1998) %>%
+  ggplot(aes(x=year, y=count, colour=gender)) + 
+  geom_point() + facet_wrap(~age, ncol=3) +
+  scale_color_brewer(palette="Dark2")
+```
+
+
+---
+# More complex text
+
+Working with text more generally involves learning about *regular expressions*, which are 
+a very terse, succint language for searching and replacing in strings. Hard to get up and running but enables efficient handling of text. 
+
+---
+# Resources
+
+- [eechidna](https://cran.r-project.org/web/packages/eechidna/index.html): Exploring Election and Census Highly Informative Data Nationally for Australia
+- [AEC electorate polygons](http://www.aec.gov.au/Electorates/gis/gis_datadownload.htm)
+- [Paper on exploring missingness](https://www.jstatsoft.org/article/view/v068i06/v68i06.pdf)
+- [Slides](https://stat585-at-isu.github.io/materials/07_regular-expressions/01_regular_expressions.html) on regular expressions from stat545 at ISU
+
+---
+class: inverse middle 
+# Share and share alike
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.

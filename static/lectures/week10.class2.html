@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Statistical Thinking using Randomisation and Simulation</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Di Cook (dicook@monash.edu, @visnut)" />
+    <link href="week10.class2_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+    <link rel="stylesheet" href="myremark.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistical Thinking using Randomisation and Simulation
+## Compiling data for problem solving
+### Di Cook (<a href="mailto:dicook@monash.edu">dicook@monash.edu</a>, <span class="citation">@visnut</span>)
+### W10.C2
+
+---
+
+
+
+
+
+# Overview of this class
+
+- Reading different `data formats`
+- Handling missing data
+- String operations, working with `text`
+- Grammar of graphics
+- Randomisation to assess structure perceived in plots
+
+---
+# Reading different file formats: shapefiles
+
+The Australian Electorate Commission publishes the boundaries of the electorates on their website at [http://www.aec.gov.au/Electorates/gis/gis_datadownload.htm](http://www.aec.gov.au/Electorates/gis/gis_datadownload.htm).
+
+Once the files (preferably the national files) are downloaded, unzip the file (it will build a folder with a set of files). We want to read the shapes contained in the `shp` file into R.
+
+---
+
+
+```r
+library(maptools)
+
+# shapeFile contains the path to the shp file:
+shapeFile &lt;- "../data/vic-esri-24122010/vic 24122010.shp"
+sF &lt;- readShapeSpatial(shapeFile)
+class(sF)
+#&gt; [1] "SpatialPolygonsDataFrame"
+#&gt; attr(,"package")
+#&gt; [1] "sp"
+```
+
+---
+
+`sF` is a spatial data frame containing all of the polygons. 
+We use the `rmapshaper` package available from ateucher's github page to thin the polygons while preserving the geography:
+
+
+```r
+library(rmapshaper)
+```
+
+
+```r
+sFsmall &lt;- ms_simplify(sF, keep=0.05) # use instead of thinnedSpatialPoly
+```
+
+---
+
+`keep` indicates the percentage of points we want to keep in the polygons. 5% makes the electorate boundary still quite recognizable, but reduce the overall size of the map considerably, making it faster to plot.
+
+---
+
+We can use base graphics to plot this map:
+
+
+```r
+plot(sFsmall)
+```
+
+&lt;img src="week10.class2_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Extracting the electorate information 
+
+A spatial polygons data frame consists of both a data set with information on each of the entities (in this case, electorates), and a set of polygons for each electorate (sometimes multiple polygons are needed, e.g. if the electorate has islands). We want to extract both of these parts.
+
+---
+
+
+```r
+nat_data &lt;- sF@data
+head(nat_data)
+#&gt;   GEODB_OID OBJECTID DIV_NUMBER ELECT_DIV NUMCCDS ACTUAL PROJECTED
+#&gt; 0         1        1          1     Aston     190  92370     98469
+#&gt; 1         2        2          2  Ballarat     274  95003    100786
+#&gt; 2         3        3          3    Batman     265  96909    104258
+#&gt; 3         4        4          4   Bendigo     284  95729    102582
+#&gt; 4         5        5          5     Bruce     226  95472     99904
+#&gt; 5         6        6          6   Calwell     214  99031    104734
+#&gt;   POPULATION OVER_18 AREA_SQKM SORTNAME                MAP_SYMBOL MAP_TYPE
+#&gt; 0          0       0   98.9337    Aston Final Divisional Boundary    Metro
+#&gt; 1          0       0 4651.6400 Ballarat Final Divisional Boundary    Rural
+#&gt; 2          0       0   65.6887   Batman Final Divisional Boundary    Metro
+#&gt; 3          0       0 6255.0000  Bendigo Final Divisional Boundary    Rural
+#&gt; 4          0       0   72.6900    Bruce Final Divisional Boundary    Metro
+#&gt; 5          0       0  174.7130  Calwell Final Divisional Boundary    Metro
+#&gt;      LENGTH SHAPE_AREA
+#&gt; 0  58422.89   99056594
+#&gt; 1 417555.12 4652896627
+#&gt; 2  58226.02   65717035
+#&gt; 3 622901.96 6255411672
+#&gt; 4  48696.38   72629548
+#&gt; 5  81925.61  174767685
+```
+
+---
+
+The row names of the data file are identifiers corresponding to the polygons - we want to make them a separate variable:
+
+
+```r
+nat_data$id &lt;- row.names(nat_data)
+```
+
+---
+# Extracting the polygon information 
+
+The `fortify` function in the `ggplot2` package extracts the polygons into a data frame. 
+
+```r
+nat_map &lt;- ggplot2::fortify(sFsmall)
+head(nat_map)
+#&gt;      long     lat order  hole piece id group
+#&gt; 1 2525287 2407463     1 FALSE     1  0   0.1
+#&gt; 2 2525840 2407413     2 FALSE     1  0   0.1
+#&gt; 3 2527187 2406561     3 FALSE     1  0   0.1
+#&gt; 4 2527167 2406442     4 FALSE     1  0   0.1
+#&gt; 5 2527987 2406306     5 FALSE     1  0   0.1
+#&gt; 6 2527967 2406186     6 FALSE     1  0   0.1
+```
+
+---
+
+We need to make sure that `group` and `piece` are kept as factor variables - if they are allowed to be converted to numeric values, it messes things up, because as factor levels `9` and `9.0` are distinct, whereas they are not when interpreted as numbers ...
+
+
+```r
+nat_map$group &lt;- paste("g",nat_map$group,sep=".")
+nat_map$piece &lt;- paste("p",nat_map$piece,sep=".")
+head(nat_map)
+#&gt;      long     lat order  hole piece id group
+#&gt; 1 2525287 2407463     1 FALSE   p.1  0 g.0.1
+#&gt; 2 2525840 2407413     2 FALSE   p.1  0 g.0.1
+#&gt; 3 2527187 2406561     3 FALSE   p.1  0 g.0.1
+#&gt; 4 2527167 2406442     4 FALSE   p.1  0 g.0.1
+#&gt; 5 2527987 2406306     5 FALSE   p.1  0 g.0.1
+#&gt; 6 2527967 2406186     6 FALSE   p.1  0 g.0.1
+```
+
+---
+# Plot it
+
+
+```r
+ggplot(nat_map, aes(x=long, y=lat, group=group)) + 
+  geom_polygon(fill="white", colour="black") 
+```
+
+&lt;img src="week10.class2_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Add measured variables
+
+
+```r
+ggplot(nat_data, aes(fill=AREA_SQKM)) + 
+  geom_map(aes(map_id=id), map=nat_map) +
+  expand_limits(x=nat_map$long, y=nat_map$lat) + 
+  theme_map()
+```
+
+&lt;img src="week10.class2_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Handling missing values
+
+- Need to know how the missings are coded, hopefully clearly missing, treated as `\(NA\)` in R, not `\(0\)`, or `\(-9\)`, or `\(-9999\)`, or `\(.\)` Recode as need be.
+- Study the distribution of missing vs not missing, which will help determine how to handle them.
+
+---
+# What ways can these affect analysis?
+
+- If missings happen when conditions are special, eg sensor tends to stop when temperature drops below 3 degrees Celsius, estimation of model parameters may not reflect the population parameters
+- Some techniques, particularly multivariate methods like many used in data mining require complete records over many variables. Just a few missing numbers can mean a lot of cases that cannot be used. 
+
+---
+# Making it Easy - MissingDataGUI
+
+- Methods for summarising missings in a data set
+- Ways to plot to examine dependence between missing vs not missing
+- Imputation methods to substitute missings
+
+```
+library(naniar)
+vis_miss(tao, sort_miss=TRUE) + theme(aspect.ratio=1)
+```
+
+&lt;img src="week10.class2_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Numerical summaries
+
+Proportion of observations missing:
+
+
+```
+#&gt; [1] 0.02672101
+```
+
+Proportion of variables missing:
+
+
+```
+#&gt; [1] 0.3333333
+```
+
+How many observations have `\(k\)` missings?
+
+
+```
+#&gt; [[1]]
+#&gt; # A tibble: 4 x 3
+#&gt;   n_missing_in_case n_cases    percent
+#&gt;               &lt;int&gt;   &lt;int&gt;      &lt;dbl&gt;
+#&gt; 1                 0     565 76.7663043
+#&gt; 2                 1     167 22.6902174
+#&gt; 3                 2       2  0.2717391
+#&gt; 4                 3       2  0.2717391
+```
+
+---
+# By group
+
+
+```
+#&gt; [[1]]
+#&gt; # A tibble: 6 x 4
+#&gt;    year n_missing_in_case n_cases    percent
+#&gt;   &lt;int&gt;             &lt;int&gt;   &lt;int&gt;      &lt;dbl&gt;
+#&gt; 1  1997                 0     291 79.0760870
+#&gt; 2  1997                 1      77 20.9239130
+#&gt; 3  1993                 0     274 74.4565217
+#&gt; 4  1993                 1      90 24.4565217
+#&gt; 5  1993                 2       2  0.5434783
+#&gt; 6  1993                 3       2  0.5434783
+```
+
+---
+# Missings shouldn't be ignored
+
+but most software will simply drop them!
+
+
+```
+#&gt; Warning: Removed 94 rows containing missing values (geom_point).
+```
+
+&lt;img src="week10.class2_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Keep them in the plot
+
+&lt;img src="week10.class2_files/figure-html/unnamed-chunk-17-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# by year
+
+&lt;img src="week10.class2_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Understanding missing dependencies
+
+&lt;img src="week10.class2_files/figure-html/unnamed-chunk-19-1.png" style="display: block; margin: auto;" /&gt;
+
+Year needs to be accounted for in finding good substu=itute values.
+
+---
+# Relationship with other variables
+
+&lt;img src="week10.class2_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Handling missings
+
+- An small fraction of cases have several missings, drop the cases
+- A variable or two, out of many, have a lot of missings, drop the variables
+- If missings are small in number, but located in many cases and variables, you need to impute these values, to do most analyses
+- Designing the imputation should take into account dependencies that you have seen between missingness and existing variables.
+- For the ocean buoys data this means imputation needs to be done separately by year
+
+---
+# Common ways to impute values
+
+- Simple parametric: use the mean or median of the complete cases for each variable
+- Simple non-parametric: find the `\(k\)` nearest neighbours with a complete value and average these
+- Multiple imputation: Use a statistical distribution, e.g. normal model and simulate a value (or set of values, hot deck imputation) for the missings
+
+---
+# Examples - using the mean
+
+and ignoring year.
+
+&lt;img src="week10.class2_files/figure-html/unnamed-chunk-21-1.png" style="display: block; margin: auto;" /&gt;
+
+POOR MATCH!
+
+---
+# by year
+
+&lt;img src="week10.class2_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
+
+Better, but still a bit weird!
+
+---
+# Nearest neighbors imputation
+
+&lt;img src="week10.class2_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" /&gt;
+
+A LITTLE BETTER!
+
+---
+# by year
+
+&lt;img src="week10.class2_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" /&gt;
+
+MUCH BETTER!
+
+---
+# Famous example of ignoring missings
+
+- Subsequent investigation determined that the cause was failure of the O-ring seals used to isolate the fuel supply from burning gases.
+- NASA staff ignored observations where no O-rings failed.
+
+![](challenger.png)
+![](challenger_plot.gif)
+
+[http://www.asktog.com/books/challengerExerpt.html](http://www.asktog.com/books/challengerExerpt.html)
+
+
+---
+# Working with text
+
+
+```r
+tb &lt;- read_csv("../data/tb.csv")
+tb[7:10,1:10]
+#&gt; # A tibble: 4 x 10
+#&gt;    iso2  year  m_04 m_514 m_014 m_1524 m_2534 m_3544 m_4554 m_5564
+#&gt;   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;  &lt;int&gt;  &lt;int&gt;  &lt;int&gt;  &lt;int&gt;
+#&gt; 1    AD  1996    NA    NA     0      0      0      4      1      0
+#&gt; 2    AD  1997    NA    NA     0      0      1      2      2      1
+#&gt; 3    AD  1998    NA    NA     0      0      0      1      0      0
+#&gt; 4    AD  1999    NA    NA     0      0      0      1      1      0
+```
+
+---
+# Convert to long form
+
+
+```r
+tb_long &lt;- tb %&gt;% gather(variable, count, m_04:f_u)
+head(tb_long)
+#&gt; # A tibble: 6 x 4
+#&gt;    iso2  year variable count
+#&gt;   &lt;chr&gt; &lt;int&gt;    &lt;chr&gt; &lt;int&gt;
+#&gt; 1    AD  1989     m_04    NA
+#&gt; 2    AD  1990     m_04    NA
+#&gt; 3    AD  1991     m_04    NA
+#&gt; 4    AD  1992     m_04    NA
+#&gt; 5    AD  1993     m_04    NA
+#&gt; 6    AD  1994     m_04    NA
+```
+
+---
+# String split
+
+
+```r
+tb_long &lt;- tb_long %&gt;% separate(variable, c("gender", "age"))
+head(tb_long)
+#&gt; # A tibble: 6 x 5
+#&gt;    iso2  year gender   age count
+#&gt;   &lt;chr&gt; &lt;int&gt;  &lt;chr&gt; &lt;chr&gt; &lt;int&gt;
+#&gt; 1    AD  1989      m    04    NA
+#&gt; 2    AD  1990      m    04    NA
+#&gt; 3    AD  1991      m    04    NA
+#&gt; 4    AD  1992      m    04    NA
+#&gt; 5    AD  1993      m    04    NA
+#&gt; 6    AD  1994      m    04    NA
+```
+
+---
+# Take a look
+
+
+```r
+tb_long %&gt;% filter(iso2 == "CO", age!="u", year&gt;1998) %&gt;%
+  ggplot(aes(x=year, y=count, colour=gender)) + 
+  geom_point() + facet_wrap(~age, ncol=3) +
+  scale_color_brewer(palette="Dark2")
+```
+
+&lt;img src="week10.class2_files/figure-html/unnamed-chunk-28-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# More complex text
+
+Working with text more generally involves learning about *regular expressions*, which are 
+a very terse, succint language for searching and replacing in strings. Hard to get up and running but enables efficient handling of text. 
+
+---
+# Resources
+
+- [eechidna](https://cran.r-project.org/web/packages/eechidna/index.html): Exploring Election and Census Highly Informative Data Nationally for Australia
+- [AEC electorate polygons](http://www.aec.gov.au/Electorates/gis/gis_datadownload.htm)
+- [Paper on exploring missingness](https://www.jstatsoft.org/article/view/v068i06/v68i06.pdf)
+- [Slides](https://stat585-at-isu.github.io/materials/07_regular-expressions/01_regular_expressions.html) on regular expressions from stat545 at ISU
+
+---
+class: inverse middle 
+# Share and share alike
+
+&lt;a rel="license" href="http://creativecommons.org/licenses/by/4.0/"&gt;&lt;img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /&gt;&lt;/a&gt;&lt;br /&gt;This work is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by/4.0/"&gt;Creative Commons Attribution 4.0 International License&lt;/a&gt;.
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
