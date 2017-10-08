@@ -53,9 +53,9 @@ title: Home
 - Week 6: [Diagnosing models](labs/lab6.pdf) [(Rmd)](labs/lab6.Rmd); [SOLUTION](labs/lab6_solution.pdf) [(Rmd)](labs/lab6_solution.Rmd) [Tutorial slides](tutorials/lab06/index.html) [(Rmd)](tutorials/lab06/index.Rmd) [pisa_au.rda](tutorials/lab06/pisa_au.rda)
 - Week 7: [Bootstrap intervals](labs/lab7.pdf) [(Rmd)](labs/lab7.Rmd); [SOLUTION](labs/lab7_solution.pdf) [(Rmd)](labs/lab7_solution.Rmd); [Tutorial slides](tutorials/lab07/index.html) [(Rmd)](tutorials/lab07/index.Rmd)
 - Week 8: [Tree models](labs/lab8.pdf) [(Rmd)](labs/lab8.Rmd); [SOLUTION](labs/lab8_solution.pdf) [(Rmd)](labs/lab8_solution.Rmd); [Tutorial slides](tutorials/lab08/index.html) [(Rmd)](tutorials/lab08/index.Rmd) [melb_auctions.csv](labs/melb_auctions.csv)
-- Week 9: [Bayesian Thinking](labs/lab9.pdf) [(Rmd)](labs/lab9.Rmd); [Tutorial slides](tutorials/lab09/) [(Rmd)](tutorials/lab09/index.Rmd) [Nat's shiny app](https://ebsmonash.shinyapps.io/etc2420bayes/)
+- Week 9: [Bayesian Thinking](labs/lab9.pdf) [(Rmd)](labs/lab9.Rmd); [Tutorial slides](tutorials/lab09/) [(Rmd)](tutorials/lab09/index.Rmd);  [SOLUTION](labs/lab9_solution.pdf) [(Rmd)](labs/lab9_solution.Rmd) [Nat's shiny app](https://ebsmonash.shinyapps.io/etc2420bayes/)
 - Week 10: [Working with Data](labs/lab10.pdf) [(Rmd)](labs/lab10.Rmd); [melb_ghcn.csv](labs/melb_ghcn.csv); [Tutorial slides](tutorials/lab10/) [(Rmd)](tutorials/lab10/index.Rmd) 
-- Week 11: [Modeling Risk and Loss with Data](labs/lab11.pdf) [(Rmd)](labs/lab11.Rmd); [spam-503.csv](spam-503.csv)
+- Week 11: [Modeling Risk and Loss with Data](labs/lab11.pdf) [(Rmd)](labs/lab11.Rmd); [melb_ped_weather.csv](melb_ped_weather.csv)
 
 ## [ETC5242 Project](project/project.pdf)
 
