@@ -1,0 +1,634 @@
+---
+title: 'Statistical Thinking using Randomisation and Simulation'
+subtitle:  'Compiling data for problem solving'
+author: Di Cook (dicook@monash.edu, @visnut)
+date: "W11.C1"
+output:
+  xaringan::moon_reader:
+    css: ["default", "myremark.css"]
+    self_contained: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE,
+  echo=FALSE,
+  fig.align='center', 
+  fig.height = 4,
+  fig.width = 4,
+  collapse = TRUE,
+  comment = "#>"
+)
+library(tidyverse)
+library(gridExtra)
+library(ggthemes)
+library(HLMdiag)
+```
+
+
+# Overview of this class
+
+- Working with text
+- Web scraping
+- Grammar of graphics
+- Randomisation to assess structure perceived in plots
+
+---
+# Simple web scraping
+
+- Example: NBA salaries
+- ESPN provides basketball players' salaries for the 2017-2018 season at [http://espn.go.com/nba/salaries](http://espn.go.com/nba/salaries)
+
+```{r echo=TRUE}
+library(XML)
+nba <- NULL
+for (i in 1:11) {
+  temp <- readHTMLTable(
+    sprintf("http://espn.go.com/nba/salaries/_/page/%d",i))[[1]]
+  nba <- rbind(nba, temp)
+}
+glimpse(nba)
+```
+
+---
+# Text massaging
+
+```
+head(nba$SALARY)
+
+# get rid of $ and , in salaries and convert to numeric:
+gsub("[$,]", "", head(as.character(nba$SALARY)))
+nba$SALARY <- as.numeric(gsub("[$,]", "", 
+  as.character(nba$SALARY)))
+```
+
+```{r, echo=FALSE, warning=TRUE}
+head(nba$SALARY)
+
+# get rid of $ and , in salaries and convert to numeric:
+gsub("[$,]", "", head(as.character(nba$SALARY)))
+nba$SALARY <- as.numeric(gsub("[$,]", "", 
+                                as.character(nba$SALARY)))
+```
+
+- Where does the warning come from?
+
+---
+# Cleaning NBA salaries data: hunting the warning
+
+```
+nba %>% filter(is.na(SALARY)) %>% head()
+```
+
+```{r, echo=FALSE}
+nba %>% filter(is.na(SALARY)) %>% head()
+```
+
+- We don't need these rows - delete all of them
+
+```
+dim(nba)
+nba <- nba[-which(nba$RK=="RK"),]
+dim(nba)
+```
+
+```{r, echo=FALSE}
+dim(nba)
+nba <- nba[-which(nba$RK=="RK"),]
+dim(nba)
+```
+
+---
+# Cleaning NBA data
+
+- Separate names into first, last, and position
+
+```
+nba <- nba %>% 
+  mutate(NAME = as.character(nba$NAME)) %>% 
+  separate(NAME, c("full_name", "position"), ",") %>% 
+  separate(full_name, c("first", "last"), " ") 
+```
+
+
+```{r echo=FALSE}
+nba <- nba %>% 
+  mutate(NAME = as.character(nba$NAME)) %>% 
+  separate(NAME, c("full_name", "position"), ",") %>% 
+  separate(full_name, c("first", "last"), " ") 
+head(nba)
+```
+
+---
+# Cleaned data ...?
+
+- Numbers might still be wrong, but now we are in a position to check for that.
+
+```
+ggplot(data=nba, aes(x=SALARY)) + geom_histogram()
+```
+
+```{r, echo=FALSE, message=FALSE, error=FALSE, fig.width=7, fig.height=5}
+ggplot(data=nba, aes(x=SALARY)) + geom_histogram()
+```
+
+---
+# Web scraping resources
+
+- Carson Sievert's [tutorial](https://slides.cpsievert.me/web-scraping/20150612/)
+- Ankit Agarwal's [blog post 1 ](http://brazenly.blogspot.com.au/2016/05/r-consummate-all-encompassing-tool-for.html); Look for several more advanced scraping
+- R Blogger's [post](https://www.r-bloggers.com/scraping-with-selenium/)
+
+---
+# Tidy data and random variables
+
+- The concept of tidy data matches elementary statistics
+- Tabular form puts variables in columns and observations in rows
+- Not all tabular data is in this form
+- This is the point of tidy data
+
+$$X = \left[ \begin{array}{rrrr}
+           X_1 & X_2 & ... & X_p 
+           \end{array} \right] \\
+  = \left[ \begin{array}{rrrr}
+           X_{11} & X_{12} & ... & X_{1p} \\
+           X_{21} & X_{22} & ... & X_{2p} \\
+           \vdots & \vdots & \ddots& \vdots \\
+           X_{n1} & X_{n2} & ... & X_{np}
+           \end{array} \right]$$
+
+- $X_1 \sim N(0,1), ~~X_2 \sim exp(1) ...$
+
+---
+# Grammar of graphics and statistics
+
+- A statistic is a function on the values of items in a sample, e.g. for $n$ iid random variates $\bar{X}_1=\sum_{i=1}^n X_{i1}$, $s_1^2=\frac{1}{n-1}\sum_{i=1}^n(X_{i1}-\bar{X}_1)^2$
+- We study the behaviour of the statistic over all possible samples of size $n$. 
+- The grammar of graphics is the mapping of (random) variables to graphical elements, making plots of data into statistics
+
+---
+# Pipeline: Messy to tidy to plot
+
+```{r echo=TRUE}
+messy_data <- read_csv("../data/tb.csv")
+head(messy_data)
+```
+
+---
+
+```{r echo=TRUE}
+tidy_data <- messy_data %>% 
+  gather(demo, count, -year, -iso2, na.rm = TRUE) %>% 
+  separate(demo, c("gender", "age"))
+tidy_data <- tidy_data %>% 
+  filter(!(age %in% c("014", "04", "514", "u")))
+head(tidy_data)
+```
+
+---
+# 100% charts
+
+```{r fig.width=12, fig.height=3, echo=TRUE}
+tidy_data %>% 
+  filter(iso2 == "AU") %>% 
+  ggplot(aes(x = year, y = count, fill = gender)) +
+  geom_bar(stat = "identity", position = "fill") +
+  facet_grid(~ age) + 
+  scale_fill_brewer(palette="Dark2")
+```
+
+---
+# Stacked barcharts
+
+```{r fig.width=10, fig.height=3, echo=TRUE}
+tidy_data %>% 
+  filter(iso2 == "AU") %>% 
+  ggplot(aes(x = year, y = count, fill = gender)) +
+  geom_bar(stat = "identity") +
+  facet_grid(~ age) + 
+  scale_fill_brewer(palette="Dark2") +
+  theme(
+    axis.text = element_text(size = 14), 
+    strip.text = element_text(size = 16), 
+    axis.title = element_text(size = 16)
+  )
+```
+
+---
+# Side-by-side barcharts
+
+```{r fig.width=10, fig.height=3, echo=TRUE}
+tidy_data %>% 
+  filter(iso2 == "AU") %>% 
+  ggplot(aes(x = year, y = count, fill = gender)) +
+  geom_bar(stat = "identity", position="dodge") +
+  facet_grid(~ age) + 
+  scale_fill_brewer(palette="Dark2") +
+  theme(
+    axis.text = element_text(size = 14), 
+    strip.text = element_text(size = 16), 
+    axis.title = element_text(size = 16)
+  )
+```
+
+---
+# facet by gender
+
+```{r fig.width=10, fig.height=3, echo=TRUE}
+tidy_data %>% 
+  filter(iso2 == "AU") %>% 
+  ggplot(aes(x = year, y = count, fill = gender)) +
+  geom_bar(stat = "identity") +
+  facet_grid(gender ~ age) + 
+  scale_fill_brewer(palette="Dark2") +
+  theme(
+    axis.text = element_text(size = 14), 
+    strip.text = element_text(size = 16), 
+    axis.title = element_text(size = 16)
+  )
+```
+
+---
+# Rose plot
+
+```{r fig.width=10, fig.height=3, echo=TRUE}
+tidy_data %>% 
+  filter(iso2 == "AU") %>% 
+  ggplot(aes(x = year, y = count, fill = gender)) +
+  geom_bar(stat = "identity") +
+  facet_grid(gender ~ age) + 
+  scale_fill_brewer(palette="Dark2") +
+  theme(
+    axis.text = element_blank(), 
+    strip.text = element_text(size = 16), 
+    axis.title = element_text(size = 16)
+  ) + coord_polar()
+```
+
+---
+# Rainbow charts
+
+```{r fig.width=10, fig.height=3, echo=TRUE}
+tidy_data %>% 
+  filter(iso2 == "AU") %>% 
+  ggplot(aes(x = 1, y = count, fill = factor(year))) +
+  geom_bar(stat = "identity", position="fill") +
+  facet_grid(gender ~ age) + 
+  theme(
+    axis.text = element_blank(), 
+    strip.text = element_text(size = 16), 
+    axis.title = element_text(size = 16)
+  ) 
+```
+
+---
+# Pie charts
+
+```{r fig.width=10, fig.height=3, echo=TRUE}
+tidy_data %>% 
+  filter(iso2 == "AU") %>% 
+  ggplot(aes(x = 1, y = count, fill = factor(year))) +
+  geom_bar(stat = "identity", position="fill") +
+  facet_grid(gender ~ age) + 
+  theme(
+    axis.text = element_blank(), 
+    strip.text = element_text(size = 16), 
+    axis.title = element_text(size = 16)
+  ) + coord_polar(theta="y")
+```
+
+---
+class: inverse middle 
+# Your turn
+
+What do you learn about tb incidence in the Australia by gender and age and year from the
+- 100% charts?
+- stacked bar charts?
+- side-by-side barcharts?
+- facetted barcharts?
+
+---
+# Summary of grammar
+
+- The grammar is a functional language for decribing the mapping of (random) variables to plot elements. 
+- Its worth learning
+- Original resource: Lee Wilkinson [Grammar of graphics](https://www.cs.uic.edu/~wilkinson/TheGrammarOfGraphics/GOG.html)
+
+---
+# Inference
+
+- Choice of plot implicitly sets $H_0$, $H_1$
+- Generically, we are thinking  $H_0$: no pattern, $H_1$: pattern, but the choice of plot makes this much more explicit
+
+---
+# Putting the pieces together
+
+```{r}
+df <- data.frame(v1=c(rexp(20), rexp(15, 2)), 
+                 v2=c(rep("A", 20), rep("B", 15)))
+ggplot(df, aes(x=v2, y=v1, fill=v2)) + 
+  geom_boxplot() + coord_flip()
+```
+
+---
+class: inverse middle 
+# Your turn
+
+- Question?
+- Data, variables
+- Mapping
+- Null generating mechanism
+
+--
+- Question? Is there a difference between the two groups? $H_0$: no difference, $H_1$: difference
+
+--
+- Data, variables: Two variables: v1, v2; v2 is categorical
+
+--
+- Mapping: x=V2, y=V1, colour=V1, geom=boxplot
+
+--
+- Null generating mechanism: permute the values of V1, relative to V2
+
+
+---
+# Clarity
+
+- The null hypothesis is determined based on the plot type
+- It is not based on the structure seen in a data set
+
+---
+# Lineup
+
+Embed the data plot in a field of null plots
+
+```{r eval=FALSE}
+library(nullabor)
+pos <- sample(1:20, 1)
+df_null <- lineup(null_permute('v1'), df, pos=pos)
+ggplot(df_null, aes(x=v2, y=v1, fill=v2)) + 
+  geom_boxplot() +
+  facet_wrap(~.sample, ncol=5) + coord_flip()
+```
+
+---
+
+Which plot shows the most difference between the groups?
+
+```{r fig.height=7, fig.width=9, echo=FALSE}
+library(nullabor)
+pos <- sample(1:20, 1)
+df_null <- lineup(null_permute('v1'), df, pos=pos)
+ggplot(df_null, aes(x=v2, y=v1, fill=v2)) + 
+  geom_boxplot() +
+  facet_wrap(~.sample, ncol=5) + coord_flip()
+```
+
+---
+# Evaluation
+
+- Computing $p$-values
+- Power - signal strength
+
+---
+# p-values
+
+Suppose $x$ individuals selected the data plot from a lineup of $m$ plots, shown to $K$ independent observers, then simplistically we can think about the probability of this happening, if the data plot is from the same distribution as the null plots. This yields a binomial formula:
+
+$$P(X\geq x) = \sum_{i=x}^{K} \binom{K}{i} \left(\frac{1}{m}\right)^i\left(\frac{m-1}{m}\right)^{K-i}$$
+
+For $x=4, K=17, m=20$
+
+```{r echo=TRUE}
+pvisual(4, 17, m=20)
+```
+
+---
+# Simulation approach
+
+- Scenario I: in each of K evaluations a different data set and a different set of (m-1) null plots is shown.
+- Scenario II: in each of K evaluations the same data set but a different set of (m-1) null plots is shown.
+- Scenario III: the same lineup, i.e. same data and same set of null plots, is shown to K different observers.
+
+---
+# Simulation
+
+Crucial idea: assign a p-value to each plot (data and null); under null hypothesis, this p-value is from U[0,1] 
+
+Scenario I:
+- for the $k$th lineup evaluation do:
+ - pick 20 $p$-values from $U[0,1]$
+ - for data plot compute 'strength' of other plots: $q = (1-p_\text{data})/\sum_j(1-p_j)$
+ - Use $q$ to determine whether data was picked in simulation: $x_k \tilde B_{1,q}$
+ - repeat above three steps $K$ times, and find the number of data picks $X = \sum_k x_k$
+- Repeat N times to get distribution of $X$
+
+---
+# Simulation
+
+
+Scenario II (same data, different nulls):
+- for the $k$th lineup evaluation pick 20 $p$-values from $U[0,1]$:
+- for data plot compute 'strength' of other plots: $q = (1-p_\text{data})/\sum_j(1-p_j)$
+- Use $q$ to determine whether data was picked in simulation: $x_k \tilde B_{1,q}$
+- find the number of data picks $X = \sum_k x_k$
+- Repeat N times to get distribution of $X$
+
+---
+# Simulation
+
+
+Scenario III (same data, same nulls):
+- for the $k$th lineup evaluation pick $p_\text{data} \sim U[0,1]$:
+ - pick 19 $p$-values from $U[0,1]$
+ - for data plot compute 'strength' of other plots: $q = (1-p_\text{data})/\sum_j(1-p_j)$
+ - simulate number of data picks $X ~ B_{K, q}$
+- Repeat N times to get distribution of $X$
+
+
+---
+# Null-generating mechanisms
+
+- Permutation: randomizing the order of one of the variables breaks association, but keeps marginal distributions the same
+- Simulation: from a given distribution, or model. Assumption is that the data comes from that model 
+
+---
+class: inverse middle 
+# Your turn
+
+For these plot descriptions, decide on:
+
+- null hypothesis
+- null generating mechanism
+
+---
+class: inverse middle 
+# Your turn
+
+```{r echo=FALSE, fig.width=10, fig.height=6}
+ggplot(autism, 
+       aes(x=age2+2, y=vsae, group=childid, colour=gender)) + 
+  geom_point() + scale_colour_brewer(palette="Dark2") +
+  geom_line() + xlim(c(0, 15)) +
+  xlab("Age (in years)") + ylab("Vineland Socialization Age Equivalent")
+```
+
+---
+class: inverse middle 
+# Your turn
+
+```{r echo=FALSE, fig.width=10, fig.height=6}
+fly <- read_csv("../data/flying-etiquette.csv")
+fly$`How often do you travel by plane?` <- 
+  factor(fly$`How often do you travel by plane?`, levels=c(
+    "Never","Once a year or less","Once a month or less",
+    "A few times per month","A few times per week","Every day"))
+fly_sub <- fly %>% 
+  filter(`How often do you travel by plane?` %in% 
+       c("Once a year or less","Once a month or less")) %>%
+  filter(!is.na(`Do you ever recline your seat when you fly?`)) %>%
+  filter(!is.na(Age)) %>% filter(!is.na(Gender))
+ggplot(fly_sub, 
+       aes(x=`In general, is itrude to bring a baby on a plane?`)) + 
+  geom_bar(mapping=aes(fill=Gender), position="fill") + 
+  scale_fill_brewer(palette="Dark2") +
+  coord_flip() 
+```
+
+---
+# Inference for graphics resources
+
+- Hofmann, H., Follett, L., Majumder, M. and Cook, D. (2012) Graphical Tests for Power Comparison of Competing Designs, http://doi.ieeecomputersociety.org/10.1109/TVCG.2012.230.
+- Wickham, H., Cook, D., Hofmann, H. and Buja, A. (2010) Graphical Inference for Infovis,  http://doi.ieeecomputersociety.org/10.1109/TVCG.2010.161. 
+
+---
+# Principles of design
+
+- Hierarchy of mappings: (first) position along an axis - (last) color (Cleveland, 1984; Heer and Bostock, 2009)
+- Pre-attentive: Some elements are noticed before you even realise it.
+- Color: (pre-attentive) palettes - qualitative, sequential, diverging.
+- Proximity: Place elements for primary comparison close together. 
+- Change blindness: When focus is interrupted differences may not be noticed.
+
+---
+# Hierarchy of mappings
+
+- 1.Position - common scale (BEST)
+- 2.Position - nonaligned scale
+- 3.Length, direction, angle
+- 4.Area
+- 5.Volume, curvature
+- 6.Shading, color (WORST)
+
+---
+# Pre-attentive
+
+Can you find the odd one out?
+
+```{r echo=FALSE}
+df <- data.frame(x=runif(100), y=runif(100), cl=sample(c(rep("A", 1), rep("B", 99))))
+ggplot(data=df, aes(x, y, shape=cl)) + theme_bw() + 
+  geom_point() +
+  theme(legend.position="None", aspect.ratio=1)
+```
+
+---
+
+Is it easier now?
+
+```{r echo=FALSE}
+ggplot(data=df, aes(x, y, colour=cl)) + 
+  geom_point() +
+  scale_colour_brewer(palette="Dark2") +
+  theme_bw() + 
+  theme(legend.position="None", aspect.ratio=1)
+```
+
+
+---
+# Color palettes
+
+- Qualitative: categorical variables
+    - Map categorical variables, with small number of categories
+- Sequential: low to high numeric values
+    - Numerical variables, emphasis is on the high values
+- Diverging: negative to positive values
+    - Numerical variables, emphasis is on both top and bottom values. Only makes sense if you have positive and negative values.
+
+---
+
+```{r, echo=FALSE, fig.height=7, fig.width=12}
+library(RColorBrewer)
+display.brewer.all()
+```
+
+
+---
+# Proximity
+
+```{r echo=TRUE, fig.height=4, fig.width=9}
+ggplot(fly_sub, aes(x=`In general, is itrude to bring a baby on a plane?`,
+                    fill=Gender)) + 
+  scale_fill_brewer(palette="Dark2") +
+  geom_bar(position="fill") + coord_flip() + facet_wrap(~Age, ncol=5)
+```
+
+With this arrangement we can see proportion of gender across rudeness category, within age groups.  
+
+---
+# Proximity
+
+```{r echo=TRUE, fig.height=4, fig.width=9}
+ggplot(fly_sub, aes(x=Gender,
+   fill=`In general, is itrude to bring a baby on a plane?`)) + 
+  geom_bar(position="fill") + coord_flip() + facet_wrap(~Age, ncol=5) +
+  scale_fill_brewer(palette="Dark2") +
+  theme(legend.position="bottom")
+```
+
+Now we can see proportion of rudeness category across gender, within age groups. 
+
+---
+# Another arrangement
+
+```{r echo=TRUE, fig.height=4, fig.width=9}
+ggplot(fly_sub, aes(x=Age,
+                    fill=`In general, is itrude to bring a baby on a plane?`)) + 
+  geom_bar(position="fill") + coord_flip() + facet_wrap(~Gender, ncol=5) + 
+  scale_fill_brewer(palette="Dark2") +
+  theme(legend.position="bottom")
+```
+And, now we can see proportion of rudeness category across age groups, within gender. 
+
+---
+# Summary
+
+- How you arrange the plot is a most powerful tool for making it easier for the reader to learn one thing over another. 
+- Making many plots, with different arrangements can be advised, and may be better than having one "perfect" plot.
+- Be aware of colour blind proof palettes
+- Use position along a common scale when possible for numeric variables
+- Beware colour, use sparingly
+
+---
+# Visualisation resources
+
+- Winston Chang (2012) [Cookbook for R](graphics cookbook)
+- ggplot2 [Cheat sheet](https://www.rstudio.com/wp-content/uploads/2016/11/ggplot2-cheatsheet-2.1.pdf)
+- [ggplot2: Elegant Graphics for Data Analysis, Hadley Wickham](http://ggplot2.org/book/), [web site](http://ggplot2.org)
+- Antony Unwin (2014) [Graphical Data Analysis](http://www.gradaanwr.net)
+- Naomi Robbins (2013) [Creating More Effective Charts](http://www.nbr-graphs.com)
+- [Antony Unwin, Graphical Data Analysis with R](https://www.crcpress.com/Graphical-Data-Analysis-with-R/Unwin/9781498715232)
+
+---
+class: inverse middle 
+# Share and share alike
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
