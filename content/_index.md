@@ -40,7 +40,7 @@ title: Home
 - Week 8: Ensemble models with [bootstrapping](lectures/week8.class1.html)([Rmd](lectures/week8.class1.Rmd)) and [boosting](lectures/week8.class2.html)([Rmd](lectures/week8.class2.Rmd)); Reading: [Introduction to Recursive Partitioning](https://cran.r-project.org/web/packages/rpart/vignettes/longintro.pdf), [Gentle intro to boosting](https://www.analyticsvidhya.com/blog/2015/11/quick-introduction-boosting-algorithms-machine-learning/);  [tennis_2012_wta_fixed.csv](data/tennis_2012_wta_fixed.csv)
 - Week 9: [Bayesian inference](lectures/week9.class1.html)([Rmd](lectures/week9.class1.Rmd))); Reading: [Conditional probability and Bayesian methods](https://www.analyticsvidhya.com/blog/2017/03/conditional-probability-bayes-theorem/), [Intro to Bayesian methods](https://www.analyticsvidhya.com/blog/2016/06/bayesian-statistics-beginners-simple-english/), [A visual guide to Bayesian thinking](https://www.youtube.com/watch?v=BrK7X_XlGB8), [The Odds, Continually Updated](https://www.nytimes.com/2014/09/30/science/the-odds-continually-updated.html?mcubz=3), [Think Bayes](http://www.greenteapress.com/thinkbayes/thinkbayes.pdf)
 - Week 10: [Data wrangling 1](lectures/week10.class1.html)([Rmd](lectures/week10.class1.Rmd)) [Data wrangling 2](lectures/week10.class2.html)([Rmd](lectures/week10.class2.Rmd)); Reading: [Tidy data](https://www.jstatsoft.org/article/view/v059i10/v59i10.pdf)
-- Week 11: Modelling risk and loss
+- Week 11: Data wrangling 3; Reading: [Handling dates](https://www.jstatsoft.org/index.php/jss/article/view/v040i03/v40i03.pdf)
 - Week 12: Project presentations
 
 ## Tutorials
@@ -55,6 +55,7 @@ title: Home
 - Week 8: [Tree models](labs/lab8.pdf) [(Rmd)](labs/lab8.Rmd); [SOLUTION](labs/lab8_solution.pdf) [(Rmd)](labs/lab8_solution.Rmd); [Tutorial slides](tutorials/lab08/index.html) [(Rmd)](tutorials/lab08/index.Rmd) [melb_auctions.csv](labs/melb_auctions.csv)
 - Week 9: [Bayesian Thinking](labs/lab9.pdf) [(Rmd)](labs/lab9.Rmd); [Tutorial slides](tutorials/lab09/) [(Rmd)](tutorials/lab09/index.Rmd) [Nat's shiny app](https://ebsmonash.shinyapps.io/etc2420bayes/)
 - Week 10: [Working with Data](labs/lab10.pdf) [(Rmd)](labs/lab10.Rmd); [melb_ghcn.csv](labs/melb_ghcn.csv); [Tutorial slides](tutorials/lab10/) [(Rmd)](tutorials/lab10/index.Rmd) 
+- Week 11: [Modeling Risk and Loss with Data]
 
 ## [ETC5242 Project](project/project.pdf)
 
