@@ -59,6 +59,9 @@ title: Home
 
 ## [ETC5242 Project](project/project.pdf)
 
+- [Example report 1](project/example-report1.pdf)
+- [Example report 2](project/example-report2.pdf)
+
 ## Last year's exams 
 
 Note that it was open book, 3 hours, and worth 70%. This year's exam is 2 hours long, closed notes and worth 60%.
