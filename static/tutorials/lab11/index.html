@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Model risk and loss</title>
+    <meta charset="utf-8">
+    <link href="index_files/remark-css-0.0.1/example.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Model risk and loss
+
+---
+
+
+
+
+## Read the data
+
+We'll continue with the pedestrian traffic data and weather data to model risk and loss.
+
+
+```r
+library(tidyverse)
+ped_weather &lt;- read_csv("melb_ped_weather.csv")
+ped_weather &lt;- ped_weather %&gt;% 
+  mutate(
+    time = factor(time),
+    day = factor(day),
+    month = factor(month)
+  )
+```
+
+---
+
+* Suppose you're running a coffee shop in downtown Melbourne.
+* A fitted model for pedestrian traffic at two locations, Melbourne Central &amp; Flinders Street Station Underpass using the following code snippet:
+
+
+```r
+ped_weath_glm &lt;- glm(
+  count ~ day * time * month * sensor
+  + high_tmp + low_tmp + high_prcp,
+  data = ped_weather, family = poisson(link = "log")
+)
+save(ped_weath_glm, file = "ped_weather_glm.rda")
+```
+
+* You'll be provided with this model object (`ped_weather_glm.rda`) in the class without running the code yourself, since it takes a relatively long time to get the results.
+
+---
+
+## Simulated smooth plot
+
+&lt;img src="figure/smooth-plot-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Assumptions
+
+* At Flinders, the proportion of pedestrians passing by who will buy a coffee is 0.1 between 7-10am, 0.05 between 10-4, 0.01 between 4-8. At Melbourne Central, the proportion who will buy coffee is 0.08 between 7-10am, 0.06 between 10-4, 0.02 between 4-10pm. At all other times assume no purchases.
+* Each coffee purchase is $4.
+* To open the coffee shop with one attendant costs $100/hour. Two attendants is $150/hour. Three attendants is $200/hour and four attendants is $250/hour. One attendant per hour can handle 30 customers, if the number is more than the number the staff can handle the customers will walk out without purchasing.
+* You can be open no more than 8 hours per day, and the hours open can be different by day of the week. The same pattern, though, is used for every week, all months. The hours each day need to be contiguous.
+
+---
+
+## A side-by-side boxplot
+
+&lt;img src="figure/boxplot-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+## What does the `simulate` function do?
+
+A Poisson distribution is assumed on the error term. The `simulate` function takes a GLM object and randomly simulates a sequence of response vectors based on that Poisson distribution.
+
+
+```r
+ped_new &lt;- simulate(ped_weath_glm, 10)
+ped_new &lt;- bind_cols(ped_weather, ped_new)
+```
+
+---
+
+## Let's play the game!
+
+* Two players (two teams compete against each other)
+* Records for two locations in Melbourne are used: "Melbourne Central", "Flinders Street Station Underpass". Pick which location you want to open a coffee shop. If the teams cannot decide, flip a coin.
+* Decide what hours you will open you coffee shop, and how many attendants you will have working for each hour. You can have different numbers of attendees for each hour. You can be open no more than 8 hours per day, and the hours open can be different by day of the week. The same pattern, though, is used for every week, all months. (Mark your open times in the table below, to keep each team honest.)
+* You will play 10 rounds of the game, which will randomly select a day, time of day and simulate the pedestrian counts at each site. You will need to tally up costs and profits, using the function `compute_earnings` provided. (Fractions are rounded to the nearest integer.)
+* Winning team is the one with more earnings.
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

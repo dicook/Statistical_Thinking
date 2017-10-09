@@ -177,10 +177,31 @@ Your group will be assigned one sensor to work with. Subset your data to have on
 
 a. Why was precipitation, max and min temp divided by 10? 
 b. Plot the minimum vs maximum temperature and describe the relationship. Why might it not be a good idea to use both of these in a model?
+```{r}
+melb_ghcn_wide %>%
+  ggplot(aes(x = TMIN, y = TMAX)) +
+  geom_point()
+```
+
 c. Replacing missing values with 0 is generally a REALLY BAD idea. Why is it reasonable for precipitation?
 d. Three new variables were created, `high_prcp`, `high_tmp`, `low_tmp`. Explain why you think Dr Cook did this? And why these variables rather than the original will be used in the forthcoming model.
 e. Make a plot of 3pm each day in January, and pedestrian `count` by `high_tmp`. You choose what you think is the best plot to make. What do you learn from the plot?
+```{r}
+ped_weather %>% 
+  filter(time == 15, month == "Jan") %>% 
+  ggplot(aes(x = count)) +
+  geom_density(aes(colour = high_tmp, fill = high_tmp)) +
+  facet_grid(~ high_tmp)
+```
+
 f. Make a time series plot of pedestrian counts, faceted by month and day. What do you learn about the pedestrian traffic at your sensor location?
+```{r}
+ped_weather %>% 
+  ggplot(aes(x = time, y = count)) +
+  geom_line(aes(group = date)) +
+  facet_grid(month ~ day)
+```
+
 
 ## Question 2
 
@@ -193,7 +214,7 @@ Three-way interactions between `day`, `time`, `month` are included.
 
 HEADS UP: The model will take a few minutes to fit, and to compute the predicted values. Start it running and then go get a coffee or tea. 
 
-```{r fig.height=6, fig.width=6, fig.align='center', cache=TRUE, results='hide', eval=FALSE}
+```{r fig.height=6, fig.width=6, fig.align='center', cache=TRUE, eval=TRUE}
 # Fit model
 ped_weather_glm <- glm(count~day*time*month+high_tmp+low_tmp+high_prcp,
                      data=ped_weather, family=poisson(link="log"))

@@ -1,0 +1,80 @@
+---
+title: "Model risk and loss"
+output:
+  xaringan::moon_reader:
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r initial, echo = FALSE, cache = FALSE, results = 'hide'}
+library(knitr)
+opts_chunk$set(
+  warning = FALSE, message = FALSE, 
+	fig.path = 'figure/', cache.path = 'cache/', 
+	fig.align = 'center', fig.width = 10, fig.height = 6, 
+	fig.show = 'hold', cache = TRUE, external  =  TRUE,
+  dev = 'svglite'
+)
+read_chunk("lab11.R")
+```
+
+## Read the data
+
+We'll continue with the pedestrian traffic data and weather data to model risk and loss.
+
+```{r data, echo = TRUE}
+```
+
+---
+
+* Suppose you're running a coffee shop in downtown Melbourne.
+* A fitted model for pedestrian traffic at two locations, Melbourne Central & Flinders Street Station Underpass using the following code snippet:
+
+```{r glm, eval = FALSE}
+```
+
+* You'll be provided with this model object (`ped_weather_glm.rda`) in the class without running the code yourself, since it takes a relatively long time to get the results.
+
+---
+
+## Simulated smooth plot
+
+```{r smooth-plot, echo = FALSE, fig.height = 7}
+```
+
+---
+
+## Assumptions
+
+* At Flinders, the proportion of pedestrians passing by who will buy a coffee is 0.1 between 7-10am, 0.05 between 10-4, 0.01 between 4-8. At Melbourne Central, the proportion who will buy coffee is 0.08 between 7-10am, 0.06 between 10-4, 0.02 between 4-10pm. At all other times assume no purchases.
+* Each coffee purchase is $4.
+* To open the coffee shop with one attendant costs $100/hour. Two attendants is $150/hour. Three attendants is $200/hour and four attendants is $250/hour. One attendant per hour can handle 30 customers, if the number is more than the number the staff can handle the customers will walk out without purchasing.
+* You can be open no more than 8 hours per day, and the hours open can be different by day of the week. The same pattern, though, is used for every week, all months. The hours each day need to be contiguous.
+
+---
+
+## A side-by-side boxplot
+
+```{r boxplot, echo = FALSE}
+```
+
+---
+
+## What does the `simulate` function do?
+
+A Poisson distribution is assumed on the error term. The `simulate` function takes a GLM object and randomly simulates a sequence of response vectors based on that Poisson distribution.
+
+```{r simulate, eval = FALSE}
+```
+
+---
+
+## Let's play the game!
+
+* Two players (two teams compete against each other)
+* Records for two locations in Melbourne are used: "Melbourne Central", "Flinders Street Station Underpass". Pick which location you want to open a coffee shop. If the teams cannot decide, flip a coin.
+* Decide what hours you will open you coffee shop, and how many attendants you will have working for each hour. You can have different numbers of attendees for each hour. You can be open no more than 8 hours per day, and the hours open can be different by day of the week. The same pattern, though, is used for every week, all months. (Mark your open times in the table below, to keep each team honest.)
+* You will play 10 rounds of the game, which will randomly select a day, time of day and simulate the pedestrian counts at each site. You will need to tally up costs and profits, using the function `compute_earnings` provided. (Fractions are rounded to the nearest integer.)
+* Winning team is the one with more earnings.
