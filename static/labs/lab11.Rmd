@@ -157,10 +157,6 @@ d. If you are open, have three attendants at Flinders and two attendants at Melb
 ped_new_sub %>% group_by(sensor) %>% summarise(min(value), max(value))
 ```
 
-```
-Flinders it would be 1218*.1*4-200=287 at highest and 1151*.1*4-200=260 at the lowest. Melbourne Central it would be 1082*.08*4-150=1968 at the highest, and 982*.08*4-150=164 at the lowest.
-```
-
 ## Question 3
 
 a. Now extend this to the full day (between 7am-10pm, closing at 10pm), keep the same number of attendants for the full day. How much in profit do you make at most, and at the lowest at each location?
@@ -204,7 +200,6 @@ Fl_dif <- pred[4] - pred[3]
 MC_dif <- pred[2] - pred[1]
 ```
 
-```We need to modify the compute_earnings function to take the reduction in pedestrians based on the weather into account.```
 
 ```{r eval=FALSE}
 compute_earnings2 <- function(ped_sim, sel_date, sel_time, Fl_attendants=1, MC_attendants=1) {
@@ -267,8 +262,6 @@ sum(earn_MC)
 ```
 
 b. During the month your coffee machine breaks, and you need to buy a new one. The new one costs $20000. Can you afford it?
-
-`Yes, at Melbourne Central, with the month's earnings, but not at Flinders St which didn't make enough in the month.`
 
 ## Question 5
 
