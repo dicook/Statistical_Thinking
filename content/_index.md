@@ -59,8 +59,8 @@ title: Home
 
 ## [ETC5242 Project](project/project.pdf)
 
-- [Example report 1](project/example-report1.pdf)
-- [Example report 2](project/example-report2.pdf)
+- [Example report 1](project/example_report1.pdf)
+- [Example report 2](project/example_report2.pdf)
 
 ## Last year's exams 
 
