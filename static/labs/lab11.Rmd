@@ -43,8 +43,8 @@ compute_earnings <- function(ped_sim, sel_date, sel_time, Fl_attendants=1, MC_at
     select(new1)
   Fl <- 0
   MC <- 0
-  if (nrow(Fl_count) > 0) Fl <- min(round(Fl_count*Fl_rate, 0), 50*Fl_attendants)
-  if (nrow(MC_count) > 0) MC <- min(round(MC_count*MC_rate, 0), 50*MC_attendants)
+  if (nrow(Fl_count) > 0) Fl <- min(round(Fl_count*Fl_rate, 0), 30*Fl_attendants)
+  if (nrow(MC_count) > 0) MC <- min(round(MC_count*MC_rate, 0), 30*MC_attendants)
   Fl_earn <- 0
   MC_earn <- 0
   if (Fl > 0) Fl_earn <- Fl*4 - (100+50*(Fl_attendants-1))
@@ -256,7 +256,7 @@ earn_Fl <- NULL
 earn_MC <- NULL
 for (j in 0:30) {
   sel_date <- ymd("2013-03-01") + days(j)
-  for (i in 7:20) {
+  for (i in 7:21) {
     earn <- compute_earnings(ped_sim, sel_date, i, 3, 2)
     earn_Fl <- c(earn_Fl, earn[[1]])
     earn_MC <- c(earn_MC, earn[[2]])
