@@ -55,7 +55,7 @@ title: Home
 - Week 8: [Tree models](labs/lab8.pdf) [(Rmd)](labs/lab8.Rmd); [SOLUTION](labs/lab8_solution.pdf) [(Rmd)](labs/lab8_solution.Rmd); [Tutorial slides](tutorials/lab08/index.html) [(Rmd)](tutorials/lab08/index.Rmd) [melb_auctions.csv](labs/melb_auctions.csv)
 - Week 9: [Bayesian Thinking](labs/lab9.pdf) [(Rmd)](labs/lab9.Rmd); [Tutorial slides](tutorials/lab09/) [(Rmd)](tutorials/lab09/index.Rmd);  [SOLUTION](labs/lab9_solution.pdf) [(Rmd)](labs/lab9_solution.Rmd) [Nat's shiny app](https://ebsmonash.shinyapps.io/etc2420bayes/)
 - Week 10: [Working with Data](labs/lab10.pdf) [(Rmd)](labs/lab10.Rmd); [melb_ghcn.csv](labs/melb_ghcn.csv); [Tutorial slides](tutorials/lab10/) [(Rmd)](tutorials/lab10/index.Rmd) 
-- Week 11: [Modeling Risk and Loss with Data](labs/lab11.pdf) [(Rmd)](labs/lab11.Rmd); [melb_ped_weather.csv](labs/melb_ped_weather.csv)
+- Week 11: [Modeling Risk and Loss with Data](labs/lab11.pdf) [(Rmd)](labs/lab11.Rmd); [melb_ped_weather.csv](labs/melb_ped_weather.csv); [Tutorial slides](tutorials/lab11/) [(Rmd)](tutorials/lab11/index.Rmd)
 
 ## [ETC5242 Project](project/project.pdf)
 
