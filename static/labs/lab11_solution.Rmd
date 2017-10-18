@@ -1,0 +1,371 @@
+---
+title: "ETC 2420/5242 Lab 11 2017"
+author: "Di Cook"
+date: "Week 11"
+output: pdf_document
+---
+
+```{r echo = FALSE, message = FALSE, warning = FALSE, warning = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  error = FALSE, 
+  echo = FALSE, 
+  collapse = TRUE,
+  comment = "#",
+  fig.height = 3,
+  fig.width = 7,
+  fig.align = "center",
+  cache = FALSE
+)
+library(knitr)
+library(tidyverse)
+library(ggmap)
+library(lubridate)
+library(broom)
+```
+
+```{r echo=FALSE}
+sample_day_time <- function() {
+  sel_date <- sample(ped_weather$date, 1)
+  sel_time <- sample(7:21, 1)
+  return(list(sel_date, sel_time))
+}
+compute_earnings <- function(ped_sim, sel_date, sel_time, Fl_attendants=1, MC_attendants=1) {
+  Fl_rate <- c(rep(0.1, 3), rep(0.05, 6), rep(0.01, 4), rep(0, 2))[sel_time-6]
+  MC_rate <- c(rep(0.08, 3), rep(0.06, 6), rep(0.02, 6))[sel_time-6]
+  ped_sim <- ped_sim %>% dplyr::filter(date == sel_date, time == sel_time)
+  Fl_count <- ped_sim %>% 
+    dplyr::filter(sensor == "Flinders Street Station Underpass") %>% 
+    select(new1)
+  MC_count <- ped_sim %>% 
+    dplyr::filter(sensor == "Melbourne Central") %>% 
+    select(new1)
+  Fl <- 0
+  MC <- 0
+  if (nrow(Fl_count) > 0) Fl <- min(round(Fl_count*Fl_rate, 0), 50*Fl_attendants)
+  if (nrow(MC_count) > 0) MC <- min(round(MC_count*MC_rate, 0), 50*MC_attendants)
+  Fl_earn <- 0
+  MC_earn <- 0
+  if (Fl > 0) Fl_earn <- Fl*4 - (100+50*(Fl_attendants-1))
+  if (MC > 0) MC_earn <- MC*4 - (100+50*(MC_attendants-1))
+  return(list(Fl_earn, MC_earn))
+}
+```
+
+## Purpose
+
+In this lab we will model risk and loss for running a coffee shop in downtown Melbourne using the pedestrian traffic data and weather data. Data is from 2013-2014. We are going to play a game!
+
+## Models
+
+You are provided with a fitted model for pedestrian traffic at two locations, Melbourne Central and Flinders Street Station Underpass, which was built using this code.
+
+```
+ped_weather <- read_csv("melb_ped_weather.csv")
+ped_weather$time <- factor(ped_weather$time)
+ped_weather$day <- factor(ped_weather$day)
+ped_weather$month <- factor(ped_weather$month)
+ped_weath_glm <- glm(count~day*time*month*sensor+
+  high_tmp+low_tmp+high_prcp,
+  data=ped_weather, family=poisson(link="log"))
+save(ped_weath_glm, file="ped_weather_glm.rda")
+```
+
+```{r fig.width=8, fig.height=8, fig.align='center'}
+load("ped_weather_glm.rda")
+ped_weather <- ped_weath_glm$data %>%
+  mutate(day = factor(day, levels=c("Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun")), 
+         month = factor(month, levels=c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")))
+ped_weather$new1 <- simulate(ped_weath_glm)$sim_1
+ggplot(ped_weather, aes(x=as.numeric(as.character(time)), 
+                        y=new1, colour=sensor)) + 
+  xlab("Time") + ylab("Count") +
+  geom_smooth() +
+  facet_grid(month~day) + 
+  theme_bw() + theme(legend.position="bottom")
+```
+
+## Assumptions
+
+
+- At Flinders, the proportion of pedestrians passing by who will buy a coffee is 0.1 between 7-10am, 0.05 between 10-4, 0.01 between 4-8. At Melbourne Central, the proportion who will buy coffee is 0.08 between 7-10am, 0.06 between 10-4, 0.02 between 4-10pm. At all other times assume no purchases.
+- Each coffee purchase is $4.
+- To open the coffee shop with one attendant costs $100/hour. Two attendants is $150/hour. Three attendants is $200/hour and four attendants is $250/hour. One attendant per hour can handle 30 customers, if the number is more than the number the staff can handle the customers will walk out without purchasing.
+- You can be open no more than 8 hours per day, and the hours open can be different by day of the week. The same pattern, though, is used for every week, all months. The hours each day need to be contiguous.
+
+## Question 1
+
+a. (2pts) Plot the sensor traffic data, by day of the week, using a side-by-side boxplot, coloured by facetted by sensor.
+
+```{r}
+ped_weather %>% select(sensor, day, count, new1) %>%
+  gather(type, value, count, new1) %>%
+  ggplot(aes(x=day, y=value, colour=type)) + 
+  geom_boxplot() + facet_wrap(~sensor)
+```
+
+b. (4pts) Write down the objective function for the game, the difference in profit (loss) between a coffee shop at the two locations, taking into account the predicted number of pedestrians, proportion of coffee buyers, hour of day, and number of attendants.
+
+Assume $x_{Fl}(d, t), x_{MC}(d, t)$ is the number of pedestrians that pass by each location for day $d$ and time $t$. And $p_{Fl}(t), p_{MC}(t)$ is the proportion that buy a coffee at time $t$. Let $e_{Fl}, e_{MC}$ be the number of employees working in any hour, ranging from 0 (if closed) to 4. $y_{Fl}(d,t), y_{MC}(d,t)$ are the earnings for day $d$ and time $t$. 
+
+$$y_{Fl}(d,t) = min(p_{Fl}(t)\times x_{Fl}(d, t),e_{Fl}\times 50)\times 4 - 100 - (e_{Fl}-1)\times 50 ~~\mbox{if }e_{Fl}>0 $$
+
+`Equivalently for` $y_{MC}(d,t)$.
+
+c. (2pts) Predict the earnings for both locations for the day "2014-03-17" 8am, for all combinations of 1-4 employees. What is the optimal number of employees at each location? `4 for Fl, 2 for MC`
+
+```{r}
+ped_sim <- ped_weather
+set.seed(4)
+ped_sim$new1 <- simulate(ped_weath_glm)$sim_1
+Fl_earn <- rep(0, 4)
+MC_earn <- rep(0, 4)
+for (i in 1:4)
+  Fl_earn[i] <- compute_earnings(ped_sim, "2014-03-17", 8, i, 1)[[1]]
+for (i in 1:4)
+  MC_earn[i] <- compute_earnings(ped_sim, "2014-03-17", 8, 1, i)[[2]]
+```
+
+## Question 2
+
+a. Simulate 10 sets of new pedestrian counts using the `simulate` function.
+
+```{r}
+ped_new <- simulate(ped_weath_glm, 10)
+ped_new <- bind_cols(ped_weather, ped_new)
+```
+
+b. Subset to examine only records for March 28, 2013, 9am. (What day of the week is this?)
+
+```{r}
+ped_new_sub <- ped_new %>% 
+  dplyr::filter(date == ymd("2013-03-28"), time==9) %>%
+  select(sensor, count, sim_1:sim_10) %>%
+  gather(sim, value, sim_1:sim_10)
+wday(ymd("2013-03-28"), label=TRUE)
+```
+
+c. (2pts) Summarise the distribution of the 10 values for the two locations, and compare with the actual count. `Flinders has higher count. Actual counts are outside the range of the simulated values.`
+
+```{r fig.width=6, fig.align='center'}
+ggplot(ped_new_sub, aes(x=sensor, y=value)) + geom_point() +
+  geom_point(aes(y=count), colour="red", size=3) + 
+  xlab("") + ylab("Count")
+```
+
+d. (2pts) If you are open, have three attendants at Flinders and two attendants at Melbourne Central, how much would you make at most, and at least under these conditions, at each location? 
+
+```{r}
+ped_new_sub %>% group_by(sensor) %>% summarise(min(value), max(value))
+```
+
+```
+Flinders it would be 1218*.1*4-200=287 at highest and 1151*.1*4-200=260 at the lowest. Melbourne Central it would be 1082*.08*4-150=1968 at the highest, and 982*.08*4-150=164 at the lowest.
+```
+
+## Question 3
+
+a. (2pts) Now extend this to the full day (between 7am-10pm, closing at 10pm), keep the same number of attendants for the full day. How much in profit do you make at most, and at the lowest at each location?
+
+```{r}
+set.seed(4)
+ped_sim$new1 <- simulate(ped_weath_glm)$sim_1
+earn_Fl <- NULL
+earn_MC <- NULL
+for (i in 7:21) {
+  earn <- compute_earnings(ped_sim, "2013-03-28", i, 3, 2)
+  earn_Fl <- c(earn_Fl, earn[[1]])
+  earn_MC <- c(earn_MC, earn[[2]])
+}
+earn_Fl
+earn_MC
+sum(earn_Fl)
+sum(earn_MC)
+```
+
+b. (2pts) Suppose that the weather for the day is actually a hot day. How does this affect your profits? (Predict the counts for both locations for the hot and not hot day, and compute the difference. Subtract this number from your simulation values - because these were for a not hot day.)
+
+```{r}
+newdat <- data.frame(day=c("Thurs", "Thurs", "Thurs", "Thurs"), 
+                     month=c("Mar", "Mar", "Mar", "Mar"), 
+                     time=c(9, 9, 9, 9), 
+                     sensor=c("Melbourne Central", "Melbourne Central",
+                                   "Flinders Street Station Underpass", 
+                                   "Flinders Street Station Underpass"),
+                     high_tmp=c("hot","not", "hot","not"), 
+                     low_tmp=c("not", "not", "not", "not"), 
+                     high_prcp=c("none", "none", "none", "none"))
+newdat$time <- factor(newdat$time, levels=0:23)
+newdat$day <- factor(newdat$day, levels=levels(ped_weather$day))
+newdat$month <- factor(newdat$month, levels=levels(ped_weather$month))
+newdat$high_tmp <- factor(newdat$high_tmp, levels=levels(ped_weather$high_tmp))
+newdat$low_tmp <- factor(newdat$low_tmp, levels=levels(ped_weather$low_tmp))
+newdat$high_prcp <- factor(newdat$high_prcp, levels=levels(ped_weather$high_prcp))
+pred <- predict(ped_weath_glm, newdat, type="response")
+Fl_dif <- pred[4] - pred[3]
+MC_dif <- pred[2] - pred[1]
+```
+
+```We need to modify the compute_earnings function to take the reduction in pedestrians based on the weather into account.```
+
+```{r eval=FALSE}
+compute_earnings2 <- function(ped_sim, sel_date, sel_time, Fl_attendants=1, MC_attendants=1) {
+  Fl_rate <- c(rep(0.1, 3), rep(0.05, 6), rep(0.01, 4), rep(0, 2))[sel_time-6]
+  MC_rate <- c(rep(0.08, 3), rep(0.06, 6), rep(0.02, 6))[sel_time-6]
+  ped_sim_sub <- ped_sim %>% dplyr::filter(date == sel_date, time == sel_time)
+  Fl_count <- ped_sim_sub %>% 
+    dplyr::filter(sensor == "Flinders Street Station Underpass") %>% 
+    select(new1) - Fl_dif
+  MC_count <- ped_sim_sub %>% 
+    dplyr::filter(sensor == "Melbourne Central") %>% 
+    select(new1) - MC_dif
+  Fl <- 0
+  MC <- 0
+  if (nrow(Fl_count) > 0) Fl <- min(round(Fl_count*Fl_rate, 0), 50*Fl_attendants)
+  if (nrow(MC_count) > 0) MC <- min(round(MC_count*MC_rate, 0), 50*MC_attendants)
+  Fl_earn <- 0
+  MC_earn <- 0
+  #cat(Fl, MC, "\n")
+  if (Fl > 0) Fl_earn <- Fl*4 - (100+50*(Fl_attendants-1))
+  if (MC > 0) MC_earn <- MC*4 - (100+50*(MC_attendants-1))
+  return(list(Fl_earn, MC_earn))
+}
+set.seed(4)
+ped_sim <- ped_weather
+ped_sim$new1 <- simulate(ped_weath_glm)$sim_1
+earn_Fl <- NULL
+earn_MC <- NULL
+for (i in 7:21) {
+  earn <- compute_earnings2(ped_sim, "2013-03-28", i, 3, 2)
+  earn_Fl <- c(earn_Fl, earn[[1]])
+  earn_MC <- c(earn_MC, earn[[2]])
+}
+earn_Fl
+earn_MC
+sum(earn_Fl)
+sum(earn_MC)
+```
+
+## Question 4
+
+a. (3pts) Now scale your calculations up for the full month of March (assuming that you are open 7 days a week). How much do you earn at most, and at worst? At both locations, assuming the same weather conditions as in the given data.
+
+```{r}
+set.seed(4)
+ped_sim <- ped_weather
+ped_sim$new1 <- simulate(ped_weath_glm)$sim_1
+earn_Fl <- NULL
+earn_MC <- NULL
+for (j in 0:30) {
+  sel_date <- ymd("2013-03-01") + days(j)
+  for (i in 7:20) {
+    earn <- compute_earnings(ped_sim, sel_date, i, 3, 2)
+    earn_Fl <- c(earn_Fl, earn[[1]])
+    earn_MC <- c(earn_MC, earn[[2]])
+  }
+}
+sum(earn_Fl)
+sum(earn_MC)
+```
+
+b. (2pts) During the month your coffee machine breaks, and you need to buy a new one. The new one costs $20000. Can you afford it?
+
+`Yes, at Melbourne Central, with the month's earnings, but not at Flinders St which didn't make enough in the month.`
+
+## Question 5
+
+(3pts for reporting results) Let's play the game.
+
+- Two players (two teams compete against each other)
+- Records for two locations in Melbourne are used: "Melbourne Central", "Flinders Street Station Underpass". Pick which location you want to open a coffee shop. If the teams cannot decide, flip a coin.
+- Decide what hours you will open you coffee shop, and how many attendants you will have working for each hour. You can have different numbers of attendees for each hour. You can be open no more than 8 hours per day, and the hours open can be different by day of the week. The same pattern, though, is used for every week, all months. (Mark your open times in the table below, to keep each team honest.)
+- You will play 10 rounds of the game, which will randomly select a day, time of day and simulate the pedestrian counts at each site. You will need to tally up costs and profits, using the function `compute_earnings` provided. (Fractions are rounded to the nearest integer.)
+- Winning team is the one with more earnings.
+
+\begin{center}
+\begin{tabular}{cc}
+\begin{tabular}{|l|c|c|c|c|c|c|c|} \hline
+& \multicolumn{7}{c|}{Flinders St} \\\hline
+& Mon & Tue & Wed & Thu & Fri & Sat & Sun \\\hline
+7 &&&&&&& \\\hline
+8 &&&&&&& \\\hline
+9 &&&&&&& \\\hline
+10 &&&&&&& \\\hline
+11 &&&&&&& \\\hline
+12 &&&&&&& \\\hline
+1 &&&&&&& \\\hline
+2 &&&&&&& \\\hline
+3 &&&&&&& \\\hline
+4 &&&&&&& \\\hline
+5 &&&&&&& \\\hline
+6 &&&&&&& \\\hline
+7 &&&&&&& \\\hline
+8 &&&&&&& \\\hline
+9 &&&&&&& \\\hline
+\end{tabular}
+&
+\begin{tabular}{|l|c|c|c|c|c|c|c|} \hline
+& \multicolumn{7}{c|}{Melbourne Central} \\\hline
+& Mon & Tue & Wed & Thu & Fri & Sat & Sun \\\hline
+7 &&&&&&& \\\hline
+8 &&&&&&& \\\hline
+9 &&&&&&& \\\hline
+10 &&&&&&& \\\hline
+11 &&&&&&& \\\hline
+12 &&&&&&& \\\hline
+1 &&&&&&& \\\hline
+2 &&&&&&& \\\hline
+3 &&&&&&& \\\hline
+4 &&&&&&& \\\hline
+5 &&&&&&& \\\hline
+6 &&&&&&& \\\hline
+7 &&&&&&& \\\hline
+8 &&&&&&& \\\hline
+9 &&&&&&& \\\hline
+\end{tabular}
+\end{tabular}
+\end{center}
+
+
+## TURN IN 
+
+- Your `.Rmd` file
+- Your `html` file that results from knitting the Rmd.
+
+
+## Game code
+
+```{r echo=TRUE, eval=FALSE}
+sample_day_time <- function() {
+  sel_date <- sample(ped_weather$date, 1)
+  sel_time <- sample(7:21, 1)
+  return(list(sel_date, sel_time))
+}
+dt <- sample_day_time()
+dt
+compute_earnings <- function(ped_sim, sel_date, sel_time, Fl_attendants=1, MC_attendants=1) {
+  Fl_rate <- c(rep(0.1, 3), rep(0.05, 6), rep(0.01, 4), rep(0, 2))[sel_time-6]
+  MC_rate <- c(rep(0.08, 3), rep(0.06, 6), rep(0.02, 6))[sel_time-6]
+  ped_sim <- ped_sim %>% dplyr::filter(date == sel_date, time == sel_time)
+  Fl_count <- ped_sim %>% 
+    dplyr::filter(sensor == "Flinders Street Station Underpass") %>% 
+    select(new1)
+  MC_count <- ped_sim %>% 
+    dplyr::filter(sensor == "Melbourne Central") %>% 
+    select(new1)
+  Fl <- 0
+  MC <- 0
+  if (nrow(Fl_count) > 0) Fl <- min(round(Fl_count*Fl_rate, 0), 50*Fl_attendants)
+  if (nrow(MC_count) > 0) MC <- min(round(MC_count*MC_rate, 0), 50*MC_attendants)
+  Fl_earn <- 0
+  MC_earn <- 0
+  if (Fl > 0) Fl_earn <- Fl*4 - (100+50*(Fl_attendants-1))
+  if (MC > 0) MC_earn <- MC*4 - (100+50*(MC_attendants-1))
+  return(list(Fl_earn, MC_earn))
+}
+ped_sim <- ped_weather
+ped_sim$new1 <- simulate(ped_weath_glm)$sim_1
+compute_earnings(ped_sim, dt[[1]], dt[[2]], 1, 2)
+```
+
