@@ -1,50 +1,89 @@
 ---
 title: "Project Summary"
 author: "Di Cook"
-date: "October 19, 2016"
-output: ioslides_presentation
+date: "October 20, 2017"
+output:
+  xaringan::moon_reader:
+    css: ["default", "myremark.css"]
+    self_contained: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   echo = FALSE, 
   warning = FALSE,
-  message = FALSE)
+  message = FALSE, 
+  fig.align='center', 
+  fig.width=12, fig.height=7)
 ```
 
-## Public vs private error
+```{r}
+library(tidyverse)
+```
+
+# Top scores
+
+```{r}
+results <- read_csv("vitticeps-publicleaderboard.csv")
+topscores <- results %>% filter(Score>1) %>% 
+  group_by(TeamName) %>% filter(Score==min(Score)) %>%
+  ungroup() %>%
+  arrange(Score) %>% select(TeamName, SubmissionDate, Score) 
+#topscores
+topscores <- read_csv("topscores.csv")
+topscores
+```
+
+An error of 1.1 means $110,000. 
+
+---
+
+```{r}
+cumscores <- topscores %>% mutate(cs=cumsum(`Public Score`))
+ggplot(cumscores, aes(x=`Public Score`, y=cs)) + 
+  geom_line() + geom_rug(sides="b") + ylab("Cumulative score")
+```
+
+
+---
+# Submissions over time
+
+```{r}
+ggplot(results, aes(SubmissionDate, Score)) +
+  geom_point() + geom_smooth(se=FALSE)
+```
+
+---
+```{r}
+winners <- results %>% filter(TeamName %in% c("abcde", "Raymond"))
+ggplot(winners, aes(SubmissionDate, Score, colour=TeamName)) +
+  geom_point() + geom_smooth(se=FALSE) + scale_colour_brewer(palette="Dark2")
+```
+
+---
+# Public vs private error
 
 The error on the private data was for the most part lower than the public!
 
 ```{r}
-library(readr)
-kaggle <- read_csv("AllSubmissionsDetails.csv")
-library(ggplot2)
-summary(kaggle$PrivateScore)
-summary(kaggle$PublicScore)
+ggplot(topscores, aes(x=`Public Score`, y=`Private Score`)) + 
+  geom_abline(intercept=0, slope=1) + geom_point() + 
+  xlim(c(1, 2.6)) + ylim(c(1, 2.6)) + theme(aspect.ratio=1)
 ```
 
-##
+---
+# Some details about data
 
-```{r}
-ggplot(kaggle, aes(x=PublicScore, y=PrivateScore)) +
-  geom_point() + coord_equal() + 
-  xlim(c(25000, 40000)) + ylim(c(25000, 40000)) +
-  geom_abline(slope=1)
+The auction report pdf's did not have number of baths, car parks, living area, land size, number of visits, or ratings! These variables were simulated by us.
+
+```{r dev='png', dpi=300}
+auctions <- read.csv(file = "HousePriceDataComp_Revised.csv")[,-1]
+
+ggplot(auctions, aes(x=house_size, y=price)) +
+  geom_point(alpha=0.5) + facet_wrap(~property_type, ncol=3)
 ```
 
-##
-
-Public (triangle) and private (dots) scores by date submitted, with regression line overlaid. Most groups improved over time.
-
-```{r}
-library(plotly)
-p <- ggplot(kaggle, aes(x=DateSubmittedUtc, y=PrivateScore, colour=TeamName, label=TeamName)) +
-  ylim(c(25000, 40000)) +
-  geom_point() +
-  geom_smooth(method="lm", se=F) + 
-  geom_point(aes(y=PublicScore), shape=2) +
-  geom_smooth(aes(y=PublicScore), method="lm", se=F, linetype=2) + 
-  theme(legend.position = "none")
-ggplotly(p)
-```

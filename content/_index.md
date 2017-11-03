@@ -83,6 +83,8 @@ Please just use these to help you study, and don't distribute them to next year'
 - [Quiz 7](quizzes/Quiz7.pdf)
 - [Quiz 8](quizzes/Quiz8.pdf)
 - [Quiz 9](quizzes/Quiz9.pdf)
+- [Quiz 10](quizzes/Quiz10.pdf)
+- [Quiz 11](quizzes/Quiz11.pdf)
 
 ## Computing information
 
